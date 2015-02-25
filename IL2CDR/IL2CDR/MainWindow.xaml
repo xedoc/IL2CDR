@@ -8,6 +8,7 @@
         xmlns:mvvmlight="http://www.galasoft.ch/mvvmlight"
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
+        UseLayoutRounding="True"
         Height="300"
         Width="716"
         Title="IL2 CDR"
@@ -68,19 +69,19 @@
                         <StackPanel Grid.Column="1" Orientation="Vertical">
                             <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
                                 <Label MinWidth="100" HorizontalContentAlignment="Right">Host:</Label>
-                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="MySQL host IP or hostname..."/>
+                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="MySQL host IP or hostname..."/>
                             </DockPanel>
                             <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
                                 <Label MinWidth="100" HorizontalContentAlignment="Right">User:</Label>
-                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="User name..."/>
+                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="User name..."/>
                             </DockPanel>
                             <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
                                 <Label MinWidth="100" HorizontalContentAlignment="Right">Password:</Label>
-                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Password..."/>
+                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Password..."/>
                             </DockPanel>
                             <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
                                 <Label MinWidth="100" HorizontalContentAlignment="Right">Port:</Label>
-                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="3306"/>
+                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="3306"/>
                             </DockPanel>
                         </StackPanel>
                         <Button Width="100" Height="30" Grid.Row="1" HorizontalAlignment="Left">Reload scripts</Button>
@@ -148,12 +149,12 @@
                     <StackPanel Orientation="Vertical">
                         <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
                             <Label MinWidth="50" HorizontalContentAlignment="Left">Logs:</Label>
-                            <TextBox Text="{Binding Config.MissonLogFolder}" Width="300" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Mission log folder..."/>
+                            <TextBox Margin="1" Text="{Binding Config.MissonLogFolder}" Width="300" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Mission log folder..."/>
                             <Button Command="{Binding SelectMissionLogFolder}" Margin="5,0" Width="30" HorizontalAlignment="Left">..</Button>
                         </DockPanel>
                         <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
                             <CheckBox Margin="5">Delete logs older than</CheckBox>
-                            <TextBox VerticalContentAlignment="Center" HorizontalContentAlignment="Center">5</TextBox>
+                            <TextBox Margin="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">5</TextBox>
                             <Label>days</Label>
                         </DockPanel>
                     </StackPanel>
