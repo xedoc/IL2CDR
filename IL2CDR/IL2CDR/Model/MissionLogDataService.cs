@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
-    public interface IDataService
+    public class MissionLogDataService : IMissionLogDataService
     {
-        void GetData(Action<DataItem, Exception> callback);
+        
     }
 }
