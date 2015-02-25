@@ -1,0 +1,175 @@
+﻿<Controls:MetroWindow x:Class="IL2CDR.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" 
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:mvvmlight="http://www.galasoft.ch/mvvmlight"
+        xmlns:ignore="http://www.ignore.com"
+        mc:Ignorable="d ignore"
+        Height="300"
+        Width="716"
+        Title="IL2 CDR"
+        Background="#252525"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Closing">
+                <mvvmlight:EventToCommand Command="{Binding ExitApplication}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+    <Controls:MetroWindow.Resources>
+        <ResourceDictionary>
+            <Style x:Key="TabItemBorder" TargetType="Border">
+                <Setter Property="BorderBrush" Value="#FF494949"/>
+                <Setter Property="BorderThickness" Value="0,1,0,0"/>
+                <Setter Property="Padding" Value="10"/>
+            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skins/MainSkin.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Controls:MetroWindow.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <TabControl>
+            <TabItem Header="Scripts">
+                <Border Style="{StaticResource TabItemBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26*"/>
+                            <RowDefinition Height="7*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ListBox ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0,0,1,0" BorderBrush="#FF494949">
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="True" Margin="5"/>
+                                    <Label>MySQL writer</Label>
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Margin="5"/>
+                                    <Label>Air Domination War</Label>
+                                </StackPanel>
+                            </ListBoxItem>
+                            <ListBoxItem>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Margin="5"/>
+                                    <Label>Chat commands</Label>
+                                </StackPanel>
+                            </ListBoxItem>
+                        </ListBox>
+
+                        <StackPanel Grid.Column="1" Orientation="Vertical">
+                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                                <Label MinWidth="100" HorizontalContentAlignment="Right">Host:</Label>
+                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="MySQL host IP or hostname..."/>
+                            </DockPanel>
+                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                                <Label MinWidth="100" HorizontalContentAlignment="Right">User:</Label>
+                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="User name..."/>
+                            </DockPanel>
+                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                                <Label MinWidth="100" HorizontalContentAlignment="Right">Password:</Label>
+                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Password..."/>
+                            </DockPanel>
+                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                                <Label MinWidth="100" HorizontalContentAlignment="Right">Port:</Label>
+                                <TextBox Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="3306"/>
+                            </DockPanel>
+                        </StackPanel>
+                        <Button Width="100" Height="30" Grid.Row="1" HorizontalAlignment="Left">Reload scripts</Button>
+                    </Grid>
+                </Border>
+            </TabItem>
+            <TabItem Header="RCON">
+                <Border Style="{StaticResource TabItemBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Player" Margin="5,5,0,5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" MinWidth="50"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*" MinWidth="50"/>
+                                </Grid.ColumnDefinitions>
+                                <ListBox ScrollViewer.VerticalScrollBarVisibility="Visible">
+                                    <ListBoxItem IsSelected="True" Content="John"/>
+                                    <ListBoxItem Content="Mike"/>
+                                </ListBox>
+                                <GridSplitter Background="Transparent" Width="4" Grid.Column="1" BorderBrush="#FF383838" BorderThickness="1,0,0,0" HorizontalAlignment="Stretch"/>
+                                <StackPanel Margin="5" Grid.Column="2">
+                                    <Label Content="ID:123456"/>
+                                    <Label Content="Yak-1 ser.69(RU)"/>
+                                    <Label Content="In Air"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Margin="2" Width="40" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Content="Kick"/>
+                                        <Button Margin="2" Width="40" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Content="Ban"/>
+                                        <Button Margin="2" Width="40">PM</Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Column="1" Header="Global">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <WrapPanel Orientation="Vertical">
+                                    <TextBlock>SPS: 50</TextBlock>
+                                    <TextBlock>Players: 2</TextBlock>
+                                    <TextBlock>Mission: Multiplayer/Ranked/BoS_MP_RD_Stalingrad</TextBlock>
+                                </WrapPanel>
+                                <WrapPanel VerticalAlignment="Top" Grid.Row="1">
+                                    <Button Margin="2" Width="100" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Content="SAY TO ALL"/>
+                                    <Button Margin="2" Width="100" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Content="ShutDown"/>
+                                    <Button Margin="2" Width="100" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Content="Open SDS"/>
+                                    <Button Margin="2" Width="100" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Content="Server input"/>
+                                </WrapPanel>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+
+
+
+                </Border>
+            </TabItem>
+            <TabItem Header="Settings">
+                <Border Style="{StaticResource TabItemBorder}">
+                    <StackPanel Orientation="Vertical">
+                        <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                            <Label MinWidth="50" HorizontalContentAlignment="Left">Logs:</Label>
+                            <TextBox Text="{Binding Config.MissonLogFolder}" Width="300" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Mission log folder..."/>
+                            <Button Command="{Binding SelectMissionLogFolder}" Margin="5,0" Width="30" HorizontalAlignment="Left">..</Button>
+                        </DockPanel>
+                        <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                            <CheckBox Margin="5">Delete logs older than</CheckBox>
+                            <TextBox VerticalContentAlignment="Center" HorizontalContentAlignment="Center">5</TextBox>
+                            <Label>days</Label>
+                        </DockPanel>
+                    </StackPanel>
+
+
+                </Border>
+
+            </TabItem>
+            <TabItem Header="Log">
+                <Border Style="{StaticResource TabItemBorder}">
+                    <TextBox>
+                        [Feb 02, 2015 12:00:00] Application started...
+                    </TextBox>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Controls:MetroWindow>
