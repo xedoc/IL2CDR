@@ -89,6 +89,7 @@
     <Compile Include="Model\Config.cs" />
     <Compile Include="Model\Dialogs.cs" />
     <Compile Include="Model\IActionScript.cs" />
+    <Compile Include="Model\IStopStart.cs" />
     <Compile Include="Model\IMissionLogDataService.cs" />
     <Compile Include="Model\Log.cs" />
     <Compile Include="Model\MissionLogDataService.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Model\NativeMethods.cs" />
     <Compile Include="Model\Net.cs" />
     <Compile Include="Model\NotifyPropertyChangeBase.cs" />
+    <Compile Include="Model\Util.cs" />
     <Compile Include="Properties\PortableSettingsProvider.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
