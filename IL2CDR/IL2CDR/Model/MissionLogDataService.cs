@@ -6,87 +6,72 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace IL2CDR.Model
 {
     public class MissionLogDataService : IMissionLogDataService, IStopStart
     {
-        private string watchPath = String.Empty;
-        private FileSystemWatcher watcher;
-        private Dictionary<string, int> filePositions;
-        private ConcurrentQueue<string> logLinesQueue;
-
-        public Action<string> OnNewLine { get; set; }
-
-        public MissionLogDataService()
+        private const string mask = "missionReport(*)[*].txt";
+        private string missionDateTime = String.Empty;
+        private TextFileTracker tracker;
+        private string folder;
+        public MissionLogDataService(string folder)
         {
-            filePositions = new Dictionary<string, int>();
+            this.folder = folder;
+            Initialize();
         }
-        public void SetupFolderWatcher()
+        public void Initialize()
         {
-            watcher = new FileSystemWatcher(watchPath, "*.txt");
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite;
-            watcher.Changed += watcher_Changed;
-            watcher.EnableRaisingEvents = true;
-        }
-
-        void watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            var path = e.FullPath;
-            if( e.ChangeType == WatcherChangeTypes.Changed )
-            {
-                ReadNewLines(e.FullPath);
-                string line = null;
-                while( logLinesQueue.TryDequeue( out line ))
+            tracker = new TextFileTracker(folder, mask);
+            tracker.OnNewLine = (line) => {
+                var header = new MissionLogEventBase(line);
+                if( header.Type != EventType.Unknown && 
+                    header.Type != EventType.Version )
                 {
-                    if (OnNewLine != null)
-                        OnNewLine(line);
+                    //TODO: create data object by given event type
+                    //TODO: send data to ActionManager
                 }
-                    
-            }
-            
+            };
         }
-        private void ReadNewLines( string path )
-        {            
-            if( !filePositions.ContainsKey(path))
-                filePositions.Add(path, 0);
+        public void ReadMissionHistory()
+        {
+            missionDateTime = Util.GetNewestFilePath(folder, "missionReport(*)[0].txt")
+                .With(x => Re.GetSubString(x, @".*?\((.*)?\)[0]\.txt"));
 
-            var openException = Util.Try(() => {
-                using (Stream stream = File.Open(path, FileMode.Open))
-                {
-                    stream.Seek(filePositions[path], 0);
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        while (!reader.EndOfStream)
-                        {
-                            var e = Util.Try(() => logLinesQueue.Enqueue(reader.ReadLine()));
-                            if (e != null)
-                                Log.WriteError("Error reading line from {0} {1}", path, e.Message);
-                        }
-                    }
-                }            
-            });
+            var missionFiles = Util.GetFilesSortedByTime(folder, String.Format("missionReport({0})[*].txt", missionDateTime), true);
 
-            if (openException != null)
-                Log.WriteError("Can't open log file {0} {1}", path, openException.Message);
-
+            foreach( var file in missionFiles )
+            {
+               var lines = File.ReadAllLines(file);
+               if( lines != null )
+               {
+                   foreach( var line in lines )
+                   {
+                       var header = new MissionLogEventBase(line);
+                       if (header.Type != EventType.Unknown &&
+                           header.Type != EventType.Version)
+                       {
+                           //TODO: create data object by given event type
+                           //TODO: save history
+                       }
+                   }
+               }
+            }
         }
         public void Start()
         {
-            logLinesQueue = new ConcurrentQueue<string>();
-            filePositions.Clear();
-            SetupFolderWatcher();
+            ReadMissionHistory();
         }
 
         public void Stop()
         {
-            watcher.EnableRaisingEvents = false;
+            
         }
 
         public void Restart()
         {
-            Stop();
-            Start();
+            
         }
     }
 }

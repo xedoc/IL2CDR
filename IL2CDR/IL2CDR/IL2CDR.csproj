@@ -97,6 +97,9 @@
     <Compile Include="Model\NativeMethods.cs" />
     <Compile Include="Model\Net.cs" />
     <Compile Include="Model\NotifyPropertyChangeBase.cs" />
+    <Compile Include="Model\Re.cs" />
+    <Compile Include="Model\Sugar.cs" />
+    <Compile Include="Model\TextFileTracker.cs" />
     <Compile Include="Model\Util.cs" />
     <Compile Include="Properties\PortableSettingsProvider.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
