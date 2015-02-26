@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 
 namespace IL2CDR.Model
 {
+    [Serializable]
     public enum FieldType
     {
         Unknown = -1,
@@ -19,6 +20,10 @@ namespace IL2CDR.Model
     [Serializable]
     public class ConfigField : NotifyPropertyChangeBase 
     {
+        public ConfigField()
+        {
+
+        }
         public ConfigField(string name, string label, FieldType dataType, bool isVisible, object value)
         {
             Name = name;
@@ -100,7 +105,7 @@ namespace IL2CDR.Model
         /// Sets and gets the Value property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [XmlAttribute]
+        [XmlElement]
         public object Value
         {
             get

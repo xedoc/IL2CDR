@@ -9,7 +9,7 @@ using IL2CDR.Properties;
 namespace IL2CDR.Model
 {
     [Serializable]
-    public class Config:NotifyPropertyChangeBase
+    public class Config : NotifyPropertyChangeBase
     {
         public Config()
         {

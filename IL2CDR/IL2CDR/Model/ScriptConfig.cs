@@ -13,7 +13,7 @@ namespace IL2CDR.Model
     {
         public ScriptConfig()
         {
-            Parameters = new ObservableCollection<ConfigField>();
+            Parameters = new List<ConfigField>();
         }
 
         /// <summary>
@@ -27,6 +27,7 @@ namespace IL2CDR.Model
         /// Sets and gets the FileName property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [XmlAttribute]
         public string FileName
         {
             get
@@ -51,14 +52,14 @@ namespace IL2CDR.Model
         /// </summary>
         public const string ParametersPropertyName = "Parameters";
 
-        private ObservableCollection<ConfigField> _parameters = null;
+        private List<ConfigField> _parameters = null;
 
         /// <summary>
         /// Sets and gets the Parameters property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
         [XmlArray]
-        public ObservableCollection<ConfigField> Parameters
+        public List<ConfigField> Parameters
         {
             get
             {

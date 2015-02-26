@@ -12,6 +12,7 @@ namespace IL2CDR.Model
     public class ScriptManager : IScriptManager
     {
         private List<object> scripts;
+        private Config config;
         private const string scriptsSubFolder = @"\Scripts";
         private static Random random = new Random();
         private static Dictionary<EventType, Action<IActionScript, object>> actionScripts = 
@@ -38,6 +39,7 @@ namespace IL2CDR.Model
         public ScriptManager()
         {
             scripts = new List<object>();
+            config = Settings.Default.Config;
         }
 
 
@@ -68,9 +70,21 @@ namespace IL2CDR.Model
             var scriptFiles = Directory.GetFiles(folder, "*.cs", SearchOption.AllDirectories);
             foreach (var scriptPath in scriptFiles)
             {
+                var scriptFileName = Path.GetFileName(scriptPath);
                 Util.Try(() => {
                     Log.WriteInfo("Loading script {0}...", scriptPath);
                     var scriptObject = CSScript.Evaluator.LoadFile(scriptPath);
+                    if( !config.ScriptConfigs.Any( script => script.FileName.Equals( scriptFileName, StringComparison.InvariantCultureIgnoreCase )))
+                    {
+                        var scriptConfig = scriptObject as IScriptConfig;
+                        if( scriptConfig != null )
+                        {
+                            var defaultConfig = scriptConfig.DefaultConfig;
+                            defaultConfig.FileName = scriptFileName;                            
+                            config.ScriptConfigs.Add(defaultConfig);
+                        }
+                    }
+
                     scripts.Add(scriptObject);                
                 });
             }

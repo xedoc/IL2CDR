@@ -22,7 +22,7 @@ namespace IL2CDR
         const string SettingsRootName = "Settings";
         const string RoamingSettingsRootName = "Roaming";
         const string LocalSettingsRootName = "Local";
-        const string ConfigNamespace = "IL2CDR.Config";
+        const string ConfigNamespace = "IL2CDR";
 
         readonly string FileName;
         readonly Lazy<XDocument> SettingsXml;
