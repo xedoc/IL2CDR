@@ -92,11 +92,15 @@
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Model\ActionManager.cs" />
     <Compile Include="Model\Config.cs" />
+    <Compile Include="Model\ConfigField.cs" />
     <Compile Include="Model\Dialogs.cs" />
     <Compile Include="Model\IActionScript.cs" />
+    <Compile Include="Model\IScriptConfig.cs" />
+    <Compile Include="Model\IScriptManager.cs" />
     <Compile Include="Model\IStopStart.cs" />
     <Compile Include="Model\IMissionLogDataService.cs" />
     <Compile Include="Model\Log.cs" />
+    <Compile Include="Model\LogDataService.cs" />
     <Compile Include="Model\MissionLogDataService.cs" />
     <Compile Include="Model\MissionLogEvent.cs" />
     <Compile Include="Model\MySQL.cs" />
@@ -104,9 +108,11 @@
     <Compile Include="Model\Net.cs" />
     <Compile Include="Model\NotifyPropertyChangeBase.cs" />
     <Compile Include="Model\Re.cs" />
+    <Compile Include="Model\ScriptConfig.cs" />
     <Compile Include="Model\ScriptManager.cs" />
     <Compile Include="Model\Sugar.cs" />
     <Compile Include="Model\TextFileTracker.cs" />
+    <Compile Include="Model\UI.cs" />
     <Compile Include="Model\Util.cs" />
     <Compile Include="Properties\PortableSettingsProvider.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />

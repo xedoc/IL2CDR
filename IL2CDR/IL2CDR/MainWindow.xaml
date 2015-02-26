@@ -165,9 +165,8 @@
             </TabItem>
             <TabItem Header="Log">
                 <Border Style="{StaticResource TabItemBorder}">
-                    <TextBox>
-                        [Feb 02, 2015 12:00:00] Application started...
-                    </TextBox>
+                    <TextBox Text="{Binding LogMessages}"/>
+
                 </Border>
             </TabItem>
         </TabControl>

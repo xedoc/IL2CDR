@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using IL2CDR.Properties;
 
 namespace IL2CDR.Model
@@ -12,7 +13,38 @@ namespace IL2CDR.Model
     {
         public Config()
         {
+            ScriptConfigs = new List<ScriptConfig>();
+        }
 
+        /// <summary>
+        /// The <see cref="ScriptConfigs" /> property's name.
+        /// </summary>
+        public const string ScriptConfigsPropertyName = "ScriptConfigs";
+
+        private List<ScriptConfig> _scriptConfigs = null;
+
+        /// <summary>
+        /// Sets and gets the ScriptConfigs property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        [XmlArray]
+        public List<ScriptConfig> ScriptConfigs
+        {
+            get
+            {
+                return _scriptConfigs;
+            }
+
+            set
+            {
+                if (_scriptConfigs == value)
+                {
+                    return;
+                }
+
+                _scriptConfigs = value;
+                RaisePropertyChanged(ScriptConfigsPropertyName);
+            }
         }
 
         /// <summary>
@@ -26,6 +58,7 @@ namespace IL2CDR.Model
         /// Sets and gets the MissonLogFolder property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [XmlAttribute]
         public string MissonLogFolder
         {
             get
@@ -55,6 +88,7 @@ namespace IL2CDR.Model
         /// Sets and gets the LastMissionLogFile property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [XmlAttribute]
         public string LastMissionLogFile
         {
             get

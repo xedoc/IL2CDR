@@ -19,10 +19,13 @@ namespace IL2CDR.Model
         void OnMissionEnd(MissionLogEventMissionEnd data );
         void OnLanding(MissionLogEventLanding data);
         void OnTakeOff(MissionLogEventTakeOff data);
-        void OnPlayerMissionEnd(MissionLogEventMissionEnd data );
+        void OnPlayerMissionEnd(MissionLogEventPlayerMissionEnd data );
         void OnKill(MissionLogEventKill data);
         void OnDamage(MissionLogEventDamage data);
         void OnHit(MissionLogEventHit data);
         void OnMissionStart( MissionLogEventStart data );
+        void OnUserId(MissionLogUserId data);
+        void OnOther(object data);
+
     }
 }

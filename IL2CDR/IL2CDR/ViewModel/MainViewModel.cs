@@ -2,6 +2,7 @@
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using System.Collections.ObjectModel;
 using IL2CDR.Model;
 using IL2CDR.Properties;
 
@@ -21,6 +22,14 @@ namespace IL2CDR.ViewModel
         public MainViewModel()
         {
             Config = Properties.Settings.Default.Config;
+            var messages = (Application.Current as App).LogDataService.LogMessages;
+            LogMessages = String.Join( Environment.NewLine, messages);
+            messages.CollectionChanged += messages_CollectionChanged;
+        }
+
+        void messages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, e.NewItems));
         }
 
 
@@ -124,6 +133,36 @@ namespace IL2CDR.ViewModel
             }
         }
 
+
+        /// <summary>
+        /// The <see cref="LogMessages" /> property's name.
+        /// </summary>
+        public const string LogMessagesPropertyName = "LogMessages";
+
+        private string _logMessages = null;
+
+        /// <summary>
+        /// Sets and gets the LogMessages property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string LogMessages
+        {
+            get
+            {
+                return _logMessages;
+            }
+
+            set
+            {
+                if (_logMessages == value)
+                {
+                    return;
+                }
+
+                _logMessages = value;
+                RaisePropertyChanged(LogMessagesPropertyName);
+            }
+        }
         ////public override void Cleanup()
         ////{
         ////    // Clean up if needed

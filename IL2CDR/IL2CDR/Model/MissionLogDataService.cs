@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace IL2CDR.Model
 {
@@ -17,6 +18,7 @@ namespace IL2CDR.Model
         private string missionDateTime = String.Empty;
         private TextFileTracker tracker;
         private string folder;
+        private ActionManager actionManager;
         public MissionLogDataService(string folder)
         {
             this.folder = folder;
@@ -24,13 +26,15 @@ namespace IL2CDR.Model
         }
         public void Initialize()
         {
+            actionManager = (Application.Current as App).ActionManager;
             missionHistory = new List<object>();
             tracker = new TextFileTracker(folder, mask);
             tracker.OnNewLine = (line) => {
                 var data = MissionLogDataBuilder.GetData(line);
-                if( data != null )
+                if( data != null && actionManager != null)
                 {
-                    //TODO: Send data to ActionManager
+                    actionManager.ProcessAction(data);
+                    missionHistory.Add(data);
                 }
             };
         }
@@ -51,9 +55,7 @@ namespace IL2CDR.Model
                         {
                             var data = MissionLogDataBuilder.GetData(line);
                             if (data != null)
-                            {
                                 missionHistory.Add(data);
-                            }
                         }
                     }
                 }                

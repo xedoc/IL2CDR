@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace IL2CDR.Model
 {
@@ -44,6 +45,7 @@ namespace IL2CDR.Model
 
         private static void AppendToLogFile(string text)
         {
+            (Application.Current as App).LogDataService.AddMessage(text);
             //try
             //{
             //    File.AppendAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\il2cdr_log.txt", text + Environment.NewLine);

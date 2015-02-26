@@ -15,12 +15,18 @@ namespace IL2CDR
     /// </summary>
     public partial class App : Application
     {
+        public ScriptManager ScriptManager { get; set; }
+        public ActionManager ActionManager { get; set; }
+        public LogDataService LogDataService { get; set; }
+
         static App()
         {
             DispatcherHelper.Initialize();
         }
         protected override void OnStartup(StartupEventArgs e)
         {
+            LogDataService = new LogDataService();
+
             NativeMethods.SetProcessDPIAware();
 
             Net.DemandTCPPermission();
@@ -38,8 +44,9 @@ namespace IL2CDR
             CopyDataFolders(rootDataFolder);
             AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
 
-            var scriptManager = new ScriptManager();
-            scriptManager.LoadScripts();
+            ScriptManager = new ScriptManager();
+            ScriptManager.LoadScripts();
+            ActionManager = new ActionManager(ScriptManager);
 
             WebRequest.DefaultWebProxy = null;
         }
@@ -50,7 +57,7 @@ namespace IL2CDR
                 ResetConfig();
             }
         }
-        private void ResetConfig()
+        public void ResetConfig()
         {
             IL2CDR.Properties.Settings.Default.Config = new Config()
             {

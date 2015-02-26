@@ -10,14 +10,14 @@ using MySql.Data.MySqlClient;
 
 namespace IL2CDR.Model
 {
-    public class MySQL
+    public class MySQLDatabase
     {
         public MySqlConnection conn;
         public MySqlCommand cmd = new MySqlCommand();
         private static object lockMysql = new object();
-        private const String mysqlConnString = @"Data Source={0};Initial Catalog=company;User Id={1};Password={2};UseCompression=true;Keepalive=1;Minimum Pool Size=1;Maximum Pool Size=100;Pooling=true;";
+        private const String mysqlConnString = @"Data Source={0};Initial Catalog={3};User Id={1};Password={2};UseCompression=true;Keepalive=1;Minimum Pool Size=1;Maximum Pool Size=100;Pooling=true;";
 
-        public MySQL()
+        public MySQLDatabase()
         {
             IsConnected = false;
         }
@@ -36,9 +36,9 @@ namespace IL2CDR.Model
                 {
                     IsConnected = false;
                     conn.Close();
-                    conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password));
+                    conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
                 }   
-                conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password));
+                conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
                 conn.OpenAsync().ContinueWith((task) =>
                 {
                     IsConnected = true;

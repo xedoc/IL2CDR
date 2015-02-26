@@ -3,12 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IL2CDR;
 using IL2CDR.Model;
 
 namespace IL2CDR.Scripts
 {
-    public class Example : IActionScript
+    public class Example : IActionScript, IScriptConfig
     {
+        public ScriptConfig DefaultConfig
+        {
+            get {
+                return new ScriptConfig() { 
+                    Enabled = false,
+                    Title = "Example script",
+                    Description = "This script does nothing",
+                };
+            }
+        }
+
+        public ScriptConfig Config
+        {
+            get;
+            set;
+        }
+
         public void OnVersion(MissionLogEventVersion data)
         {
         }
@@ -30,7 +48,7 @@ namespace IL2CDR.Scripts
         }
 
         public void OnPlayerPlaneSpawn(MissionLogEventPlayerPlaneSpawn data)
-        {
+        {            
         }
 
         public void OnAirfieldInfo(MissionLogEventAirfieldInfo data)
@@ -71,6 +89,22 @@ namespace IL2CDR.Scripts
 
         public void OnMissionStart(MissionLogEventStart data)
         {
+        }
+
+
+        public void OnPlayerMissionEnd(MissionLogEventPlayerMissionEnd data)
+        {
+            
+        }
+
+        public void OnUserId(MissionLogUserId data)
+        {
+            
+        }
+
+        public void OnOther(object data)
+        {
+            
         }
     }
 }
