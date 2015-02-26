@@ -20,6 +20,7 @@ namespace IL2CDR.Model
             }
             catch( Exception e)
             {
+                Log.WriteError("Exception: {0}\n{1}", e.Message, e.StackTrace);
                 return e;
             }
 

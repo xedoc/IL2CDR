@@ -12,6 +12,7 @@ namespace IL2CDR.Model
 {
     public class MissionLogDataService : IMissionLogDataService, IStopStart
     {
+        private List<object> missionHistory;
         private const string mask = "missionReport(*)[*].txt";
         private string missionDateTime = String.Empty;
         private TextFileTracker tracker;
@@ -23,14 +24,13 @@ namespace IL2CDR.Model
         }
         public void Initialize()
         {
+            missionHistory = new List<object>();
             tracker = new TextFileTracker(folder, mask);
             tracker.OnNewLine = (line) => {
-                var header = new MissionLogEventBase(line);
-                if( header.Type != EventType.Unknown && 
-                    header.Type != EventType.Version )
+                var data = MissionLogDataBuilder.GetData(line);
+                if( data != null )
                 {
-                    //TODO: create data object by given event type
-                    //TODO: send data to ActionManager
+                    //TODO: Send data to ActionManager
                 }
             };
         }
@@ -41,37 +41,40 @@ namespace IL2CDR.Model
 
             var missionFiles = Util.GetFilesSortedByTime(folder, String.Format("missionReport({0})[*].txt", missionDateTime), true);
 
-            foreach( var file in missionFiles )
-            {
-               var lines = File.ReadAllLines(file);
-               if( lines != null )
-               {
-                   foreach( var line in lines )
-                   {
-                       var header = new MissionLogEventBase(line);
-                       if (header.Type != EventType.Unknown &&
-                           header.Type != EventType.Version)
-                       {
-                           //TODO: create data object by given event type
-                           //TODO: save history
-                       }
-                   }
-               }
-            }
+            var readException = Util.Try(() => {
+                foreach (var file in missionFiles)
+                {
+                    var lines = File.ReadAllLines(file);
+                    if (lines != null)
+                    {
+                        foreach (var line in lines)
+                        {
+                            var data = MissionLogDataBuilder.GetData(line);
+                            if (data != null)
+                            {
+                                missionHistory.Add(data);
+                            }
+                        }
+                    }
+                }                
+            });
         }
         public void Start()
         {
+            missionHistory.Clear();
             ReadMissionHistory();
+            tracker.Start();
         }
 
         public void Stop()
         {
-            
+            tracker.Stop();
         }
 
         public void Restart()
         {
-            
+            Stop();
+            Start();
         }
     }
 }

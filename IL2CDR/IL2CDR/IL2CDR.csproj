@@ -57,6 +57,10 @@
     <Reference Include="Mono.CSharp">
       <HintPath>..\packages\CS-Script.3.9.4.1\lib\net45\Mono.CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySql.Data.6.9.5\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -86,6 +90,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Design\DesignMissionLogDataService.cs" />
+    <Compile Include="Model\ActionManager.cs" />
     <Compile Include="Model\Config.cs" />
     <Compile Include="Model\Dialogs.cs" />
     <Compile Include="Model\IActionScript.cs" />
@@ -94,10 +99,12 @@
     <Compile Include="Model\Log.cs" />
     <Compile Include="Model\MissionLogDataService.cs" />
     <Compile Include="Model\MissionLogEvent.cs" />
+    <Compile Include="Model\MySQL.cs" />
     <Compile Include="Model\NativeMethods.cs" />
     <Compile Include="Model\Net.cs" />
     <Compile Include="Model\NotifyPropertyChangeBase.cs" />
     <Compile Include="Model\Re.cs" />
+    <Compile Include="Model\ScriptManager.cs" />
     <Compile Include="Model\Sugar.cs" />
     <Compile Include="Model\TextFileTracker.cs" />
     <Compile Include="Model\Util.cs" />

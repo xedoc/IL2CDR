@@ -37,9 +37,7 @@ namespace IL2CDR.ViewModel
                     ?? (_selectMissionLogFolder = new RelayCommand(
                     () =>
                     {
-                        var folder = Dialogs.OpenFolderDialog(null);
-                        if (!String.IsNullOrWhiteSpace(folder))
-                            Settings.Default.Config.MissonLogFolder = folder;
+                        Config.MissionFolderDialog();
                     }));
             }
         }

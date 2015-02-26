@@ -38,6 +38,9 @@ namespace IL2CDR
             CopyDataFolders(rootDataFolder);
             AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
 
+            var scriptManager = new ScriptManager();
+            scriptManager.LoadScripts();
+
             WebRequest.DefaultWebProxy = null;
         }
         private void InitConfiguration()

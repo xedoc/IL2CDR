@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IL2CDR.Properties;
 
 namespace IL2CDR.Model
 {
@@ -71,6 +72,13 @@ namespace IL2CDR.Model
                 _lastMissionLogFile = value;
                 RaisePropertyChanged(LastMissionLogFilePropertyName);
             }
+        }
+
+        public void MissionFolderDialog()
+        {
+            var folder = Dialogs.OpenFolderDialog(null);
+            if (!String.IsNullOrWhiteSpace(folder))
+                Settings.Default.Config.MissonLogFolder = folder;
         }
     }
 }
