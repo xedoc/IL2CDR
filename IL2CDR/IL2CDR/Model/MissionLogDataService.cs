@@ -17,18 +17,18 @@ namespace IL2CDR.Model
         private const string mask = "missionReport(*)[*].txt";
         private string missionDateTime = String.Empty;
         private TextFileTracker tracker;
-        private string folder;
         private ActionManager actionManager;
         public MissionLogDataService(string folder)
         {
-            this.folder = folder;
+            MissionLogFolder = folder;
             Initialize();
         }
+        public string MissionLogFolder { get; set; }
         public void Initialize()
         {
             actionManager = (Application.Current as App).ActionManager;
             missionHistory = new List<object>();
-            tracker = new TextFileTracker(folder, mask);
+            tracker = new TextFileTracker(MissionLogFolder, mask);
             tracker.OnNewLine = (line) => {
                 var data = MissionLogDataBuilder.GetData(line);
                 if( data != null && actionManager != null)
@@ -40,10 +40,10 @@ namespace IL2CDR.Model
         }
         public void ReadMissionHistory()
         {
-            missionDateTime = Util.GetNewestFilePath(folder, "missionReport(*)[0].txt")
+            missionDateTime = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt")
                 .With(x => Re.GetSubString(x, @".*?\((.*)?\)[0]\.txt"));
 
-            var missionFiles = Util.GetFilesSortedByTime(folder, String.Format("missionReport({0})[*].txt", missionDateTime), true);
+            var missionFiles = Util.GetFilesSortedByTime(MissionLogFolder, String.Format("missionReport({0})[*].txt", missionDateTime), true);
 
             var readException = Util.Try(() => {
                 foreach (var file in missionFiles)
@@ -63,6 +63,12 @@ namespace IL2CDR.Model
         }
         public void Start()
         {
+            if (String.IsNullOrWhiteSpace(MissionLogFolder))
+                return;
+
+            if (!Directory.Exists(MissionLogFolder))
+                return;
+
             missionHistory.Clear();
             ReadMissionHistory();
             tracker.Start();

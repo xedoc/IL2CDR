@@ -22,7 +22,7 @@ namespace IL2CDR.ViewModel
         public MainViewModel()
         {
             Config = Properties.Settings.Default.Config;
-            var messages = (Application.Current as App).LogDataService.LogMessages;
+            var messages = (Application.Current as App).AppLogDataService.LogMessages;
             LogMessages = String.Join( Environment.NewLine, messages);
             messages.CollectionChanged += messages_CollectionChanged;
         }

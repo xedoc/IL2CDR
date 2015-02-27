@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using GalaSoft.MvvmLight.Threading;
 using IL2CDR.Model;
+using IL2CDR.Properties;
 
 namespace IL2CDR
 {
@@ -17,7 +18,8 @@ namespace IL2CDR
     {
         public ScriptManager ScriptManager { get; set; }
         public ActionManager ActionManager { get; set; }
-        public LogDataService LogDataService { get; set; }
+        public AppLogDataService AppLogDataService { get; set; }
+        public MissionLogDataService MissionLogDataService { get; set; }
 
         static App()
         {
@@ -25,30 +27,34 @@ namespace IL2CDR
         }
         protected override void OnStartup(StartupEventArgs e)
         {
-            LogDataService = new LogDataService();
+            Regex.CacheSize = 0;
+            WebRequest.DefaultWebProxy = null;
+            var rootDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\IL2CDR";
+            AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
+
+            AppLogDataService = new AppLogDataService();
 
             NativeMethods.SetProcessDPIAware();
-
             Net.DemandTCPPermission();
-
             if (RenderCapability.Tier == 0)
                 Timeline.DesiredFrameRateProperty.OverrideMetadata(
                     typeof(Timeline),
                     new FrameworkPropertyMetadata { DefaultValue = 20 });
 
-            Regex.CacheSize = 0;
             
             InitConfiguration();
-            var rootDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\IL2CDR";
             CreateDataFolders(rootDataFolder);
             CopyDataFolders(rootDataFolder);
-            AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
 
             ScriptManager = new ScriptManager();
             ScriptManager.LoadScripts();
             ActionManager = new ActionManager(ScriptManager);
 
-            WebRequest.DefaultWebProxy = null;
+            if( !String.IsNullOrWhiteSpace(Settings.Default.Config.MissonLogFolder) )
+            {
+                MissionLogDataService = new MissionLogDataService(Settings.Default.Config.MissonLogFolder);
+                MissionLogDataService.Start();
+            }
         }
         private void InitConfiguration()
         {

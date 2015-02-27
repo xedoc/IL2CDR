@@ -7,10 +7,10 @@ using System.Collections.ObjectModel;
 
 namespace IL2CDR.Model
 {
-    public class LogDataService
+    public class AppLogDataService
     {
         public ObservableCollection<string> LogMessages { get; set; }
-        public LogDataService()
+        public AppLogDataService()
         {
             LogMessages = new ObservableCollection<string>();
         }
