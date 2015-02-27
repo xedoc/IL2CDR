@@ -20,6 +20,9 @@ namespace IL2CDR
         public ActionManager ActionManager { get; set; }
         public AppLogDataService AppLogDataService { get; set; }
         public MissionLogDataService MissionLogDataService { get; set; }
+        public SettingsManager SettingsManager { get; set; }
+        public IL2StartupConfig StartupConfig { get; set; }
+        public StatusDataService StatusDataService { get; set; }
 
         static App()
         {
@@ -27,12 +30,18 @@ namespace IL2CDR
         }
         protected override void OnStartup(StartupEventArgs e)
         {
+            AppLogDataService = new AppLogDataService();
+            Log.WriteInfo("Application is starting...");
+
+            StatusDataService = new StatusDataService();
+
             Regex.CacheSize = 0;
             WebRequest.DefaultWebProxy = null;
             var rootDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\IL2CDR";
             AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
 
-            AppLogDataService = new AppLogDataService();
+            CreateDataFolders(rootDataFolder);
+            CopyDataFolders(rootDataFolder);
 
             NativeMethods.SetProcessDPIAware();
             Net.DemandTCPPermission();
@@ -40,20 +49,24 @@ namespace IL2CDR
                 Timeline.DesiredFrameRateProperty.OverrideMetadata(
                     typeof(Timeline),
                     new FrameworkPropertyMetadata { DefaultValue = 20 });
-
             
+            SettingsManager = new SettingsManager();
+            SettingsManager.BackupStartupConfig();
+
             InitConfiguration();
-            CreateDataFolders(rootDataFolder);
-            CopyDataFolders(rootDataFolder);
+
+            StartupConfig = new IL2StartupConfig(String.Format(@"{0}data\startup.cfg", Settings.Default.Config.RootFolder));
+            StartupConfig.ReadConfig();
 
             ScriptManager = new ScriptManager();
             ScriptManager.LoadScripts();
             ActionManager = new ActionManager(ScriptManager);
 
-            if( !String.IsNullOrWhiteSpace(Settings.Default.Config.MissonLogFolder) )
+            if( !String.IsNullOrWhiteSpace(StartupConfig.MissionTextLogFolder) )
             {
-                MissionLogDataService = new MissionLogDataService(Settings.Default.Config.MissonLogFolder);
-                MissionLogDataService.Start();
+                MissionLogDataService = new MissionLogDataService(StartupConfig.MissionTextLogFolder);
+                if( Settings.Default.Config.IsMissionLogMonitorEnabled )
+                    MissionLogDataService.Start();
             }
         }
         private void InitConfiguration()
@@ -61,14 +74,18 @@ namespace IL2CDR
             if( IL2CDR.Properties.Settings.Default.Config == null )
             {
                 ResetConfig();
+                var installFolder = SettingsManager.GetIL2LocationFromRegistry();
+                if( !String.IsNullOrWhiteSpace(installFolder))
+                {
+                    UI.Dispatch( () => Settings.Default.Config.RootFolder = installFolder);
+                }
             }
         }
         public void ResetConfig()
         {
             IL2CDR.Properties.Settings.Default.Config = new Config()
             {
-                LastMissionLogFile = String.Empty,
-                MissonLogFolder = String.Empty,                
+                LastMissionLogFile = String.Empty,               
             };
              
 

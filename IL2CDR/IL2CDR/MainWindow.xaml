@@ -14,11 +14,11 @@
         Title="IL2 CDR"
         Background="#252525"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Closing">
-                <mvvmlight:EventToCommand Command="{Binding ExitApplication}"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <mvvmlight:EventToCommand Command="{Binding ExitApplication}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
             <Style x:Key="TabItemBorder" TargetType="Border">
@@ -34,6 +34,64 @@
 
     <Grid x:Name="LayoutRoot">
         <TabControl>
+            <TabItem Header="Status">
+                <Border Style="{StaticResource TabItemBorder}">
+                    <StackPanel Orientation="Vertical" Margin="20,0,10,0">
+                        <StackPanel  Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="OK" IsReadOnly="True" HorizontalContentAlignment="Center" Background="#FF0D9100" BorderThickness="0"/>
+                                <TextBox Grid.Column="1" IsReadOnly="True" Text="IL2 Configuration file"  BorderThickness="0"/>
+                                <TextBox Text="" IsReadOnly="True" Grid.Column="2" BorderThickness="0" Foreground="Red"/>
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="!" IsReadOnly="True" HorizontalContentAlignment="Center" Background="#FF832525" BorderThickness="0"/>
+                                <TextBox Grid.Column="1" IsReadOnly="True" Text="RCON connection"  BorderThickness="0"/>
+                                <TextBox Text="TCP connection refused" IsReadOnly="True" Grid.Column="2" BorderThickness="0" Foreground="Red"/>
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="!" IsReadOnly="True" HorizontalContentAlignment="Center" Background="#FF832525" BorderThickness="0"/>
+                                <TextBox Grid.Column="1" IsReadOnly="True" Text="Dedicated server"  BorderThickness="0"/>
+                                <TextBox Text="DServer.exe isn't running" IsReadOnly="True" Grid.Column="2" BorderThickness="0" Foreground="Red"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <ItemsControl>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Label>test</Label>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical">
+                                    </StackPanel>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </TabItem>
             <TabItem Header="Scripts">
                 <Border Style="{StaticResource TabItemBorder}">
                     <Grid>
@@ -139,22 +197,26 @@
                             </Grid>
                         </GroupBox>
                     </Grid>
-
-
-
                 </Border>
             </TabItem>
             <TabItem Header="Settings">
                 <Border Style="{StaticResource TabItemBorder}">
                     <StackPanel Orientation="Vertical">
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label HorizontalContentAlignment="Left" Grid.Column="0">IL2 folder:</Label>
+                            <TextBox Grid.Column="1" Text="{Binding Config.RootFolder, Mode=TwoWay}" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="IL2 root folder..."/>
+                            <Button Grid.Column="2" Command="{Binding SelectRootFolder}" Margin="5,0,0,0" Width="30" HorizontalAlignment="Left">..</Button>
+                        </Grid>
+                        <CheckBox Command="{Binding EnableMissionLogMonitor}" IsChecked="{Binding Config.IsMissionLogMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,10">Enable mission log monitoring</CheckBox>
+                        <CheckBox Command="{Binding EnableChatLogMonitor}" IsChecked="{Binding Config.IsChatMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,5">Enable chat log monitoring</CheckBox>
                         <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                            <Label MinWidth="50" HorizontalContentAlignment="Left">Logs:</Label>
-                            <TextBox Margin="1" Text="{Binding Config.MissonLogFolder}" Width="300" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Mission log folder..."/>
-                            <Button Command="{Binding SelectMissionLogFolder}" Margin="5,0" Width="30" HorizontalAlignment="Left">..</Button>
-                        </DockPanel>
-                        <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                            <CheckBox Margin="5">Delete logs older than</CheckBox>
-                            <TextBox Margin="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">5</TextBox>
+                            <CheckBox>Delete mission logs older than</CheckBox>
+                            <TextBox Margin="5,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding Config.MissionLogCleanupInterval, Mode=TwoWay}"></TextBox>
                             <Label>days</Label>
                         </DockPanel>
                     </StackPanel>

@@ -15,6 +15,7 @@ namespace IL2CDR.Model
         private ConcurrentQueue<string> logLinesQueue;
         private string folder, mask;
 
+        public Func<string,bool> Preprocess { get; set; }
         public Action<string> OnNewLine { get; set; }
 
         public TextFileTracker(string folder, string mask)
@@ -25,15 +26,29 @@ namespace IL2CDR.Model
         }
         public void SetupFolderWatcher()
         {
+            if (String.IsNullOrWhiteSpace(folder))
+                return;
+
             watcher = new FileSystemWatcher(folder,mask);
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite;
             watcher.Changed += watcher_Changed;
             watcher.EnableRaisingEvents = true;
         }
-
         void watcher_Changed(object sender, FileSystemEventArgs e)
         {
             var path = e.FullPath;
+
+            if( e.ChangeType != WatcherChangeTypes.Deleted )
+            {
+                if (Preprocess != null)
+                {
+                    bool handled = false;
+                    Util.Try(() => handled = Preprocess(File.ReadAllText(path)));
+                    if (handled)
+                        return;
+                }
+            }
+
             if( e.ChangeType == WatcherChangeTypes.Changed )
             {
                 ReadNewLines(e.FullPath);

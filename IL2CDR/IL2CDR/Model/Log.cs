@@ -23,7 +23,7 @@ namespace IL2CDR.Model
         }
         public static void WriteInfo(String message)
         {
-            var text = String.Format("[{1}] Info: {0}", message, DateTime.Now.ToLongTimeString());
+            var text = String.Format("[{1}] {0}", message, DateTime.Now.ToLongTimeString());
             AppendToLogFile(text);
         }
 

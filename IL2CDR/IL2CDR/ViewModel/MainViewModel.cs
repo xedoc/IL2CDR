@@ -33,20 +33,20 @@ namespace IL2CDR.ViewModel
         }
 
 
-        private RelayCommand _selectMissionLogFolder;
+        private RelayCommand _selectRootFolder;
 
         /// <summary>
-        /// Gets the SelectMissionLogFolder.
+        /// Gets the SelectRootFolder.
         /// </summary>
-        public RelayCommand SelectMissionLogFolder
+        public RelayCommand SelectRootFolder
         {
             get
             {
-                return _selectMissionLogFolder
-                    ?? (_selectMissionLogFolder = new RelayCommand(
+                return _selectRootFolder
+                    ?? (_selectRootFolder = new RelayCommand(
                     () =>
                     {
-                        Config.MissionFolderDialog();
+                        Config.RootFolderDialog();
                     }));
             }
         }
@@ -163,6 +163,50 @@ namespace IL2CDR.ViewModel
                 RaisePropertyChanged(LogMessagesPropertyName);
             }
         }
+
+        private RelayCommand _enableChatLogMonitor;
+
+        /// <summary>
+        /// Gets the EnableChatLogMonitor.
+        /// </summary>
+        public RelayCommand EnableChatLogMonitor
+        {
+            get
+            {
+                return _enableChatLogMonitor
+                    ?? (_enableChatLogMonitor = new RelayCommand(
+                    () =>
+                    {
+                        
+                    }));
+            }
+        }
+
+        private RelayCommand _enableMissionLogMonitor;
+
+        /// <summary>
+        /// Gets the EnableMissionLogMonitor.
+        /// </summary>
+        public RelayCommand EnableMissionLogMonitor
+        {
+            get
+            {
+                return _enableMissionLogMonitor
+                    ?? (_enableMissionLogMonitor = new RelayCommand(
+                    () =>
+                    {
+                        var missionLogService = (Application.Current as App).MissionLogDataService;
+                        if (missionLogService == null)
+                            return;
+
+                        if( !Config.IsMissionLogMonitorEnabled )
+                            missionLogService.Stop();
+                        else
+                            missionLogService.Start();
+                    }));
+            }
+        }
+
         ////public override void Cleanup()
         ////{
         ////    // Clean up if needed
