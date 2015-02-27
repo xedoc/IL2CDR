@@ -23,8 +23,29 @@ namespace IL2CDR
                 removeItem = list.FirstOrDefault(match);
             }
         }
+        public static Guid GetGuid(this Dictionary<string, string> dict, string name)
+        {
+            Guid guid;
+            Guid.TryParse(dict.GetString(name), out guid);
+            return guid;
+        }
+
+        public static int GetInt(this Dictionary<string, string> dict, string name)
+        {
+            int i = -1;
+            int.TryParse(dict.GetString(name), out i);
+            return i;
+        }
+
+        public static string GetString(this Dictionary<string, string> dict, string name)
+        {
+            string value = null;
+            dict.TryGetValue(name, out value);
+            return value;
+        }
 
     }
+
 
     public class SmartCollection<T> : ObservableCollection<T>
     {

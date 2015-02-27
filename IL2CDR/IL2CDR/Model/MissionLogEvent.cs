@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
@@ -105,16 +106,17 @@ namespace IL2CDR.Model
     //USERID:xxxxxx-... USERNICKID:xxxxxx-...
     public class MissionLogUserId : MissionLogEventBase
     {
-        public Guid UserGuid { get; set; } 
+        public Guid NickGuid { get; set; } 
         public Guid LoginGuid { get; set; }
 
         public MissionLogUserId(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+
+            NickGuid = RawParameters.GetGuid("USERNICKID");
+            LoginGuid = RawParameters.GetGuid("USERID");
         }
     }
-
     //Atype:16
     //T:28250 AType:16 BOTID:182273 POS(113655.180,129.202,243216.594)
     public class MissionLogBotSpawn : MissionLogEventBase
@@ -125,9 +127,17 @@ namespace IL2CDR.Model
         public MissionLogBotSpawn(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            string[] idLoc = RawParameters.GetString("BOTID").With( x => x.Split(' '));
+            if( idLoc.Length != 2 )
+                return;
+
+            int id;
+            int.TryParse(idLoc[0], out id);
+
+            Position = Util.POSToVector3D(idLoc[1]);
         }
     }
+
     //AType:15
     //T:0 AType:15 VER:17
     public class MissionLogEventVersion : MissionLogEventBase
@@ -296,6 +306,5 @@ namespace IL2CDR.Model
             //TODO: Parse key/value pairs
         }
     }
-
 
 }
