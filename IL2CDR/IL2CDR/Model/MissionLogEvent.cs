@@ -84,26 +84,12 @@ namespace IL2CDR.Model
             Type = EventType.Unknown;
             if( !String.IsNullOrWhiteSpace(logLine))
             {               
-                //Parse pairs of parameter:value separated with space
-                RawParameters = new Dictionary<string, string>(
-                    logLine.Split(' ')
-                    .Select(pair => { 
-                        var parts = pair.Split(':');
-                        
-                        if( parts.Length == 1 )
-                        {
-                            var matches = Regex.Match(parts[0], @"([a-zA-Z]+)(\(.*\))");
-                            if(matches.Groups.Count >= 2 )
-                            {
-                                return new string[] { matches.Groups[1].Value, matches.Groups[2].Value };
-                            }
-                        }
+                //Parse space separated pairs of param:value and arrays like BC((x,y,z),..) 
+                var matches = Regex.Matches(logLine, @"(\b\w+)[:]*(.*?(?=\s\w+:|$|\s\w+\())");
+                RawParameters = new Dictionary<string,string>();
 
-                        return parts;
-                        
-                    })
-                    .Where(pair => pair.Length == 2 && !String.IsNullOrEmpty(pair[0].Trim()))
-                    .ToDictionary(pair => pair[0], pair => pair[1]));
+                foreach( Match match in matches)
+                    RawParameters.Add( match.Groups[1].Value, match.Groups[2].Value );
             }
             else
             {
@@ -114,7 +100,7 @@ namespace IL2CDR.Model
     }
 
     //T:28250 AType:21 USERID:a11b29de-ce4d-4a19-903f-a6f84a08bdf0 USERNICKID:1b6c2a5a-bfd0-45eb-855f-fff71cd38fbc
-
+    //TODO: handle AType:21
 
     //AType:20
     //USERID:xxxxxx-... USERNICKID:xxxxxx-...
@@ -213,31 +199,64 @@ namespace IL2CDR.Model
         {
             ObjectId = RawParameters.GetInt("ID");
             Type = RawParameters.GetString("TYPE");
-            //TODO: Handle space separated type value somehow
+            Name = RawParameters.GetString("NAME");
+            Country = new Country() { 
+                Id = RawParameters.GetInt("COUNTRY"),
+                Name = String.Empty,
+                //TODO: Identify country by id
+            };
         }
-
-
     }
     //AType:11
     //T:1 AType:11 GID:926720 IDS:532480,538624,547840,557056,563200,569344,575488 LID:532480
     //T:1 AType:11 GID:927744 IDS:640000,646144,655360,664576,670720,676864,683008 LID:640000
     public class MissionLogEventGroupInitInfo : MissionLogEventBase
     {
+        public int GroupId { get; set; }
+        public int[] ObjectIds { get; set; }
+        public int LeaderId { get; set; }
+
         public MissionLogEventGroupInitInfo(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            GroupId = RawParameters.GetInt("GID");
+            ObjectIds = Util.SequenceToIntArray(RawParameters.GetString("IDS"));
+            LeaderId = RawParameters.GetInt("LID");
         }
     }
     //AType:10
-    //T:13129 AType:10 PLID:402433 PID:182273 BUL:1620 SH:0 BOMB:0 RCT:0 (113655.359,129.266,243216.766) IDS:1b6c2a5a-bfd0-45eb-855f-fff71cd38fbc LOGIN:a11b29de-ce4d-4a19-903f-a6f84a08bdf0 NAME:xedoc TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 PAYLOAD:0 FUEL:1.000 SKIN: WM:1
+    //T:13129 AType:10 PLID:402433 PID:182273 BUL:1620 SH:0 BOMB:0 RCT:0 (113655.359,129.266,243216.766) IDS:1b6c2a5a-bfd0-45eb-855f-fff71cd38fbc 
+    //LOGIN:a11b29de-ce4d-4a19-903f-a6f84a08bdf0 NAME:xedoc TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 
+    //PAYLOAD:0 FUEL:1.000 SKIN: WM:1
 
     public class MissionLogEventPlayerPlaneSpawn : MissionLogEventBase
     {
+        public int PlayerId { get; set; }
+        public int PlaneId { get; set; } //TODO: check if property is what I think
+        //TODO: identify SH parameter
+        public int Bombs { get; set; }
+        //TODO: what is RCT ? Rectangle or rockets ?
+        //RCT:0 (113655.359,129.266,243216.766)
+        //public int Rockets { get; set; }
+        public Guid[] NickGuids { get; set; }
+        public Guid LoginGuid { get; set; }
+        public string PlayerName { get; set; }
+        public string Type { get; set; }
+        public Country Country { get; set; }
+        public int Form { get; set; } //TODO: is it formation ?
+        public int AirFieldId { get; set; }
+        public bool IsInAir { get; set; }
+        public int ParentId { get; set; }
+        public int Payload { get; set; }
+        public double Fuel { get; set; }
+        //TODO: find type of Skin
+        //public string Skin { get; set; }
+        //TODO: Identify WM
+
         public MissionLogEventPlayerPlaneSpawn(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            //TODO:Parse key/value pairs
         }
     }
     //AType:9
@@ -245,6 +264,10 @@ namespace IL2CDR.Model
     //T:10 AType:9 AID:98304 COUNTRY:101 POS(112253.711, 25.323, 260996.453) IDS()
     public class MissionLogEventAirfieldInfo : MissionLogEventBase
     {
+        public int AirFieldId { get; set; }
+        public Vector3D Position { get; set; }
+        //TODO: what is ids ? Players ?
+
         public MissionLogEventAirfieldInfo(string logLine)
             : base(logLine)
         {
@@ -252,6 +275,7 @@ namespace IL2CDR.Model
         }
     }
     //AType:8
+    //TODO: find example of AType:8
     public class MissionLogEventObjectiveCompleted : MissionLogEventBase
     {
         public MissionLogEventObjectiveCompleted(string logLine)
@@ -261,6 +285,7 @@ namespace IL2CDR.Model
         }
     }
     //AType:7
+    //TODO: find example of AType:7
     public class MissionLogEventMissionEnd : MissionLogEventBase
     {
         public MissionLogEventMissionEnd(string logLine)
@@ -270,6 +295,7 @@ namespace IL2CDR.Model
         }
     }
     //AType:6
+    //TODO: find example of AType:6
     public class MissionLogEventLanding : MissionLogEventBase
     {
         public MissionLogEventLanding(string logLine)
@@ -279,6 +305,7 @@ namespace IL2CDR.Model
         }
     }
     //AType:5
+    //TODO: find example of AType:5
     public class MissionLogEventTakeOff : MissionLogEventBase
     {
         public MissionLogEventTakeOff(string logLine)
@@ -288,6 +315,7 @@ namespace IL2CDR.Model
         }
     }
     //AType:4
+    //TODO: find example of AType:4
     public class MissionLogEventPlayerMissionEnd : MissionLogEventBase
     {
         public MissionLogEventPlayerMissionEnd(string logLine)
@@ -300,13 +328,19 @@ namespace IL2CDR.Model
     //T:16459 AType:3 AID:886784 TID:630784 POS(123722.586,132.251,239770.719)
     public class MissionLogEventKill : MissionLogEventBase
     {
+        public int AttackerId { get; set; }
+        public int TargetId { get; set; }
+        public Vector3D Position { get; set; }
         public MissionLogEventKill(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            AttackerId = RawParameters.GetInt("AID");
+            TargetId = RawParameters.GetInt("TID");
+            Position = Util.POSToVector3D(RawParameters.GetString("POS"));
         }
     }
     //AType:2
+    //TODO: find example of AType:2
     public class MissionLogEventDamage: MissionLogEventBase
     {
         public MissionLogEventDamage(string logLine) : base (logLine)
@@ -315,6 +349,7 @@ namespace IL2CDR.Model
         }
     }
     //AType:1
+    //TODO: find example of AType:1
     public class MissionLogEventHit : MissionLogEventBase
     {
         public MissionLogEventHit(string logLine) : base(logLine)
@@ -331,7 +366,7 @@ namespace IL2CDR.Model
         public string MissionFile { get; set; }
         public int MissionID { get; set; }
         public int GameType { get; set; }
-        public Dictionary<int, int> Counters { get; set; }
+        public Dictionary<int, int> CountryCounters { get; set; }
         public bool[] SettingsFlags { get; set; }
         public int Mods { get; set; }
         public int Preset { get; set; }
@@ -339,13 +374,29 @@ namespace IL2CDR.Model
         public MissionLogEventStart(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            //TODO: handle DateTime type
+            MissionFile = RawParameters.GetString("MFile");
+            //TODO: find example of MID
+            //MissionID = RawParameters.GetString("MID")
+            GameType = RawParameters.GetInt("GType");
+            //TODO: handle dictionary values
+            //TODO: handle bool array
+            Mods = RawParameters.GetInt("MODS");
+            Preset = RawParameters.GetInt("Preset");
+            AQMId = RawParameters.GetInt("AWMID");
         }
     }
 
     public class Country
     {
         public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class Player
+    {
+        public int[] NickIds { get; set; }
+        public int LoginId { get; set; }
         public string Name { get; set; }
     }
 
