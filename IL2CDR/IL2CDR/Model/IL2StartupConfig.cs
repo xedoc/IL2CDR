@@ -106,7 +106,7 @@ namespace IL2CDR.Model
                 return;
 
             var replacement = Regex.Replace(sectionContent, String.Concat(@"[\s|\t]*",name, reParameter), Environment.NewLine);
-            replacement = String.Concat(replacement, String.Format("{2}      {0} = {1}", name, value, Environment.NewLine));
+            replacement = String.Concat(replacement, String.Format("{2}\t{0} = {1}", name, value, Environment.NewLine));
             configContent = configContent.Replace(sectionContent, replacement);
 
             Util.Try(() => File.WriteAllText(configFilePath, configContent));

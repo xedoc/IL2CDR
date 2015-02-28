@@ -85,11 +85,25 @@ namespace IL2CDR.Model
             if( !String.IsNullOrWhiteSpace(logLine))
             {               
                 //Parse pairs of parameter:value separated with space
-                RawParameters = new Dictionary<string, string>( 
+                RawParameters = new Dictionary<string, string>(
                     logLine.Split(' ')
-                    .Select(pair => pair.Split(':'))
+                    .Select(pair => { 
+                        var parts = pair.Split(':');
+                        
+                        if( parts.Length == 1 )
+                        {
+                            var matches = Regex.Match(parts[0], @"([a-zA-Z]+)(\(.*\))");
+                            if(matches.Groups.Count >= 2 )
+                            {
+                                return new string[] { matches.Groups[1].Value, matches.Groups[2].Value };
+                            }
+                        }
+
+                        return parts;
+                        
+                    })
                     .Where(pair => pair.Length == 2 && !String.IsNullOrEmpty(pair[0].Trim()))
-                    .ToDictionary( pair => pair[0], pair => pair[1] ));
+                    .ToDictionary(pair => pair[0], pair => pair[1]));
             }
             else
             {
@@ -127,14 +141,8 @@ namespace IL2CDR.Model
         public MissionLogBotSpawn(string logLine)
             : base(logLine)
         {
-            string[] idLoc = RawParameters.GetString("BOTID").With( x => x.Split(' '));
-            if( idLoc.Length != 2 )
-                return;
-
-            int id;
-            int.TryParse(idLoc[0], out id);
-
-            Position = Util.POSToVector3D(idLoc[1]);
+            BotId = RawParameters.GetInt("BOTID");
+            Position = Util.POSToVector3D("POS");
         }
     }
 
@@ -146,7 +154,7 @@ namespace IL2CDR.Model
         public MissionLogEventVersion(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            Version = RawParameters.GetString("VER");
         }
     }
     //AType:14
@@ -154,10 +162,13 @@ namespace IL2CDR.Model
     //T:1 AType:14 AID:18432 BP((150876.0,0.9,262474.0),(159244.0,0.9,222558.0),(185432.0,0.9,188837.0),(183398.0,0.9,164959.0),(165913.0,0.9,150673.0),(192221.0,0.9,75572.0),(230054.0,0.9,77365.0),(230179.0,0.9,358210.0),(161.0,0.9,358111.0),(755.0,0.9,233576.0),(30336.0,0.9,229602.0),(55631.0,0.9,217230.0),(84031.0,0.9,214012.0),(110293.0,0.9,200406.0),(121516.0,0.9,210199.0),(115778.0,0.9,226024.0),(119800.0,0.9,242286.0),(131353.0,0.9,254862.0))
     public class MissionLogEventInfluenceAreaBoundary : MissionLogEventBase
     {
+        public Vector3DCollection BoundaryPoints { get; set; }
+        public int AreaId { get; set; }
         public MissionLogEventInfluenceAreaBoundary(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            AreaId = RawParameters.GetInt("AID");
+            BoundaryPoints = Util.BoundaryPointsToVectorCollection("BP");
         }
     }
     //AType:13
@@ -165,10 +176,25 @@ namespace IL2CDR.Model
     //T:0 AType:13 AID:18432 COUNTRY:101 ENABLED:1 BC(0,0,0)
     public class MissionLogEventInfluenceAreaInfo : MissionLogEventBase
     {
+        public int AirFieldId { get; set; }
+        public Country Country { get; set; }
+        public bool IsEnabled { get; set; }
+        public int[] Caps { get; set; }
+
         public MissionLogEventInfluenceAreaInfo(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            AirFieldId = RawParameters.GetInt("AID");
+            IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;
+
+            Country = new Country()
+            {
+                Id = RawParameters.GetInt("COUNTRY"),
+                Name = String.Empty,
+                //TODO: Identify countries by ID 
+            };
+            Caps = Util.SequenceToIntArray(RawParameters.GetString("BC"));
+
         }
     }
     //AType:12
@@ -176,11 +202,21 @@ namespace IL2CDR.Model
     //T:16459 AType:12 ID:630784 TYPE:Sd Kfz 10 Flak 38 COUNTRY:201 NAME:Vehicle PID:-1
     public class MissionLogEventGameObjectSpawn : MissionLogEventBase
     {
+        public int ObjectId { get; set; }
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public Country Country { get; set; }
+        public int PlayerId { get; set; }
+
         public MissionLogEventGameObjectSpawn(string logLine)
             : base(logLine)
         {
-            //TODO: Parse key/value pairs
+            ObjectId = RawParameters.GetInt("ID");
+            Type = RawParameters.GetString("TYPE");
+            //TODO: Handle space separated type value somehow
         }
+
+
     }
     //AType:11
     //T:1 AType:11 GID:926720 IDS:532480,538624,547840,557056,563200,569344,575488 LID:532480
@@ -305,6 +341,12 @@ namespace IL2CDR.Model
         {
             //TODO: Parse key/value pairs
         }
+    }
+
+    public class Country
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
 }

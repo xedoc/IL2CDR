@@ -28,13 +28,48 @@ namespace IL2CDR.Model
 
             return null;
         }
+        public static Vector3DCollection BoundaryPointsToVectorCollection(string bp)
+        {
+            Vector3DCollection vectors = new Vector3DCollection();
+            var matches = Regex.Matches(bp, @"\([\d|\.|,]+\)");
+            foreach( Match match in matches)
+            {
+                var vector = POSToVector3D(match.Value);
+                vectors.Add(vector);
+            }
+
+            return vectors;
+        }
+        public static int[] SequenceToIntArray( string seq )
+        {
+            var result = new int[]{};
+            if (String.IsNullOrWhiteSpace(seq))
+                return result;
+
+            var values = Re.GetSubString(seq, @"([\d|\.|,]+)");
+            if (String.IsNullOrWhiteSpace(values))
+                return result;
+
+            return values.Split(',')
+                .Select(x => { int i = 0; int.TryParse(x, out i); return i; })
+                .ToArray();
+
+
+        }
         public static Vector3D POSToVector3D( string pos )
         {
-            if (String.IsNullOrWhiteSpace(pos))
-                return new Vector3D();
+            Vector3D result = new Vector3D();
+            double x = 0.0, y = 0.0, z = 0.0;
 
-            string[] xyz = Regex.Replace(pos, @"\(|\)", "").Split(',');
-            double x, y, z;
+            if (String.IsNullOrWhiteSpace(pos))
+                return result;
+
+            var values = Re.GetSubString(pos, @"([\d|\.|,]+)");
+
+            if (String.IsNullOrWhiteSpace(values))
+                return result;
+            
+            var xyz = values.Split(',');
             if (pos.Length == 3)
             {
                 double.TryParse(xyz[0], out x);

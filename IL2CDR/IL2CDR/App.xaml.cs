@@ -34,6 +34,7 @@ namespace IL2CDR
             Log.WriteInfo("Application is starting...");
 
             StatusDataService = new StatusDataService();
+            SettingsManager = new SettingsManager();
 
             Regex.CacheSize = 0;
             WebRequest.DefaultWebProxy = null;
@@ -50,10 +51,9 @@ namespace IL2CDR
                     typeof(Timeline),
                     new FrameworkPropertyMetadata { DefaultValue = 20 });
             
-            SettingsManager = new SettingsManager();
-            SettingsManager.BackupStartupConfig();
 
             InitConfiguration();
+            SettingsManager.BackupStartupConfig();
 
             StartupConfig = new IL2StartupConfig(String.Format(@"{0}data\startup.cfg", Settings.Default.Config.RootFolder));
             StartupConfig.ReadConfig();
@@ -74,12 +74,17 @@ namespace IL2CDR
             if( IL2CDR.Properties.Settings.Default.Config == null )
             {
                 ResetConfig();
+            }
+            if( String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder ))
+            {
                 var installFolder = SettingsManager.GetIL2LocationFromRegistry();
-                if( !String.IsNullOrWhiteSpace(installFolder))
+                if (!String.IsNullOrWhiteSpace(installFolder))
                 {
-                    UI.Dispatch( () => Settings.Default.Config.RootFolder = installFolder);
+                    UI.Dispatch(() => Settings.Default.Config.RootFolder = installFolder);
                 }
             }
+  
+
         }
         public void ResetConfig()
         {

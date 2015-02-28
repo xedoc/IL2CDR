@@ -23,6 +23,7 @@ namespace IL2CDR
                 removeItem = list.FirstOrDefault(match);
             }
         }
+
         public static Guid GetGuid(this Dictionary<string, string> dict, string name)
         {
             Guid guid;
