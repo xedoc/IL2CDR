@@ -58,6 +58,7 @@ namespace IL2CDR.Model
         /// Sets and gets the IsChatMonitorEnabled property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [XmlAttribute]
         public bool IsChatMonitorEnabled
         {
             get
@@ -88,6 +89,7 @@ namespace IL2CDR.Model
         /// Sets and gets the MissionLogCleanupInterval property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [XmlAttribute]
         public int MissionLogCleanupInterval
         {
             get

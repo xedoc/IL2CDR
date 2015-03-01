@@ -23,6 +23,7 @@ namespace IL2CDR.Model
             MissionLogFolder = folder;
             Initialize();
         }
+        public DateTime MissionStartDateTime { get; set; }
         public string MissionLogFolder { get; set; }
         public void Initialize()
         {
@@ -40,8 +41,18 @@ namespace IL2CDR.Model
         }
         public void ReadMissionHistory()
         {
-            missionDateTime = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt")
-                .With(x => Re.GetSubString(x, @".*?\((.*)?\)[0]\.txt"));
+            //missionReport(2015-02-25_11-43-53)[0].txt
+
+            var firstMissionLogFile = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt");
+            if( String.IsNullOrWhiteSpace( firstMissionLogFile ))
+                return;
+
+            missionDateTime = Re.GetSubString(firstMissionLogFile, @".*?\((.*)?\)[0]\.txt");
+            
+            if( String.IsNullOrWhiteSpace( missionDateTime))
+                return;
+
+
 
             var missionFiles = Util.GetFilesSortedByTime(MissionLogFolder, String.Format("missionReport({0})[*].txt", missionDateTime), true);
 

@@ -50,9 +50,7 @@ namespace IL2CDR
                 Timeline.DesiredFrameRateProperty.OverrideMetadata(
                     typeof(Timeline),
                     new FrameworkPropertyMetadata { DefaultValue = 20 });
-            
 
-            InitConfiguration();
             SettingsManager.BackupStartupConfig();
 
             StartupConfig = new IL2StartupConfig(String.Format(@"{0}data\startup.cfg", Settings.Default.Config.RootFolder));
@@ -69,32 +67,8 @@ namespace IL2CDR
                     MissionLogDataService.Start();
             }
         }
-        private void InitConfiguration()
-        {
-            if( IL2CDR.Properties.Settings.Default.Config == null )
-            {
-                ResetConfig();
-            }
-            if( String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder ))
-            {
-                var installFolder = SettingsManager.GetIL2LocationFromRegistry();
-                if (!String.IsNullOrWhiteSpace(installFolder))
-                {
-                    UI.Dispatch(() => Settings.Default.Config.RootFolder = installFolder);
-                }
-            }
-  
 
-        }
-        public void ResetConfig()
-        {
-            IL2CDR.Properties.Settings.Default.Config = new Config()
-            {
-                LastMissionLogFile = String.Empty,               
-            };
-             
 
-        }
         private void CopyDataFolders(string destinationDir)
         {
 

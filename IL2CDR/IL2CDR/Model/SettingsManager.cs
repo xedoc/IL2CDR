@@ -18,6 +18,8 @@ namespace IL2CDR.Model
 
         public SettingsManager()
         {
+            InitConfiguration();
+
             config = Settings.Default.Config;
             startupConfig = (Application.Current as App).StartupConfig;
             if (startupConfig != null)
@@ -26,6 +28,27 @@ namespace IL2CDR.Model
             config.PropertyChanged += config_PropertyChanged;
         }
 
+        private void InitConfiguration()
+        {
+            if (IL2CDR.Properties.Settings.Default.Config == null)
+            {
+                ResetConfig();
+            }
+            if (String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder))
+            {
+                var installFolder = GetIL2LocationFromRegistry();
+                if (!String.IsNullOrWhiteSpace(installFolder))
+                {
+                    UI.Dispatch(() => Settings.Default.Config.RootFolder = installFolder);
+                }
+            }
+
+
+        }
+        private void ResetConfig()
+        {
+            IL2CDR.Properties.Settings.Default.Config = new Config();
+        }
         void config_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if( e.PropertyName.Equals( "RootFolder" ))

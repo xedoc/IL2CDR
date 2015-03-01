@@ -189,7 +189,7 @@ namespace IL2CDR.Model
     public class MissionLogEventGameObjectSpawn : MissionLogEventBase
     {
         public int ObjectId { get; set; }
-        public string Type { get; set; }
+        public string VehicleType { get; set; }
         public string Name { get; set; }
         public Country Country { get; set; }
         public int PlayerId { get; set; }
@@ -198,7 +198,7 @@ namespace IL2CDR.Model
             : base(logLine)
         {
             ObjectId = RawParameters.GetInt("ID");
-            Type = RawParameters.GetString("TYPE");
+            VehicleType = RawParameters.GetString("TYPE");
             Name = RawParameters.GetString("NAME");
             Country = new Country() { 
                 Id = RawParameters.GetInt("COUNTRY"),
@@ -241,7 +241,7 @@ namespace IL2CDR.Model
         public Guid[] NickGuids { get; set; }
         public Guid LoginGuid { get; set; }
         public string PlayerName { get; set; }
-        public string Type { get; set; }
+        public string VehicleType { get; set; }
         public Country Country { get; set; }
         public int Form { get; set; } //TODO: is it formation ?
         public int AirFieldId { get; set; }

@@ -50,8 +50,8 @@ namespace IL2CDR.Model
             var header = data as MissionLogEventBase;
             if (header == null)
                 return;
-
-            foreach( IActionScript script in Scripts.Where(s => s is IActionScript && s is IScriptConfig) )
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach( IActionScript script in actScripts )
             {
                 if (!(script as IScriptConfig).Config.Enabled)
                     continue;

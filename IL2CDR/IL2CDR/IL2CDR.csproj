@@ -91,6 +91,7 @@
     </Content>
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Model\ActionManager.cs" />
+    <Compile Include="Model\ActionScriptBase.cs" />
     <Compile Include="Model\Collections.cs" />
     <Compile Include="Model\Config.cs" />
     <Compile Include="Model\ConfigField.cs" />

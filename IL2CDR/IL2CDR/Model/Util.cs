@@ -78,6 +78,22 @@ namespace IL2CDR.Model
             }
             return new Vector3D(x, y, z);
         }
+
+        public static DateTime ParseDate( string text )
+        {
+            Func<string,string,string,string,string,string,DateTime>convertFunc = (y,m,d,h,min,sec) => 
+            { return new DateTime(int.Parse(y), int.Parse(m), int.Parse(d), int.Parse(h), int.Parse(min), int.Parse(sec));};
+
+            //2015-02-25_11-43-53
+            var match = Regex.Match(text, @"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})");
+            if( match.Success && match.Groups.Count == 6)
+            {
+                   return convertFunc(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, 
+                       match.Groups[4].Value, match.Groups[5].Value, match.Groups[6].Value);
+            }
+            return default(DateTime);
+        }
+
         public static string GetNewestFilePath( string folder, string mask )
         {
             if( Directory.Exists( folder ))
