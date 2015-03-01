@@ -81,8 +81,13 @@ namespace IL2CDR.Model
 
         public static DateTime ParseDate( string text )
         {
+            if( String.IsNullOrEmpty( text ))
+                return default(DateTime);
+
             Func<string,string,string,string,string,string,DateTime>convertFunc = (y,m,d,h,min,sec) => 
-            { return new DateTime(int.Parse(y), int.Parse(m), int.Parse(d), int.Parse(h), int.Parse(min), int.Parse(sec));};
+            { 
+                return new DateTime(int.Parse(y), int.Parse(m), int.Parse(d), int.Parse(h), int.Parse(min), int.Parse(sec));
+            };
 
             //2015-02-25_11-43-53
             var match = Regex.Match(text, @"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})");
@@ -93,6 +98,8 @@ namespace IL2CDR.Model
             }
             return default(DateTime);
         }
+
+        private static readonly DateTimeOffset GregorianCalendarStart = new DateTimeOffset(1582, 10, 15, 0, 0, 0, TimeSpan.Zero);
 
         public static string GetNewestFilePath( string folder, string mask )
         {

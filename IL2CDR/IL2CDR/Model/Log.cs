@@ -11,35 +11,40 @@ namespace IL2CDR.Model
 {
     public static class Log
     {
+        private static string CurrentDateTime()
+        {
+            var curDT = DateTime.Now;
+            return String.Concat(curDT.ToShortDateString(), " ", curDT.ToLongTimeString());
+        }
         public static void WriteError(String message)
         {
-            var text = String.Format("[{1}] Error: {0}", message, DateTime.Now.ToLongTimeString());
+            var text = String.Format("[{1}] Error: {0}", message, CurrentDateTime());
             AppendToLogFile(text);
         }
         public static void WriteWarning(String message)
         {
-            var text = String.Format("[{1}] Warning: {0}", message, DateTime.Now.ToLongTimeString());
+            var text = String.Format("[{1}] Warning: {0}", message, CurrentDateTime());
             AppendToLogFile(text);
         }
         public static void WriteInfo(String message)
         {
-            var text = String.Format("[{1}] {0}", message, DateTime.Now.ToLongTimeString());
+            var text = String.Format("[{1}] {0}", message, CurrentDateTime());
             AppendToLogFile(text);
         }
 
         public static void WriteError(String format, params object[] args)
         {
-            var text = String.Format("[" + DateTime.Now.ToLongTimeString() + "] Error: " + format, args);
+            var text = String.Format("[" + CurrentDateTime() + "] Error: " + format, args);
             AppendToLogFile(text);
         }
         public static void WriteWarning(String format, params object[] args)
         {
-            var text = String.Format("[" + DateTime.Now.ToLongTimeString() + "] Warning: " + format, args);
+            var text = String.Format("[" + CurrentDateTime() + "] Warning: " + format, args);
             AppendToLogFile(text);
         }
         public static void WriteInfo(String format, params object[] args)
         {
-            var text = String.Format("[" + DateTime.Now.ToLongTimeString() + "] Info: " + format, args);
+            var text = String.Format("[" + CurrentDateTime() + "] " + format, args);
             AppendToLogFile(text);
         }
 

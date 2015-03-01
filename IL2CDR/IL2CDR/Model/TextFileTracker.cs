@@ -17,6 +17,7 @@ namespace IL2CDR.Model
 
         public Func<string,bool> Preprocess { get; set; }
         public Action<string> OnNewLine { get; set; }
+        public Action<string> OnFileCreation { get; set; }
 
         public TextFileTracker(string folder, string mask)
         {
@@ -37,7 +38,11 @@ namespace IL2CDR.Model
         void watcher_Changed(object sender, FileSystemEventArgs e)
         {
             var path = e.FullPath;
-
+            if( e.ChangeType == WatcherChangeTypes.Created)
+            {
+                if (OnFileCreation != null)
+                    OnFileCreation(e.FullPath);
+            }
             if( e.ChangeType != WatcherChangeTypes.Deleted )
             {
                 if (Preprocess != null)

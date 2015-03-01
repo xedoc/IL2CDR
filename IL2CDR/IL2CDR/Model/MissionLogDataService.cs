@@ -13,31 +13,55 @@ namespace IL2CDR.Model
 {
     public class MissionLogDataService : IMissionLogDataService, IStopStart
     {
+        private object lockHistory = new object();
         private List<object> missionHistory;
         private const string mask = "missionReport(*)[*].txt";
-        private string missionDateTime = String.Empty;
+        private string missionDateTimePrefix = String.Empty;
         private TextFileTracker tracker;
         private ActionManager actionManager;
+
+        public DateTime MissionStartDateTime { get; set; }
+        public string MissionLogFolder { get; set; }
+
         public MissionLogDataService(string folder)
         {
             MissionLogFolder = folder;
             Initialize();
         }
-        public DateTime MissionStartDateTime { get; set; }
-        public string MissionLogFolder { get; set; }
+
         public void Initialize()
         {
             actionManager = (Application.Current as App).ActionManager;
             missionHistory = new List<object>();
+
             tracker = new TextFileTracker(MissionLogFolder, mask);
             tracker.OnNewLine = (line) => {
-                var data = MissionLogDataBuilder.GetData(line);
+                var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime);
                 if( data != null && actionManager != null)
                 {
                     actionManager.ProcessAction(data);
-                    missionHistory.Add(data);
+                    AddHistory(data);
                 }
             };
+
+            tracker.OnFileCreation = (filePath) =>
+            {
+                if (Regex.IsMatch(filePath, @"missionReport\([\d+|\-|_]+\)\[0\].txt", RegexOptions.IgnoreCase))
+                {
+                    //New mission log                    
+                    ClearHistory();
+                    StartNewMission(filePath);
+                }
+            };
+        }
+        private void StartNewMission(string logFilePath)
+        {
+            missionDateTimePrefix = Re.GetSubString(logFilePath, @".*?\((.*)?\)[0]\.txt");
+
+            if (String.IsNullOrWhiteSpace(missionDateTimePrefix))
+                return;
+
+            MissionStartDateTime = Util.ParseDate(missionDateTimePrefix);
         }
         public void ReadMissionHistory()
         {
@@ -46,15 +70,14 @@ namespace IL2CDR.Model
             var firstMissionLogFile = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt");
             if( String.IsNullOrWhiteSpace( firstMissionLogFile ))
                 return;
-
-            missionDateTime = Re.GetSubString(firstMissionLogFile, @".*?\((.*)?\)[0]\.txt");
             
-            if( String.IsNullOrWhiteSpace( missionDateTime))
+            StartNewMission(firstMissionLogFile);
+
+            if (MissionStartDateTime.Equals(default(DateTime)))
                 return;
 
 
-
-            var missionFiles = Util.GetFilesSortedByTime(MissionLogFolder, String.Format("missionReport({0})[*].txt", missionDateTime), true);
+            var missionFiles = Util.GetFilesSortedByTime(MissionLogFolder, String.Format("missionReport({0})[*].txt", missionDateTimePrefix), true);
 
             var readException = Util.Try(() => {
                 foreach (var file in missionFiles)
@@ -64,13 +87,25 @@ namespace IL2CDR.Model
                     {
                         foreach (var line in lines)
                         {
-                            var data = MissionLogDataBuilder.GetData(line);
-                            if (data != null)
-                                missionHistory.Add(data);
+                            var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime);
+                            AddHistory(data);
                         }
                     }
                 }                
             });
+        }
+        private void AddHistory( object data )
+        {
+            if (data == null )
+                return;
+
+            lock( lockHistory )
+                missionHistory.Add(data);
+        }
+        private void ClearHistory()
+        {
+            lock( lockHistory )
+                missionHistory.Clear();
         }
         public void Start()
         {
@@ -80,7 +115,7 @@ namespace IL2CDR.Model
             if (!Directory.Exists(MissionLogFolder))
                 return;
 
-            missionHistory.Clear();
+            ClearHistory();
             ReadMissionHistory();
             tracker.Start();
         }

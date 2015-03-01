@@ -13,18 +13,18 @@ namespace IL2CDR.Model
         void OnInfluenceAreaInfo(MissionLogEventInfluenceAreaInfo data);
         void OnGameObjectSpawn(MissionLogEventGameObjectSpawn data);
         void OnGroupInitInfo(MissionLogEventGroupInitInfo data);
-        void OnPlayerPlaneSpawn(MissionLogEventPlayerPlaneSpawn data);
+        void OnPlayerPlaneSpawn(MissionLogEventPlaneSpawn data);
         void OnAirfieldInfo(MissionLogEventAirfieldInfo data);
         void OnObjectiveCompleted(MissionLogEventObjectiveCompleted data);
         void OnMissionEnd(MissionLogEventMissionEnd data );
         void OnLanding(MissionLogEventLanding data);
         void OnTakeOff(MissionLogEventTakeOff data);
-        void OnPlayerMissionEnd(MissionLogEventPlayerMissionEnd data );
+        void OnPlayerMissionEnd(MissionLogEventPlayerAmmo data );
         void OnKill(MissionLogEventKill data);
         void OnDamage(MissionLogEventDamage data);
         void OnHit(MissionLogEventHit data);
         void OnMissionStart( MissionLogEventStart data );
-        void OnUserId(MissionLogUserId data);
+        void OnUserId(MissionJoin data);
         void OnOther(object data);
 
     }
