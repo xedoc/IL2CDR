@@ -52,8 +52,8 @@ namespace IL2CDR.Model
             { EventType.InfluenceAreaInfo, (header) => {return new MissionLogEventInfluenceAreaInfo(header);}},
             { EventType.InfluenceAreaBoundary, (header) => {return new MissionLogEventInfluenceAreaBoundary(header);}},
             { EventType.Version, (header) => {return new MissionLogEventVersion(header);}},
-            { EventType.Join, (header) => {return new MissionJoin(header);}},
-            { EventType.Leave, (header) => {return new MissionLeave(header);}},
+            { EventType.Join, (header) => {return new MissionLogEventPlayerJoin(header);}},
+            { EventType.Leave, (header) => {return new MissionLogEventPlayerLeave(header);}},
         };
 
         public static object GetData(string text, DateTime missionStartTime)
@@ -128,13 +128,13 @@ namespace IL2CDR.Model
     //AType:21
     //T:28250 AType:21 USERID:a11b29de-ce4d-4a19-903f-a6f84a08bdf0 USERNICKID:1b6c2a5a-bfd0-45eb-855f-fff71cd38fbc
     //TODO: handle AType:21 (I guess that is disconnect event)
-    public class MissionLeave : MissionLogEventHeader
+    public class MissionLogEventPlayerLeave : MissionLogEventHeader
     {
         
         public Guid NickGuid { get; set; }
         public Guid LoginGuid { get; set; }
 
-        public MissionLeave(MissionLogEventHeader header) 
+        public MissionLogEventPlayerLeave(MissionLogEventHeader header) 
             : base(header)
         {
             NickGuid = RawParameters.GetGuid("USERNICKID");
@@ -145,13 +145,13 @@ namespace IL2CDR.Model
     //AType:20
     //USERID:xxxxxx-... USERNICKID:xxxxxx-...
     //Identify AType:20
-    public class MissionJoin : MissionLogEventHeader
+    public class MissionLogEventPlayerJoin : MissionLogEventHeader
     {
         
         public Guid NickGuid { get; set; } 
         public Guid LoginGuid { get; set; }
 
-        public MissionJoin(MissionLogEventHeader header)
+        public MissionLogEventPlayerJoin(MissionLogEventHeader header)
             : base(header)
         {
 

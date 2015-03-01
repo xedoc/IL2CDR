@@ -33,7 +33,8 @@ namespace IL2CDR.Model
             { EventType.InfluenceAreaInfo, (script,data) => {script.OnInfluenceAreaInfo(data as MissionLogEventInfluenceAreaInfo);}},
             { EventType.InfluenceAreaBoundary, (script,data) => {script.OnInfluenceAreaBoundary(data as MissionLogEventInfluenceAreaBoundary);}},
             { EventType.Version, (script,data) => {script.OnVersion(data as MissionLogEventVersion);}},
-            { EventType.Disconnect, (script,data) => {script.OnUserId( data as MissionJoin);}},
+            { EventType.Join, (script,data) => {script.OnPlayerJoin(data as MissionLogEventPlayerJoin);}},
+            { EventType.Leave, (script,data) => {script.OnPlayerLeave(data as MissionLogEventPlayerLeave);}},
         };
 
         public ScriptManager()

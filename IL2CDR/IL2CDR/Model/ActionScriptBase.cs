@@ -40,7 +40,9 @@ namespace IL2CDR.Model
 
         virtual public void OnMissionStart(MissionLogEventStart data){}
 
-        virtual public void OnUserId(MissionJoin data){}
+        virtual public void OnPlayerJoin(MissionLogEventPlayerJoin data) { }
+
+        virtual public void OnPlayerLeave(MissionLogEventPlayerLeave data) { }
 
         virtual public void OnOther(object data){}
 
