@@ -26,6 +26,8 @@ namespace IL2CDR.Model
         void OnMissionStart( MissionLogEventStart data );
         void OnPlayerJoin(MissionLogEventPlayerJoin data);
         void OnPlayerLeave(MissionLogEventPlayerLeave data);
+        void OnApplicationShutdown(object data);
+        void OnApplicationStartup(object data);
         void OnOther(object data);
 
     }

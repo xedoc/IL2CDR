@@ -219,13 +219,10 @@ namespace IL2CDR.Model
         {
             AirFieldId = RawParameters.GetInt("AID");
             IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;
-
-            Country = new Country()
-            {
-                Id = RawParameters.GetInt("COUNTRY"),
-                Name = String.Empty,
-                //TODO: Identify countries by ID 
-            };
+            
+            
+            //TODO: Identify countries by ID 
+            Country = new Country(RawParameters.GetInt("COUNTRY"),String.Empty);
             PlanesByCoalition = new List<CoalitionPlanesCount>();
             var planesNumber = Util.SequenceToIntArray(RawParameters.GetString("BC"));
             //TODO:Check numbers meaning - where is DE/RU and neutral?
@@ -250,11 +247,8 @@ namespace IL2CDR.Model
             ObjectId = RawParameters.GetInt("ID");
             VehicleType = RawParameters.GetString("TYPE");
             Name = RawParameters.GetString("NAME");
-            Country = new Country() { 
-                Id = RawParameters.GetInt("COUNTRY"),
-                Name = String.Empty,
-                //TODO: Identify country by id
-            };
+            //TODO: Identify countries by ID 
+            Country = new Country(RawParameters.GetInt("COUNTRY"), String.Empty);
         }
     }
     //AType:11

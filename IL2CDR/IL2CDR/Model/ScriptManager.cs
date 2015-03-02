@@ -56,7 +56,7 @@ namespace IL2CDR.Model
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach( IActionScript script in actScripts )
             {
-                if (!(script as IScriptConfig).Config.Enabled)
+                if (!(script as IScriptConfig).Config.IsEnabled)
                     continue;
 
                 if (actionScripts.ContainsKey(header.Type))

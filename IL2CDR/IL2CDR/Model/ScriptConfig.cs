@@ -141,33 +141,33 @@ namespace IL2CDR.Model
         }
 
         /// <summary>
-        /// The <see cref="Enabled" /> property's name.
+        /// The <see cref="IsEnabled" /> property's name.
         /// </summary>
-        public const string EnabledPropertyName = "Enabled";
+        public const string IsEnabledPropertyName = "IsEnabled";
 
-        private bool _enabled = false;
+        private bool _isEnabled = true;
 
         /// <summary>
-        /// Sets and gets the Enabled property.
+        /// Sets and gets the IsEnabled property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
         [XmlAttribute]
-        public bool Enabled
+        public bool IsEnabled
         {
             get
             {
-                return _enabled;
+                return _isEnabled;
             }
 
             set
             {
-                if (_enabled == value)
+                if (_isEnabled == value)
                 {
                     return;
                 }
 
-                _enabled = value;
-                RaisePropertyChanged(EnabledPropertyName);
+                _isEnabled = value;
+                RaisePropertyChanged(IsEnabledPropertyName);
             }
         }
     }
