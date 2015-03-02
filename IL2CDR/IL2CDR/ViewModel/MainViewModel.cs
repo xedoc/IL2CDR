@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Linq;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Collections.ObjectModel;
@@ -29,7 +30,14 @@ namespace IL2CDR.ViewModel
 
         void messages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, e.NewItems));
+            if (e.NewItems == null)
+                return; 
+
+            var newLines = new string[e.NewItems.Count+1];
+            newLines[0] = String.Empty;
+            e.NewItems.CopyTo(newLines, 1);
+
+            UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, newLines));
         }
 
 

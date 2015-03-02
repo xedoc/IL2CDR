@@ -16,11 +16,16 @@ namespace IL2CDR.Scripts
             {
                 return new ScriptConfig()
                 {
-                    Enabled = false,
+                    Enabled = true,
                     Title = "Example script",
                     Description = "This script does nothing",
                 };
             }
+        }
+
+        public override void OnKill(MissionLogEventKill data)
+        {
+            Log.WriteInfo("Record a kill {0} by {1}", data.AttackerId, data.TargetId);
         }
 
         public override void OnAirfieldInfo(MissionLogEventAirfieldInfo data)

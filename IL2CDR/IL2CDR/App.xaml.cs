@@ -60,9 +60,9 @@ namespace IL2CDR
             ScriptManager.LoadScripts();
             ActionManager = new ActionManager(ScriptManager);
 
-            if( !String.IsNullOrWhiteSpace(StartupConfig.MissionTextLogFolder) )
+            if (!String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder))
             {
-                MissionLogDataService = new MissionLogDataService(StartupConfig.MissionTextLogFolder);
+                MissionLogDataService = new MissionLogDataService(String.Concat(Settings.Default.Config.RootFolder, StartupConfig.MissionTextLogFolder));
                 if( Settings.Default.Config.IsMissionLogMonitorEnabled )
                     MissionLogDataService.Start();
             }

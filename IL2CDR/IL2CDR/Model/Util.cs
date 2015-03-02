@@ -91,7 +91,7 @@ namespace IL2CDR.Model
 
             //2015-02-25_11-43-53
             var match = Regex.Match(text, @"(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})");
-            if( match.Success && match.Groups.Count == 6)
+            if( match.Success && match.Groups.Count == 7)
             {
                    return convertFunc(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value, 
                        match.Groups[4].Value, match.Groups[5].Value, match.Groups[6].Value);

@@ -11,7 +11,6 @@ namespace IL2CDR.Model
 {
     public class ScriptManager : IScriptManager
     {
-        private List<object> scripts;
         private Config config;
         private const string scriptsSubFolder = @"\Scripts";
         private static Random random = new Random();
@@ -32,14 +31,14 @@ namespace IL2CDR.Model
             { EventType.GameObjectSpawn, (script,data) => {script.OnGameObjectSpawn(data as MissionLogEventGameObjectSpawn);}},
             { EventType.InfluenceAreaInfo, (script,data) => {script.OnInfluenceAreaInfo(data as MissionLogEventInfluenceAreaInfo);}},
             { EventType.InfluenceAreaBoundary, (script,data) => {script.OnInfluenceAreaBoundary(data as MissionLogEventInfluenceAreaBoundary);}},
-            { EventType.Version, (script,data) => {script.OnVersion(data as MissionLogEventVersion);}},
+            //{ EventType.Version, (script,data) => {script.OnVersion(data as MissionLogEventVersion);}},
             { EventType.Join, (script,data) => {script.OnPlayerJoin(data as MissionLogEventPlayerJoin);}},
             { EventType.Leave, (script,data) => {script.OnPlayerLeave(data as MissionLogEventPlayerLeave);}},
         };
 
         public ScriptManager()
         {
-            scripts = new List<object>();
+            Scripts = new List<object>();
             config = Settings.Default.Config;
         }
 
@@ -51,6 +50,9 @@ namespace IL2CDR.Model
             var header = data as MissionLogEventHeader;
             if (header == null)
                 return;
+
+            Log.WriteInfo("Running action script with action type {0}", (data as MissionLogEventHeader).Type);
+
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach( IActionScript script in actScripts )
             {
@@ -75,18 +77,23 @@ namespace IL2CDR.Model
                 Util.Try(() => {
                     Log.WriteInfo("Loading script {0}...", scriptPath);
                     var scriptObject = CSScript.Evaluator.LoadFile(scriptPath);
-                    if( !config.ScriptConfigs.Any( script => script.FileName.Equals( scriptFileName, StringComparison.InvariantCultureIgnoreCase )))
+                    var savedScriptConfig = config.ScriptConfigs.FirstOrDefault( script => script.FileName.Equals( scriptFileName, StringComparison.InvariantCultureIgnoreCase ));
+                    if (savedScriptConfig == null)
                     {
                         var scriptConfig = scriptObject as IScriptConfig;
-                        if( scriptConfig != null )
+                        if (scriptConfig != null)
                         {
                             var defaultConfig = scriptConfig.DefaultConfig;
-                            defaultConfig.FileName = scriptFileName;                            
+                            defaultConfig.FileName = scriptFileName;
                             config.ScriptConfigs.Add(defaultConfig);
                         }
                     }
+                    else
+                    {
+                        (scriptObject as IScriptConfig).Config = savedScriptConfig;
+                    }
 
-                    scripts.Add(scriptObject);                
+                    Scripts.Add(scriptObject);                
                 });
             }
         }

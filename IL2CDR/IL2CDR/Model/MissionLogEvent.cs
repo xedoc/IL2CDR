@@ -59,8 +59,7 @@ namespace IL2CDR.Model
         public static object GetData(string text, DateTime missionStartTime)
         {
             var header = new MissionLogEventHeader(text, missionStartTime);
-            if (header.Type != EventType.Unknown &&
-                header.Type != EventType.Version)
+            if (header.Type != EventType.Unknown )
             {
                 if (dataFactory.ContainsKey(header.Type))
                     return dataFactory[header.Type](header);
@@ -126,7 +125,7 @@ namespace IL2CDR.Model
     }
 
     //AType:21
-    //T:28250 AType:21 USERID:a11b29de-ce4d-4a19-903f-a6f84a08bdf0 USERNICKID:1b6c2a5a-bfd0-45eb-855f-fff71cd38fbc
+    //T:28250 AType:21 USERID:00000000-0000-0000-0000-000000000000 USERNICKID:00000000-0000-0000-0000-000000000000
     //TODO: handle AType:21 (I guess that is disconnect event)
     public class MissionLogEventPlayerLeave : MissionLogEventHeader
     {
@@ -279,8 +278,8 @@ namespace IL2CDR.Model
     }
     //AType:10
     //Player plane spawn
-    //T:13129 AType:10 PLID:402433 PID:182273 BUL:1620 SH:0 BOMB:0 RCT:0 (113655.359,129.266,243216.766) IDS:1b6c2a5a-bfd0-45eb-855f-fff71cd38fbc 
-    //LOGIN:a11b29de-ce4d-4a19-903f-a6f84a08bdf0 NAME:xedoc TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 
+    //T:13129 AType:10 PLID:402433 PID:182273 BUL:1620 SH:0 BOMB:0 RCT:0 (113655.359,129.266,243216.766) IDS:00000000-0000-0000-0000-000000000000 
+    //LOGIN:00000000-0000-0000-0000-000000000000 NAME:blahblah TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 
     //PAYLOAD:0 FUEL:1.000 SKIN: WM:1
 
     public class MissionLogEventPlaneSpawn : MissionLogEventHeader
@@ -476,19 +475,6 @@ namespace IL2CDR.Model
             Preset = RawParameters.GetInt("Preset");
             AQMId = RawParameters.GetInt("AWMID");
         }
-    }
-
-    public class Country
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class Player
-    {
-        public Guid[] NickIds { get; set; }
-        public int LoginId { get; set; }
-        public string Name { get; set; }
     }
 
     public class CoalitionPlanesCount

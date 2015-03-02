@@ -56,7 +56,7 @@ namespace IL2CDR.Model
         }
         private void StartNewMission(string logFilePath)
         {
-            missionDateTimePrefix = Re.GetSubString(logFilePath, @".*?\((.*)?\)[0]\.txt");
+            missionDateTimePrefix = Re.GetSubString(logFilePath, @"\((.*)?\)\[0\]\.txt");
 
             if (String.IsNullOrWhiteSpace(missionDateTimePrefix))
                 return;
@@ -98,7 +98,6 @@ namespace IL2CDR.Model
         {
             if (data == null )
                 return;
-
             lock( lockHistory )
                 missionHistory.Add(data);
         }

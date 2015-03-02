@@ -8,7 +8,7 @@ namespace IL2CDR.Model
 {
     public interface IActionScript
     {
-        void OnVersion(MissionLogEventVersion data);
+        //void OnVersion(MissionLogEventVersion data);
         void OnInfluenceAreaBoundary(MissionLogEventInfluenceAreaBoundary data);
         void OnInfluenceAreaInfo(MissionLogEventInfluenceAreaInfo data);
         void OnGameObjectSpawn(MissionLogEventGameObjectSpawn data);

@@ -9,6 +9,7 @@ namespace IL2CDR.Model
 {
     public class AppLogDataService
     {
+        private object lockMessages = new object();
         public ObservableCollection<string> LogMessages { get; set; }
         public AppLogDataService()
         {
@@ -17,7 +18,8 @@ namespace IL2CDR.Model
 
         public void AddMessage( string text )
         {
-            LogMessages.Add(text);
+            lock(lockMessages)
+                LogMessages.Add(text);
         }
     }
 }

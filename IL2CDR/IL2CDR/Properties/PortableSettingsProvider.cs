@@ -147,9 +147,12 @@ namespace IL2CDR
                     settingsXml = null;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex)            
             {
-                Log.WriteError("{0}", "Invalid settings file {0} {1}",filePath,ex.Message);
+                if (ex is FileNotFoundException)
+                    Log.WriteInfo("Initializing application settings with default values...");
+                else
+                    Log.WriteError("Error opening configuration file {0}: {1}", filePath, ex.Message);
             }
 
             return settingsXml ??

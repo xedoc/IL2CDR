@@ -227,7 +227,7 @@
             </TabItem>
             <TabItem Header="Log">
                 <Border Style="{StaticResource TabItemBorder}">
-                    <TextBox Text="{Binding LogMessages}"/>
+                    <TextBox HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" Text="{Binding LogMessages}"/>
 
                 </Border>
             </TabItem>

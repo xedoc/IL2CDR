@@ -12,6 +12,7 @@ namespace IL2CDR.Model
 {
     public class IL2StartupConfig
     {
+        private const string dataFolder = @"data\";
         private const string reParameter = @"[\s|\t|=|""]+(.*?)[\r\n|""]+";
         private const string reSection = @"\[KEY[\s|\t|=]*{0}(.*?)[\n|\r]*\[END";
         private const string defaultChatLogfolder = "";
@@ -46,8 +47,9 @@ namespace IL2CDR.Model
             Util.Try(() => {
                 configContent = File.ReadAllText(configFilePath);
                 
-                MissionTextLogFolder = GetString( "text_log_folder" );
-                ChatLogFolder = GetString("chatlog_folder");
+                MissionTextLogFolder = BuildDataFolder( GetString( "text_log_folder" ));
+                ChatLogFolder = BuildDataFolder( GetString("chatlog_folder"));
+
                 IsMissionTextLogEnabled = GetBool("chatlog");
                 IsChatLogEnabled = GetBool("mission_text_log");
                 Login = GetString("login");
@@ -65,6 +67,17 @@ namespace IL2CDR.Model
                     EnableRequiredOptions();
                 }
             });
+        }
+
+        private string BuildDataFolder( string relativeDataFolder )
+        {
+            if (String.IsNullOrWhiteSpace(relativeDataFolder))
+                return dataFolder;
+            else if (!relativeDataFolder.Contains(":"))
+                return String.Concat(dataFolder, relativeDataFolder);
+            else
+                return dataFolder;
+
         }
 
         public void EnableRequiredOptions()
