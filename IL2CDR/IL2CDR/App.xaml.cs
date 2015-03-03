@@ -16,10 +16,13 @@ namespace IL2CDR
     /// </summary>
     public partial class App : Application
     {
+        //IStopStart services
+        public DServerManager DServerManager { get; set; }
+        public MissionLogDataService MissionLogDataService { get; set; }
+
         public ScriptManager ScriptManager { get; set; }
         public ActionManager ActionManager { get; set; }
         public AppLogDataService AppLogDataService { get; set; }
-        public MissionLogDataService MissionLogDataService { get; set; }
         public SettingsManager SettingsManager { get; set; }
         public IL2StartupConfig StartupConfig { get; set; }
         public StatusDataService StatusDataService { get; set; }
@@ -51,6 +54,9 @@ namespace IL2CDR
                     typeof(Timeline),
                     new FrameworkPropertyMetadata { DefaultValue = 20 });
 
+            DServerManager = new DServerManager();
+            DServerManager.Start();
+
             SettingsManager.BackupStartupConfig();
 
             StartupConfig = new IL2StartupConfig(String.Format(@"{0}data\startup.cfg", Settings.Default.Config.RootFolder));
@@ -67,7 +73,12 @@ namespace IL2CDR
                     MissionLogDataService.Start();
             }
         }
-
+        protected override void OnExit(ExitEventArgs e)
+        {
+            IStopStart[] stopServices = { DServerManager, MissionLogDataService };
+            foreach (var service in stopServices)
+                service.Stop();
+        }
 
         private void CopyDataFolders(string destinationDir)
         {

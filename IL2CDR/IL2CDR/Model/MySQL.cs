@@ -17,8 +17,13 @@ namespace IL2CDR.Model
         private static object lockMysql = new object();
         private const String mysqlConnString = @"Data Source={0};Initial Catalog={3};User Id={1};Password={2};UseCompression=true;Keepalive=1;Minimum Pool Size=1;Maximum Pool Size=100;Pooling=true;";
 
-        public MySQLDatabase()
+        public MySQLDatabase(string host, string user, string password, string database )
         {
+            Host = host;
+            User = user;
+            Password = password;
+            Database = database;
+
             IsConnected = false;
         }
 
@@ -68,6 +73,10 @@ namespace IL2CDR.Model
                 script.ExecuteAsync().Wait();
             }
         }
+        public void ExecSql(String query, params object[] args)
+        {
+            ExecSql(String.Format(query, args));
+        }
 
         public List<NameValueCollection> Select(String query)
         {
@@ -92,6 +101,10 @@ namespace IL2CDR.Model
             }
         }
 
+        public List<NameValueCollection> Select(String query, params object[] args)
+        {
+            return Select(String.Format(query, args));
+        }
 
         public String QuoteSQL(String text)
         {
