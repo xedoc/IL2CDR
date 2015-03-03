@@ -9,7 +9,7 @@ using IL2CDR.Properties;
 
 namespace IL2CDR.Model
 {
-    public class ScriptManager : IScriptManager
+    public class ScriptManager : IScriptManager, IStopStart
     {
         private Config config;
         private const string scriptsSubFolder = @"\Scripts";
@@ -45,14 +45,26 @@ namespace IL2CDR.Model
 
         public List<object> Scripts { get; set; }
 
+        public void RunStartupMethod()
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+                script.OnApplicationStartup(null);
+        }
+        public void RunShutdownMethod()
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+                script.OnApplicationShutdown(null);
+        }
+
         public void RunActionScripts( object data )
         {
             var header = data as MissionLogEventHeader;
             if (header == null)
                 return;
 
-            Log.WriteInfo("Running action script with action type {0}", (data as MissionLogEventHeader).Type);
-
+            Log.WriteInfo("Running action script for action type {0}", header.Type);
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach( IActionScript script in actScripts )
             {
@@ -105,6 +117,22 @@ namespace IL2CDR.Model
                 return Scripts.Where(script => script is IActionScript)
                     .Select(script => script as IActionScript).ToList();
             }
+        }
+
+        public void Start()
+        {
+            RunStartupMethod();
+        }
+
+        public void Stop()
+        {
+            RunShutdownMethod();
+        }
+
+        public void Restart()
+        {
+            Stop();
+            Start();
         }
     }
 }

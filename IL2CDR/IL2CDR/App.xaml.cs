@@ -64,6 +64,8 @@ namespace IL2CDR
 
             ScriptManager = new ScriptManager();
             ScriptManager.LoadScripts();
+            ScriptManager.Start();
+
             ActionManager = new ActionManager(ScriptManager);
 
             if (!String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder))
@@ -75,7 +77,7 @@ namespace IL2CDR
         }
         protected override void OnExit(ExitEventArgs e)
         {
-            IStopStart[] stopServices = { DServerManager, MissionLogDataService };
+            IStopStart[] stopServices = { DServerManager, MissionLogDataService, ScriptManager };
             foreach (var service in stopServices)
                 service.Stop();
         }

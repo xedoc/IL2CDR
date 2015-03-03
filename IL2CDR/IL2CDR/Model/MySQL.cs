@@ -47,11 +47,11 @@ namespace IL2CDR.Model
                 conn.OpenAsync().ContinueWith((task) =>
                 {
                     IsConnected = true;
-
                 }, TaskContinuationOptions.ExecuteSynchronously);
 
                 while (!IsConnected)
                     Thread.Sleep(16);
+
             }
         }
         public void Disconnect()
@@ -66,20 +66,31 @@ namespace IL2CDR.Model
 
         public void ExecSql(String query)
         {
-            Log.WriteInfo(query);
+            if (!CheckConnetion())
+            {
+                Log.WriteError("Can't execute a query:{0}.\nNot connected to the server", query);
+                return;
+            }
             lock (lockMysql)
             {
                 var script = new MySqlScript(conn, query);
-                script.ExecuteAsync().Wait();
+                Util.Try( ()=> script.ExecuteAsync().Wait() );
             }
         }
         public void ExecSql(String query, params object[] args)
         {
+
             ExecSql(String.Format(query, args));
         }
 
         public List<NameValueCollection> Select(String query)
         {
+            if( !CheckConnetion() )
+            {
+                Log.WriteError("Can't execute a query:{0}.\nNot connected to the server", query);
+                return new List<NameValueCollection>();
+            }
+
             var result = new List<NameValueCollection>();
 
             lock (lockMysql)
@@ -100,7 +111,22 @@ namespace IL2CDR.Model
                 return result;
             }
         }
+        public bool CheckConnetion()
+        {
+            if (!IsConnected)
+                Connect();
 
+            if (!IsConnected)
+                return false;
+
+            if( !conn.Ping() )
+            {
+                Connect();
+            }
+            
+            return true;
+
+        }
         public List<NameValueCollection> Select(String query, params object[] args)
         {
             return Select(String.Format(query, args));
@@ -121,5 +147,6 @@ namespace IL2CDR.Model
             return text;
         }
 
+        
     }
 }

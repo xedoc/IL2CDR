@@ -42,8 +42,6 @@ namespace IL2CDR.Model
                     UI.Dispatch(() => Settings.Default.Config.RootFolder = installFolder);
                 }
             }
-
-
         }
         private void ResetConfig()
         {
