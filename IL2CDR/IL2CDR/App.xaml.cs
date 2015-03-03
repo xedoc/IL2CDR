@@ -59,8 +59,8 @@ namespace IL2CDR
 
             SettingsManager.BackupStartupConfig();
 
-            StartupConfig = new IL2StartupConfig(String.Format(@"{0}data\startup.cfg", Settings.Default.Config.RootFolder));
-            StartupConfig.ReadConfig();
+            //StartupConfig = new IL2StartupConfig(String.Format(@"{0}data\startup.cfg", Settings.Default.Config.RootFolder));
+            //StartupConfig.ReadConfig();
 
             ScriptManager = new ScriptManager();
             ScriptManager.LoadScripts();
@@ -68,16 +68,16 @@ namespace IL2CDR
 
             ActionManager = new ActionManager(ScriptManager);
 
-            if (!String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder))
-            {
-                MissionLogDataService = new MissionLogDataService(String.Concat(Settings.Default.Config.RootFolder, StartupConfig.MissionTextLogFolder));
-                if( Settings.Default.Config.IsMissionLogMonitorEnabled )
-                    MissionLogDataService.Start();
-            }
+            //if (!String.IsNullOrWhiteSpace(Settings.Default.Config.RootFolder))
+            //{
+            //    MissionLogDataService = new MissionLogDataService(String.Concat(Settings.Default.Config.RootFolder, StartupConfig.MissionTextLogFolder));
+            //    if( Settings.Default.Config.IsMissionLogMonitorEnabled )
+            //        MissionLogDataService.Start();
+            //}
         }
         protected override void OnExit(ExitEventArgs e)
         {
-            IStopStart[] stopServices = { DServerManager, MissionLogDataService, ScriptManager };
+            IStopStart[] stopServices = { DServerManager, ScriptManager };
             foreach (var service in stopServices)
                 service.Stop();
         }

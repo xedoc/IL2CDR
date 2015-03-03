@@ -82,7 +82,7 @@ namespace IL2CDR.Model
 
         private void Connect()
         {
-            if( config.RconIP != default(IPAddress) && 
+            if( config.RconIP != null && 
                 config.RconPort >= 1 || 
                 config.RconPort <= 65535 )
             {
@@ -117,9 +117,12 @@ namespace IL2CDR.Model
                 Start();
 
             if (netStream.CanWrite)
-            {
-                Byte[] sendBytes = Encoding.UTF8.GetBytes(line);
-                netStream.Write(sendBytes, 0, sendBytes.Length);
+            {                
+                Byte[] sendBytes = Encoding.UTF8.GetBytes(String.Concat(line));
+                Byte[] length = BitConverter.GetBytes((ushort)(line.Length+1));
+                Byte[] zero = { 0 };
+                Byte[] packet = length.Concat(sendBytes).Concat(zero).ToArray();                                
+                Util.Try(() => netStream.Write(packet, 0, packet.Length));
             }
             else
             {
@@ -127,16 +130,23 @@ namespace IL2CDR.Model
                 return null;
             }
 
-            if (netStream.CanRead)
+            if (netStream.CanRead )
             {
-                byte[] bytes = new byte[connection.ReceiveBufferSize];
-                netStream.Read(bytes, 0, (int)connection.ReceiveBufferSize);
-                var response = Encoding.UTF8.GetString(bytes);
-                if (!String.IsNullOrWhiteSpace(response))
-                    return HttpUtility.ParseQueryString(response);
-                else
-                    return new NameValueCollection();
+                if( netStream.DataAvailable )
+                {
+                    byte[] bytes = new byte[connection.ReceiveBufferSize];
+                    Util.Try(() => netStream.Read(bytes, 0, (int)connection.ReceiveBufferSize));
+                    UInt16 length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
+                    string response = null;
+                    if (length > 2)
+                        response = Encoding.UTF8.GetString(bytes.Skip(2).Take((int)length - 1).ToArray());
 
+                    if (!String.IsNullOrWhiteSpace(response))
+                        return HttpUtility.ParseQueryString(response);
+                    else
+                        return new NameValueCollection();
+
+                }
             }
             else
             {

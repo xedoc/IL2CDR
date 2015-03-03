@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IL2CDR.Model
@@ -17,8 +18,6 @@ namespace IL2CDR.Model
             ServerId = default(Guid);
             IsConfigSet = false;
             IsRconConnected = false;
-
-            Initialize();
         }
         public Server(string name, Guid guid, bool isConfigSet, bool isRconConnected )
         {
@@ -27,13 +26,22 @@ namespace IL2CDR.Model
             IsConfigSet = isConfigSet;
             IsRconConnected = isRconConnected;
         }
-
-        private void Initialize()
+        ~Server()
         {
-            var result = rcon.GetConsole();
-            Name = Re.GetSubString(result, @"Server name '(.*?)'");
+            rcon.Stop();
         }
-
+        public void Login()
+        {
+            while( true)
+            {
+                var result = rcon.GetConsole();
+                Name = Re.GetSubString(result, @"Server name '(.*?)'");
+                if (!String.IsNullOrWhiteSpace(Name))
+                    break;
+                else
+                    Thread.Sleep(1000);
+            }
+        }
         /// <summary>
         /// The <see cref="ServerId" /> property's name.
         /// </summary>

@@ -41,17 +41,15 @@ namespace IL2CDR.Model
         }
         private void Initialize()
         {
-            Task.Factory.StartNew(() => ReadConfig()).ContinueWith((task) =>
+            ReadConfig();
+            if (!IsMissionTextLogEnabled || !IsChatLogEnabled || !IsRconEnabled ||
+                 RconPort <= 0 || RconPort > 65535 ||
+                 RconIP == null ||
+                 RconIP.Equals(default(IPAddress))
+                 )
             {
-                if (!IsMissionTextLogEnabled || !IsChatLogEnabled || !IsRconEnabled ||
-                RconPort <= 0 || RconPort > 65535 ||
-                RconIP == null ||
-                RconIP.Equals(default(IPAddress))
-                )
-                {
-                    EnableRequiredOptions();
-                }
-            });
+                EnableRequiredOptions();
+            }
         }
         public void ReadConfig()
         {

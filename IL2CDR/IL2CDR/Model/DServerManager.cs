@@ -10,10 +10,12 @@ namespace IL2CDR.Model
 {
     public class DServerManager : IStopStart
     {
+        private object lockDservers = new object();
         private ProcessMonitor dserverProcMonitor;
         public DServerManager()
         {
             dserverProcMonitor = new ProcessMonitor("DServer.exe");
+            DServers = new ObservableCollection<Server>();
             dserverProcMonitor.RunningProcesses.CollectionChanged += RunningProcesses_CollectionChanged;
             dserverProcMonitor.Start();
         }
@@ -33,7 +35,8 @@ namespace IL2CDR.Model
                 foreach (ProcessItem addedServer in e.NewItems)
                 {
                     Log.WriteInfo("DServer added. PID: {0}", addedServer.ProcessId);
-                    DServers.Add(GetServer(addedServer));
+                    lock (lockDservers)
+                        AddServer(GetServer(addedServer));
                 }
             }
 
@@ -41,8 +44,8 @@ namespace IL2CDR.Model
         public void Start()
         {
             dserverProcMonitor.Start();
-            DServers = new ObservableCollection<Server>(
-                dserverProcMonitor.RunningProcesses.Select( p => GetServer(p)));
+            foreach (var server in dserverProcMonitor.RunningProcesses)
+                AddServer(GetServer(server));
         }
 
         private Server GetServer( ProcessItem process )
@@ -53,7 +56,16 @@ namespace IL2CDR.Model
 
             return new Server(rcon);
         }
-
+        private void AddServer(Server server)
+        {
+            lock( lockDservers )
+            {
+                Task.Factory.StartNew((obj) => { (obj as Server).Login(); }, server).ContinueWith((task, obj) =>
+                {
+                    DServers.Add(obj as Server);
+                },server);
+            }
+        }
         public void Stop()
         {
             dserverProcMonitor.Stop();
