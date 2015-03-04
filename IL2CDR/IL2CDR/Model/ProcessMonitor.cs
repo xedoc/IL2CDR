@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Text;
@@ -21,18 +23,26 @@ namespace IL2CDR.Model
         {
             startWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStartTrace");
             stopWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStopTrace");
+            RunningProcesses = new ObservableCollection<ProcessItem>();
             Initialize();
         }
         public ProcessMonitor (string processName)
 	    {
             startWatcher = new ManagementEventWatcher(String.Format(@"Select * From Win32_ProcessStartTrace WHERE ProcessName LIKE ""{0}""", processName));
             stopWatcher = new ManagementEventWatcher(String.Format(@"Select * From Win32_ProcessStopTrace WHERE ProcessName LIKE ""{0}""", processName));
+
+            var noextName = Path.GetFileNameWithoutExtension(processName);
+            RunningProcesses = new ObservableCollection<ProcessItem>(
+                Process.GetProcesses().Where(p => p.ProcessName.Equals(noextName, StringComparison.InvariantCultureIgnoreCase))
+                .DistinctBy( p => p.MainModule )
+                .Select( p => new ProcessItem( (uint)p.Id, p.ProcessName, Path.GetDirectoryName(p.MainModule.FileName)))
+                );
             Initialize();
+
         }
 
         private void Initialize()
         {
-            RunningProcesses = new ObservableCollection<ProcessItem>();
 
             startWatcher.EventArrived += startWatcher_EventArrived;
             stopWatcher.EventArrived += stopWatcher_EventArrived;
@@ -42,16 +52,33 @@ namespace IL2CDR.Model
         void stopWatcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
             lock( lockProcesses )
+            {
                 RunningProcesses.RemoveAll(p => p.ProcessId == (UInt32)e.NewEvent["ProcessID"]);
+            }
         }
 
         void startWatcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
             lock (lockProcesses)
-                RunningProcesses.Add(new ProcessItem((UInt32)e.NewEvent["ProcessID"], e.NewEvent["ProcessName"] as string));
+            {
+                var process = GetProcessDetails(e.NewEvent);
+                if( process != null )
+                    RunningProcesses.Add(process);
+            }
         }
 
+        private ProcessItem GetProcessDetails( ManagementBaseObject obj )
+        {
+            if( obj == null )    
+                return null;
 
+            var id = (UInt32)obj["ProcessID"];
+            var name =  obj["ProcessName"] as string;
+            var process = Process.GetProcessById((int)id);
+            var fileName = Path.GetDirectoryName( process.MainModule.FileName );
+
+            return new ProcessItem((uint)id, name, fileName);
+        }
 
         public void Start()
         {
@@ -74,12 +101,14 @@ namespace IL2CDR.Model
     }
     public class ProcessItem
     {
-        public ProcessItem( UInt32 id, string name )
+        public ProcessItem( UInt32 id, string name,string processPath )
         {
             ProcessId = id;
             ProcessName = name;
+            ProcessPath = processPath;
         }
         public UInt32 ProcessId { get; set; }
         public string ProcessName { get;set; }
+        public string ProcessPath { get; set; }
     }
 }

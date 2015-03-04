@@ -11,7 +11,7 @@ namespace IL2CDR.Model
 {
     public class Util
     {
-        public static Exception Try(Action action)
+        public static Exception Try(Action action, bool logException = true)
         {
             if (action == null)
                 return null;
@@ -22,7 +22,9 @@ namespace IL2CDR.Model
             }
             catch( Exception e)
             {
-                Log.WriteError("Exception: {0}\n{1}", e.Message, e.StackTrace);
+                if( logException )
+                    Log.WriteError("Exception: {0}\n{1}", e.Message, e.StackTrace);
+
                 return e;
             }
 

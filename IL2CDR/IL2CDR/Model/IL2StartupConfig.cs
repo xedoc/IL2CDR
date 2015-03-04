@@ -37,6 +37,19 @@ namespace IL2CDR.Model
         {
             this.configFilePath = configFilePath;
             statusService = (Application.Current as App).StatusDataService;
+            Initialize();
+        }
+        private void Initialize()
+        {
+            ReadConfig();
+            if (!IsMissionTextLogEnabled || !IsChatLogEnabled || !IsRconEnabled ||
+                 RconPort <= 0 || RconPort > 65535 ||
+                 RconIP == null ||
+                 RconIP.Equals(default(IPAddress))
+                 )
+            {
+                EnableRequiredOptions();
+            }
         }
         public void ReadConfig()
         {
@@ -57,15 +70,6 @@ namespace IL2CDR.Model
                 IsRconEnabled = GetBool("rcon_start");
                 RconIP = GetIPAddress("rcon_ip");
                 RconPort = GetInt("rcon_port");
-
-                if (!IsMissionTextLogEnabled || !IsChatLogEnabled || !IsRconEnabled ||
-                    RconPort <= 0 || RconPort > 65535  ||
-                    RconIP == null ||
-                    RconIP.Equals(default(IPAddress))
-                    )
-                {
-                    EnableRequiredOptions();
-                }
             });
         }
 
@@ -90,10 +94,22 @@ namespace IL2CDR.Model
                 SetString("system", "rcon_ip", "127.0.0.1");
             
             if (RconPort <= 0 || RconPort > 65535)
-                SetInt("system", "rcon_port", 8991);
-            
-            if( statusService != null && statusService.GetStatus("dserver").Equals(StatusType.OK) )
-                statusService.ChangeStatus("dserver", StatusType.Warning, "Startup.cfg have been changed. DServer.exe restart is required!");
+            {
+                int minPort = 8800;
+                int maxPort = 8891;
+                for (; minPort < maxPort;minPort ++ )
+                {
+                    Net.TestTCPPort("localhost", minPort, (entry, e) => {
+                        if (e == null && entry.AddressList.Count() == 0)
+                        {
+                            SetInt("system", "rcon_port", minPort);
+                            minPort = maxPort;
+                        }
+                    });
+                }
+            }
+
+            ReadConfig();
         }
 
         private void SetBool(string section, string name, bool value)

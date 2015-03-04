@@ -29,8 +29,8 @@ namespace IL2CDR.Model
         Version = 15,                   //LET_LOG_VERSION 
         Disconnect = 16,                //LET_DISCONNECT 
         Position = 17,                  //LET_POSITION
-        Join = 20,                      //TODO: check meaning of AType:20
-        Leave = 21,                     //TODO: check meaning of AType:21
+        Join = 20,                      
+        Leave = 21,                     
     }                                   
 
     public class MissionLogDataBuilder
@@ -126,7 +126,6 @@ namespace IL2CDR.Model
 
     //AType:21
     //T:28250 AType:21 USERID:00000000-0000-0000-0000-000000000000 USERNICKID:00000000-0000-0000-0000-000000000000
-    //TODO: handle AType:21 (I guess that is disconnect event)
     public class MissionLogEventPlayerLeave : MissionLogEventHeader
     {
         
@@ -280,7 +279,7 @@ namespace IL2CDR.Model
     {
         
         public int PlayerId { get; set; }
-        public int PlaneId { get; set; } //TODO: check if property is what I think
+        public int PlaneId { get; set; }
         //TODO: identify SH parameter
         public int Bombs { get; set; }
         //TODO: what is RCT ? Rectangle or rockets ?

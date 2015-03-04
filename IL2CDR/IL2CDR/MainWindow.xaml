@@ -13,7 +13,7 @@
         Width="716"
         Title="IL2 CDR"
         Background="#252525"
-        DataContext="{Binding Main, Source={StaticResource Locator}}">
+        DataContext="{Binding Main, Source={StaticResource Locator}}" Icon="Resources/cdr.ico">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <mvvmlight:EventToCommand Command="{Binding ExitApplication}"/>
@@ -34,52 +34,52 @@
 
     <Grid x:Name="LayoutRoot">
         <TabControl>
-            <TabItem Header="Status">
+            <TabItem Header="Servers">
                 <Border Style="{StaticResource TabItemBorder}">
                     <StackPanel Orientation="Vertical" Margin="20,0,10,0">
-                        <StackPanel  Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Text="OK" IsReadOnly="True" HorizontalContentAlignment="Center" Background="#FF0D9100" BorderThickness="0"/>
-                                <TextBox Grid.Column="1" IsReadOnly="True" Text="IL2 Configuration file"  BorderThickness="0"/>
-                                <TextBox Text="" IsReadOnly="True" Grid.Column="2" BorderThickness="0" Foreground="Red"/>
-                            </Grid>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Text="!" IsReadOnly="True" HorizontalContentAlignment="Center" Background="#FF832525" BorderThickness="0"/>
-                                <TextBox Grid.Column="1" IsReadOnly="True" Text="RCON connection"  BorderThickness="0"/>
-                                <TextBox Text="TCP connection refused" IsReadOnly="True" Grid.Column="2" BorderThickness="0" Foreground="Red"/>
-                            </Grid>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox Text="!" IsReadOnly="True" HorizontalContentAlignment="Center" Background="#FF832525" BorderThickness="0"/>
-                                <TextBox Grid.Column="1" IsReadOnly="True" Text="Dedicated server"  BorderThickness="0"/>
-                                <TextBox Text="DServer.exe isn't running" IsReadOnly="True" Grid.Column="2" BorderThickness="0" Foreground="Red"/>
-                            </Grid>
-                        </StackPanel>
-
-                        <ItemsControl>
-                            <ItemsControl.ItemTemplate>
+                        <ItemsControl ItemsSource="{Binding ServerList}" >
+                            <ItemsControl.ItemTemplate>                                                               
                                 <DataTemplate>
-                                    <Grid>
-                                        <Label>test</Label>
-                                    </Grid>
+                                    <StackPanel DataContext="{Binding}" Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Top">
+                                        <Rectangle Stretch="UniformToFill">
+                                            <Rectangle.Style>
+                                                <Style>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsRconConnected}" Value="False">
+                                                            <Setter Property="Rectangle.Fill" Value="Red"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsRconConnected}" Value="True">
+                                                            <Setter Property="Rectangle.Fill" Value="Green"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Rectangle.Style>
+                                            <Rectangle.OpacityMask>
+                                                <VisualBrush Visual="{StaticResource appbar_connect}"/>
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-16,0,0" Foreground="#FF7D7D7D" >rcon</TextBlock>
+                                        
+                                        <Rectangle  Stretch="UniformToFill" Margin="10,0,0,0" >
+                                            <Rectangle.Style>
+                                                <Style>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsConfigSet}" Value="False">
+                                                            <Setter Property="Rectangle.Fill" Value="Red"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsConfigSet}" Value="True">
+                                                            <Setter Property="Rectangle.Fill" Value="Green"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>                                                    
+                                                </Style>
+                                            </Rectangle.Style>
+                                            <Rectangle.OpacityMask>
+                                                <VisualBrush Visual="{StaticResource appbar_settings}"/>
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>                                        
+                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-3,-16,0,0" Foreground="#FF7D7D7D">config</TextBlock>
+                                        <TextBox Text="{Binding Name}" Padding="0" Margin="0" IsReadOnly="True" BorderThickness="0" VerticalAlignment="Top" MinHeight="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" MaxLines="1" FontSize="14"/>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                             <ItemsControl.ItemsPanel>

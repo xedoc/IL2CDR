@@ -6,6 +6,8 @@ using GalaSoft.MvvmLight.Command;
 using System.Collections.ObjectModel;
 using IL2CDR.Model;
 using IL2CDR.Properties;
+using GalaSoft.MvvmLight.Ioc;
+using System.Collections.Generic;
 
 namespace IL2CDR.ViewModel
 {
@@ -20,8 +22,20 @@ namespace IL2CDR.ViewModel
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
+        [PreferredConstructor]
         public MainViewModel()
         {
+            if( IsInDesignMode )
+            {
+                ServerList = new ObservableCollection<Server>(new List<Server>() { new Server("Xedoc playground", default(Guid), false, true) });
+                return;
+            }
+            else
+            {
+                ServerList = new ObservableCollection<Server>();
+            }
+
+
             Config = Properties.Settings.Default.Config;
             var messages = (Application.Current as App).AppLogDataService.LogMessages;
             LogMessages = String.Join( Environment.NewLine, messages);
@@ -212,6 +226,36 @@ namespace IL2CDR.ViewModel
                         else
                             missionLogService.Start();
                     }));
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="ServerList" /> property's name.
+        /// </summary>
+        public const string ServerListPropertyName = "ServerList";
+
+        private ObservableCollection<Server> _serverList = null;
+
+        /// <summary>
+        /// Sets and gets the ServerList property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public ObservableCollection<Server> ServerList
+        {
+            get
+            {
+                return _serverList;
+            }
+
+            set
+            {
+                if (_serverList == value)
+                {
+                    return;
+                }
+
+                _serverList = value;
+                RaisePropertyChanged(ServerListPropertyName);
             }
         }
 
