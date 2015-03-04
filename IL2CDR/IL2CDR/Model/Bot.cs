@@ -8,17 +8,12 @@ namespace IL2CDR.Model
 {
     public class Bot : GameObject
     {
-        public Bot(GameObject obj) : base(obj.Id)
+        public Bot(GameObject obj, string editorName, string name)
+            : base(obj.Id, name)
         {
-
-        }
-        public Bot(GameObject obj, string type, string name)
-            : base(obj.Id)
-        {
-            Type = type;
+            NameInEdtor = editorName;
             Name = name;
         }
-        public string Type { get; set; }
-        public string Name { get; set; }
+        public string NameInEdtor { get; set; }
     }
 }

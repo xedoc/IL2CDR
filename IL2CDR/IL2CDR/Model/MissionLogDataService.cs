@@ -19,24 +19,26 @@ namespace IL2CDR.Model
         private string missionDateTimePrefix = String.Empty;
         private TextFileTracker tracker;
         private ActionManager actionManager;
+        private Server server;
 
         public DateTime MissionStartDateTime { get; set; }
         public string MissionLogFolder { get; set; }
 
-        public MissionLogDataService(string folder)
+        public MissionLogDataService(Server server)
         {
-            MissionLogFolder = folder;
+            this.server = server;
+            MissionLogFolder = server.Rcon.Config.MissionTextLogFolder;
             Initialize();
         }
-
         public void Initialize()
         {
-            actionManager = (Application.Current as App).ActionManager;
+            
             missionHistory = new List<object>();
 
             tracker = new TextFileTracker(MissionLogFolder, mask);
             tracker.OnNewLine = (line) => {
-                var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime);
+                actionManager = (Application.Current as App).ActionManager;
+                var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
                 if( data != null && actionManager != null)
                 {
                     actionManager.ProcessAction(data);
@@ -87,12 +89,20 @@ namespace IL2CDR.Model
                     {
                         foreach (var line in lines)
                         {
-                            var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime);
+                            var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
                             AddHistory(data);
                         }
                     }
                 }                
             });
+        }
+        private int GetCurrentEventNumber()
+        {
+            int result;
+            lock (lockHistory)
+                result = missionHistory.Count;
+
+            return result;
         }
         private void AddHistory( object data )
         {

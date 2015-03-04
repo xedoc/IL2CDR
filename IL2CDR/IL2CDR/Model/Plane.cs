@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace IL2CDR.Model
+{
+    public class Plane : GameObject
+    {
+        public Plane(int id, string name) : base(id, name)
+        {
+
+        }
+        public int Payload { get; set; }
+        public int Rockets { get; set; }
+        public int Shells { get; set; } 
+        public int Bombs { get; set; }
+        public double Fuel { get; set; }
+        public WeaponMods WeaponMods { get; set; }
+        public string Skin { get; set; }
+
+    }
+}

@@ -56,11 +56,12 @@ namespace IL2CDR.Model
             { EventType.Leave, (header) => {return new MissionLogEventPlayerLeave(header);}},
         };
 
-        public static object GetData(string text, DateTime missionStartTime)
+        public static object GetData(string text, DateTime missionStartTime, int eventNumber, Server server)
         {
             var header = new MissionLogEventHeader(text, missionStartTime);
             if (header.Type != EventType.Unknown )
             {
+                header.EventID = GuidUtility.Create(GuidUtility.IsoOidNamespace, String.Concat(server.ServerId,"_",missionStartTime,"_",eventNumber));
                 if (dataFactory.ContainsKey(header.Type))
                     return dataFactory[header.Type](header);
             }
@@ -70,14 +71,17 @@ namespace IL2CDR.Model
     public class MissionLogEventHeader
     {
         private string logLine;
+
         public EventType Type { get; set; }
         public uint Ticks { get; set; } // 1/50 of second
-        public long EventID { get; set; }
+        public Server Server { get; set; }
+        public Guid EventID { get; set; }
         public DateTime MissionStartTime { get; set; }
         public Dictionary<string, string> RawParameters { get; set; }
 
         public MissionLogEventHeader(MissionLogEventHeader header)
         {
+            this.Server = header.Server;
             this.logLine = header.logLine;
             this.Type = header.Type;
             this.Ticks = header.Ticks;
@@ -269,41 +273,32 @@ namespace IL2CDR.Model
             LeaderId = RawParameters.GetInt("LID");
         }
     }
+
+    public enum WeaponMods
+    {
+        Default,
+        Mod1,
+        Mod2,
+        Mod3,
+        Mod4,
+        Mod5,
+        Mod6,
+        Mod7
+    }
     //AType:10
     //Player plane spawn
     //T:13129 AType:10 PLID:402433 PID:182273 BUL:1620 SH:0 BOMB:0 RCT:0 (113655.359,129.266,243216.766) IDS:00000000-0000-0000-0000-000000000000 
     //LOGIN:00000000-0000-0000-0000-000000000000 NAME:blahblah TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 
     //PAYLOAD:0 FUEL:1.000 SKIN: WM:1
-
     public class MissionLogEventPlaneSpawn : MissionLogEventHeader
-    {
-        
-        public int PlayerId { get; set; }
-        public int PlaneId { get; set; }
-        //TODO: identify SH parameter
-        public int Bombs { get; set; }
+    {        
         //TODO: what is RCT ? Rectangle or rockets ?
-        //RCT:0 (113655.359,129.266,243216.766)
-        //public int Rockets { get; set; }
-        public Guid NickGuid { get; set; }
-        public Guid LoginGuid { get; set; }
-        public string PlayerName { get; set; }
-        public string VehicleType { get; set; }
-        public Country Country { get; set; }
-        public int Form { get; set; } //TODO: is it formation ?
-        public int AirFieldId { get; set; }
-        public bool IsInAir { get; set; }
-        public int ParentId { get; set; }
-        public int Payload { get; set; }
-        public double Fuel { get; set; }
-        //TODO: find type of Skin
-        //public string Skin { get; set; }
-        //TODO: Identify WM
-
+        public Player Player { get; set; }
+        public int Formation { get; set; }
         public MissionLogEventPlaneSpawn(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO:Parse key/value pairs
+
         }
     }
     //AType:9
@@ -312,9 +307,7 @@ namespace IL2CDR.Model
     //T:10 AType:9 AID:98304 COUNTRY:101 POS(112253.711, 25.323, 260996.453) IDS()    
     public class MissionLogEventAirfieldInfo : MissionLogEventHeader
     {
-        
-        public int AirFieldId { get; set; }
-        public Vector3D Position { get; set; }
+        public AirField AirField { get; set; }
         //TODO: what is ids ? Players ?
 
         public MissionLogEventAirfieldInfo(MissionLogEventHeader header)
@@ -475,39 +468,8 @@ namespace IL2CDR.Model
         public Country Country { get; set; }
         public int Count { get; set; }
     }
+
+
+
 }
 
-//Sequence examples:
-//CPlane
-//Il-2 mod.1942
-
-//CTruck
-//Transport
-//GAZ-M
-
-
-//Interesting classes
-//CSpotter
-//CParachute
-//CPlatformTank
-//CPlatformTracks
-//CSpotlight
-//CTurretCamera
-//CAttachedVehicle
-//CSubmarine
-//CShip
-//CVehicleRocketTurret
-//CVehicleExplosionTurret
-//CVehicleTurret
-//CTurretRiffle
-//CTurret
-//CTruck
-//CTrainLocomotive
-//CTrainWagon
-//CTank
-//CStaticVehicle
-//CStaticEmitter
-//CStaticBlock
-//CSharedGroup
-//CPlane
-//CAerostat

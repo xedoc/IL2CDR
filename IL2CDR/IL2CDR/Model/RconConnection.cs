@@ -14,10 +14,42 @@ namespace IL2CDR.Model
     {
         private TcpClient connection;
         private NetworkStream netStream;
-        private IL2StartupConfig config;
+        private bool isStopped = false;
+        
         public RconConnection(IL2StartupConfig config)
         {
-            this.config = config;
+            Config = config;
+        }
+
+
+        /// <summary>
+        /// The <see cref="Config" /> property's name.
+        /// </summary>
+        public const string ConfigPropertyName = "Config";
+
+        private IL2StartupConfig _config = null;
+
+        /// <summary>
+        /// Sets and gets the Config property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public IL2StartupConfig Config
+        {
+            get
+            {
+                return _config;
+            }
+
+            set
+            {
+                if (_config == value)
+                {
+                    return;
+                }
+
+                _config = value;
+                RaisePropertyChanged(ConfigPropertyName);
+            }
         }
 
         /// <summary>
@@ -82,20 +114,19 @@ namespace IL2CDR.Model
 
         private void Connect()
         {
-            if( config.RconIP != null && 
-                config.RconPort >= 1 || 
-                config.RconPort <= 65535 )
+            if( Config.RconIP != null && 
+                Config.RconPort >= 1 || 
+                Config.RconPort <= 65535 )
             {
                 Task.Factory.StartNew(() => {
                     Util.Try(() => {
-                        connection = new TcpClient(config.RconIP.ToString(), config.RconPort);
+                        connection = new TcpClient(Config.RconIP.ToString(), Config.RconPort);
                         netStream = connection.GetStream();
                     });
                     IsConnected = true;
                 }).Wait(2000);
                 
             }
-
         }
         private void Disconnect()
         {
@@ -107,12 +138,15 @@ namespace IL2CDR.Model
         }
         private void Authorize()
         {
-            var result = WriteLine(String.Format("auth {0} {1}", config.Login, config.Password));
+            var result = WriteLine(String.Format("auth {0} {1}", Config.Login, Config.Password));
             Log.WriteInfo(result["STATUS"]);
         }
 
         private NameValueCollection WriteLine(string line)
         {
+            if (isStopped)
+                return new NameValueCollection();
+
             if(netStream == null || !netStream.CanWrite)
                 Start();
 
@@ -122,7 +156,7 @@ namespace IL2CDR.Model
                 Byte[] length = BitConverter.GetBytes((ushort)(line.Length+1));
                 Byte[] zero = { 0 };
                 Byte[] packet = length.Concat(sendBytes).Concat(zero).ToArray();                                
-                Util.Try(() => netStream.Write(packet, 0, packet.Length));
+                Util.Try(() => netStream.Write(packet, 0, packet.Length),false);
             }
             else
             {
@@ -135,7 +169,7 @@ namespace IL2CDR.Model
                 if( netStream.DataAvailable )
                 {
                     byte[] bytes = new byte[connection.ReceiveBufferSize];
-                    Util.Try(() => netStream.Read(bytes, 0, (int)connection.ReceiveBufferSize));
+                    Util.Try(() => netStream.Read(bytes, 0, (int)connection.ReceiveBufferSize), false);
                     UInt16 length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
                     string response = null;
                     if (length > 2)
@@ -163,6 +197,7 @@ namespace IL2CDR.Model
 
         public void Start()
         {
+            isStopped = false;
             Connect();
             Authorize();
         }
@@ -170,6 +205,7 @@ namespace IL2CDR.Model
         public void Stop()
         {
             Disconnect();
+            isStopped = true;
         }
 
         public void Restart()

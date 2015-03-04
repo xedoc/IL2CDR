@@ -18,7 +18,8 @@ namespace IL2CDR.Model
         private ManagementEventWatcher stopWatcher;
 
         public ObservableCollection<ProcessItem> RunningProcesses { get; set; }
-
+        public Action<ProcessItem> AddProcess { get; set; }
+        public Action<uint> RemoveProcess { get; set; }
         public ProcessMonitor()
         {
             startWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStartTrace");
@@ -49,11 +50,16 @@ namespace IL2CDR.Model
 
 
         }
+        public void Remove(uint id)
+        {
+            RunningProcesses.RemoveAll(p => p.ProcessId == id);
+        }
         void stopWatcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
             lock( lockProcesses )
             {
-                RunningProcesses.RemoveAll(p => p.ProcessId == (UInt32)e.NewEvent["ProcessID"]);
+                if( RemoveProcess != null )
+                    RemoveProcess((uint)e.NewEvent["ProcessID"]);
             }
         }
 
@@ -62,6 +68,9 @@ namespace IL2CDR.Model
             lock (lockProcesses)
             {
                 var process = GetProcessDetails(e.NewEvent);
+                if (AddProcess != null)
+                    AddProcess(process);
+
                 if( process != null )
                     RunningProcesses.Add(process);
             }

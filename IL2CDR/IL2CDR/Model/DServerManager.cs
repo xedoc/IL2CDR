@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,36 +17,26 @@ namespace IL2CDR.Model
         {
             dserverProcMonitor = new ProcessMonitor("DServer.exe");
             DServers = new ObservableCollection<Server>();
-            dserverProcMonitor.RunningProcesses.CollectionChanged += RunningProcesses_CollectionChanged;
+            dserverProcMonitor.AddProcess = (process) => {
+                Log.WriteInfo("DServer added. PID: {0}", process.ProcessId);
+                AddServer(GetServer(process));
+            };
+            dserverProcMonitor.RemoveProcess = (id) =>
+            {
+                Log.WriteInfo("DServer removed. PID: {0}", id);
+                RemoveServer(id);
+            };
             dserverProcMonitor.Start();
         }
         public ObservableCollection<Server> DServers { get; set; }
 
-        void RunningProcesses_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if( e.OldItems != null )
-            {
-                foreach( ProcessItem removedServer in e.OldItems )
-                {
-                    Log.WriteInfo("DServer removed. PID: {0}", removedServer.ProcessId);
-                }
-            }
-            if( e.NewItems != null )
-            {
-                foreach (ProcessItem addedServer in e.NewItems)
-                {
-                    Log.WriteInfo("DServer added. PID: {0}", addedServer.ProcessId);
-                    lock (lockDservers)
-                        AddServer(GetServer(addedServer));
-                }
-            }
-
-        }
         public void Start()
         {
             dserverProcMonitor.Start();
             foreach (var server in dserverProcMonitor.RunningProcesses)
+            {
                 AddServer(GetServer(server));
+            }
         }
 
         private Server GetServer( ProcessItem process )
@@ -53,22 +44,72 @@ namespace IL2CDR.Model
             var baseDir = Directory.GetParent(Directory.GetParent( process.ProcessPath ).FullName);
             var config = new IL2StartupConfig( String.Concat(baseDir, @"\data\startup.cfg"));
             var rcon = new RconConnection( config );
-
-            return new Server(rcon);
+            var server = new Server(rcon, process);
+            return new Server(rcon, process);
         }
-        private void AddServer(Server server)
+        private void RemoveServer( uint processId)
         {
             lock( lockDservers )
             {
-                Task.Factory.StartNew((obj) => { (obj as Server).Login(); }, server).ContinueWith((task, obj) =>
+                var server = DServers.FirstOrDefault(ds => ds != null && ds.Process != null && ds.Process.ProcessId == processId);
+                if( server != null )
                 {
-                    DServers.Add(obj as Server);
-                },server);
+                    server.MissionLogService.Stop();
+                    Util.Try(() => server.Rcon.Stop());
+                    UI.Dispatch(() => {
+                        DServers.Remove(server);
+                        dserverProcMonitor.Remove(processId);
+                    });
+                }
             }
+        }
+        private void AddServer(Server server)
+        {
+            var existingDServer = DServers.FirstOrDefault(s => s.Rcon.Config.GameRootFolder.Equals(server.Rcon.Config.GameRootFolder));
+            if( existingDServer != null )
+            {
+                var process = Process.GetProcessById((int)existingDServer.Process.ProcessId);
+                //Previous DServer process didn't exit correctly
+                if( process != null)
+                {
+                    process.Kill();
+                    RemoveServer(existingDServer.Process.ProcessId);
+                }
+            }
+            UI.Dispatch(() =>
+            {
+                lock (lockDservers)
+                    DServers.Add(server);
+            });
+            Task.Factory.StartNew((obj) => {
+                var srv = (obj as Server);
+                if (srv == null)
+                    return;
+
+                srv.IsConfigSet = srv.Rcon.Config.IsConfigReady;
+                (obj as Server).Login();             
+
+            }, server, TaskCreationOptions.LongRunning).ContinueWith((task, obj) =>
+            {
+                var srv = (obj as Server);
+                if (srv == null)
+                    return;
+
+                srv.ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, srv.Name);
+                
+                srv.MissionLogService.Start();
+                srv.IsRconConnected = true;
+
+            }, server);
         }
         public void Stop()
         {
             dserverProcMonitor.Stop();
+            foreach( var server in DServers )
+            {
+                Util.Try(() => server.Rcon.Stop());
+                server.MissionLogService.Stop();
+            }
         }
 
         public void Restart()

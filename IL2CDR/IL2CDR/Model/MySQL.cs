@@ -23,7 +23,8 @@ namespace IL2CDR.Model
             User = user;
             Password = password;
             Database = database;
-
+            
+            IsConfigIncorrect = false;
             IsConnected = false;
         }
 
@@ -32,35 +33,33 @@ namespace IL2CDR.Model
         public String Password { get; set; }
         public String Database { get; set; }
         public bool IsConnected { get; set; }
+        public bool IsConfigIncorrect { get; set; }
+
         public void Connect()
         {
             lock (lockMysql)
             {
-
-                if (IsConnected)
-                {
-                    IsConnected = false;
-                    conn.Close();
+                if( !IsConfigIncorrect )
+                { 
+                    if (IsConnected )
+                    {
+                        IsConnected = false;
+                        conn.Close();
+                        conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
+                    }   
                     conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
-                }   
-                conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
-                conn.OpenAsync().ContinueWith((task) =>
-                {
-                    IsConnected = true;
-                }, TaskContinuationOptions.ExecuteSynchronously);
-
-                while (!IsConnected)
-                    Thread.Sleep(16);
-
+                    Try(() => conn.Open());
+                }
             }
         }
         public void Disconnect()
         {
-            if (conn != null &&
+            if (!IsConfigIncorrect &&
+                conn != null &&
                 conn.State != ConnectionState.Broken &&
                 conn.State != ConnectionState.Closed)
             {
-                Util.Try(() => conn.Close());
+                Try(() => conn.Close());
             }
         }
 
@@ -74,7 +73,7 @@ namespace IL2CDR.Model
             lock (lockMysql)
             {
                 var script = new MySqlScript(conn, query);
-                Util.Try( ()=> script.ExecuteAsync().Wait() );
+                Try( ()=> script.ExecuteAsync().Wait() );
             }
         }
         public void ExecSql(String query, params object[] args)
@@ -95,24 +94,29 @@ namespace IL2CDR.Model
 
             lock (lockMysql)
             {
-                cmd = new MySqlCommand(query, conn);
-                var reader = cmd.ExecuteReader();
+                Try(() => {
+                    cmd = new MySqlCommand(query, conn);
+                    var reader = cmd.ExecuteReader();
 
-                while (reader.Read())
-                {
-                    var row = new NameValueCollection();
-                    for (int i = 0; i < reader.FieldCount; i++)
+                    while (reader.Read())
                     {
-                        row[reader.GetName(i)] = reader.GetValue(i) == DBNull.Value ? null : (string)reader.GetValue(i);
+                        var row = new NameValueCollection();
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            row[reader.GetName(i)] = reader.GetValue(i) == DBNull.Value ? null : (string)reader.GetValue(i);
+                        }
+                        result.Add(row);
                     }
-                    result.Add(row);
-                }
-                reader.Close();
+                    reader.Close();                
+                });
                 return result;
             }
         }
         public bool CheckConnetion()
         {
+            if (IsConfigIncorrect)
+                return false;
+
             if (!IsConnected)
                 Connect();
 
@@ -147,6 +151,29 @@ namespace IL2CDR.Model
             return text;
         }
 
-        
+        private Exception Try( Action action )
+        {
+            if (action == null)
+                return null;
+
+            Exception error = Util.Try(action, false);
+
+            if (error != null && error.InnerException != null)
+            {
+                var mysqlError = error.InnerException as MySqlException;
+                var errorCodes = new int[] { 1049, 1042, 1044, 1045, 1046 };
+                foreach (int code in errorCodes)
+                {
+                    if (code == mysqlError.Number)
+                    {
+                        IsConfigIncorrect = true;
+                        break;
+                    }
+                    
+                }
+            }
+            
+            return error;
+        }
     }
 }

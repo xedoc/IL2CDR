@@ -101,7 +101,8 @@ namespace IL2CDR.Model
 
         public void Stop()
         {
-            watcher.EnableRaisingEvents = false;
+            if( watcher != null )
+                watcher.EnableRaisingEvents = false;
         }
 
         public void Restart()

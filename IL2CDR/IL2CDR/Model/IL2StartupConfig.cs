@@ -12,17 +12,17 @@ namespace IL2CDR.Model
 {
     public class IL2StartupConfig
     {
-        private const string dataFolder = @"data\";
         private const string reParameter = @"[\s|\t|=|""]+(.*?)[\r\n|""]+";
         private const string reSection = @"\[KEY[\s|\t|=]*{0}(.*?)[\n|\r]*\[END";
         private const string defaultChatLogfolder = "";
         private const string defaultMissionTextLogFolder = "";
         private string configFilePath;
         private string configContent;
-        private StatusDataService statusService;
 
         public string MissionTextLogFolder { get; set; }
         public string ChatLogFolder { get; set; }
+        public string GameRootFolder { get; set; }
+
         public bool IsMissionTextLogEnabled { get; set; }
         public bool IsChatLogEnabled { get; set; }
 
@@ -33,10 +33,12 @@ namespace IL2CDR.Model
         public string Login { get; set;  }
         public string Password { get; set; }
 
+        public bool IsConfigReady { get; set; }
+
         public IL2StartupConfig(string configFilePath)
         {
             this.configFilePath = configFilePath;
-            statusService = (Application.Current as App).StatusDataService;
+
             Initialize();
         }
         private void Initialize()
@@ -48,7 +50,12 @@ namespace IL2CDR.Model
                  RconIP.Equals(default(IPAddress))
                  )
             {
+                IsConfigReady = false;
                 EnableRequiredOptions();
+            }
+            else
+            {
+                IsConfigReady = true;
             }
         }
         public void ReadConfig()
@@ -59,6 +66,8 @@ namespace IL2CDR.Model
 
             Util.Try(() => {
                 configContent = File.ReadAllText(configFilePath);
+
+                GameRootFolder = Directory.GetParent(Path.GetDirectoryName(configFilePath)).FullName;
                 
                 MissionTextLogFolder = BuildDataFolder( GetString( "text_log_folder" ));
                 ChatLogFolder = BuildDataFolder( GetString("chatlog_folder"));
@@ -76,16 +85,18 @@ namespace IL2CDR.Model
         private string BuildDataFolder( string relativeDataFolder )
         {
             if (String.IsNullOrWhiteSpace(relativeDataFolder))
-                return dataFolder;
+                return Path.GetDirectoryName(configFilePath);
             else if (!relativeDataFolder.Contains(":"))
-                return String.Concat(dataFolder, relativeDataFolder);
+                return Path.Combine(  Path.GetDirectoryName(configFilePath), relativeDataFolder);
             else
-                return dataFolder;
+                return Path.GetDirectoryName(configFilePath);
 
         }
 
         public void EnableRequiredOptions()
         {
+            Backup();
+
             var boolFields = new string[] {"chatlog", "mission_text_log", "rcon_start"};
             foreach (var field in boolFields)
                 SetBool("system", field, true);
@@ -179,5 +190,12 @@ namespace IL2CDR.Model
                 return Re.GetSubString(configContent, String.Concat(name, reParameter)).With(x => x.Trim());
         }
 
+        public void Backup()
+        {
+            var original = String.Concat(configFilePath);
+            var backup = String.Concat(configFilePath, ".bak");
+            if (!File.Exists(backup) && File.Exists(original))
+                Util.Try(() => File.Copy(original, backup, true));
+        }
     }
 }

@@ -21,6 +21,40 @@
     </i:Interaction.Triggers>
     <Controls:MetroWindow.Resources>
         <ResourceDictionary>
+            <VisualBrush Visual="{StaticResource appbar_connect}" x:Key="ConnectIcon"/>
+            <VisualBrush Visual="{StaticResource appbar_settings}" x:Key="SettingsIcon"/>
+            <Style TargetType="Rectangle" x:Key="ConnectIconStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsRconConnected}" Value="False">
+                        <Setter Property="Fill" Value="Red"/>
+                        <Setter Property="OpacityMask">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource appbar_connect}"/>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsRconConnected}" Value="True">
+                        <Setter Property="Fill" Value="Green"/>
+                        <Setter Property="OpacityMask">
+                            <Setter.Value>
+                                <VisualBrush Visual="{StaticResource appbar_connect}"/>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>               
+            </Style>
+            <Style TargetType="Rectangle" x:Key="SettingsIconStyle">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsConfigSet}" Value="False">
+                        <Setter Property="Fill" Value="Red"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsConfigSet}" Value="True">
+                        <Setter Property="Fill" Value="Green"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <BooleanToVisibilityConverter x:Key="boolToVisibility"/>
             <Style x:Key="TabItemBorder" TargetType="Border">
                 <Setter Property="BorderBrush" Value="#FF494949"/>
                 <Setter Property="BorderThickness" Value="0,1,0,0"/>
@@ -28,8 +62,10 @@
             </Style>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
+                <ResourceDictionary Source="Resources/Icons.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+
     </Controls:MetroWindow.Resources>
 
     <Grid x:Name="LayoutRoot">
@@ -37,47 +73,15 @@
             <TabItem Header="Servers">
                 <Border Style="{StaticResource TabItemBorder}">
                     <StackPanel Orientation="Vertical" Margin="20,0,10,0">
+                        <TextBlock Visibility="{Binding IsServerListMessageVisible, Converter={StaticResource boolToVisibility}}" Text="{Binding ServerListMessage}"/>
                         <ItemsControl ItemsSource="{Binding ServerList}" >
                             <ItemsControl.ItemTemplate>                                                               
                                 <DataTemplate>
                                     <StackPanel DataContext="{Binding}" Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Top">
-                                        <Rectangle Stretch="UniformToFill">
-                                            <Rectangle.Style>
-                                                <Style>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsRconConnected}" Value="False">
-                                                            <Setter Property="Rectangle.Fill" Value="Red"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IsRconConnected}" Value="True">
-                                                            <Setter Property="Rectangle.Fill" Value="Green"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Rectangle.Style>
-                                            <Rectangle.OpacityMask>
-                                                <VisualBrush Visual="{StaticResource appbar_connect}"/>
-                                            </Rectangle.OpacityMask>
-                                        </Rectangle>
-                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-16,0,0" Foreground="#FF7D7D7D" >rcon</TextBlock>
-                                        
-                                        <Rectangle  Stretch="UniformToFill" Margin="10,0,0,0" >
-                                            <Rectangle.Style>
-                                                <Style>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsConfigSet}" Value="False">
-                                                            <Setter Property="Rectangle.Fill" Value="Red"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IsConfigSet}" Value="True">
-                                                            <Setter Property="Rectangle.Fill" Value="Green"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>                                                    
-                                                </Style>
-                                            </Rectangle.Style>
-                                            <Rectangle.OpacityMask>
-                                                <VisualBrush Visual="{StaticResource appbar_settings}"/>
-                                            </Rectangle.OpacityMask>
-                                        </Rectangle>                                        
-                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-3,-16,0,0" Foreground="#FF7D7D7D">config</TextBlock>
+                                        <Rectangle OpacityMask="{StaticResource ConnectIcon}" Width="26" Height="26" Margin="0" Style="{StaticResource ConnectIconStyle}"/>
+                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-26,-16,0,0" Foreground="#FF7D7D7D" >rcon</TextBlock>
+                                        <Rectangle Style="{StaticResource SettingsIconStyle}" Width="26" Height="26" Margin="11,0,0,0" OpacityMask="{StaticResource SettingsIcon}"/>
+                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-30,-16,0,0" Foreground="#FF7D7D7D">config</TextBlock>
                                         <TextBox Text="{Binding Name}" Padding="0" Margin="0" IsReadOnly="True" BorderThickness="0" VerticalAlignment="Top" MinHeight="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" MaxLines="1" FontSize="14"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -106,19 +110,19 @@
                         <ListBox ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0,0,1,0" BorderBrush="#FF494949">
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="True" Margin="5"/>
+                                    <CheckBox Focusable="False" IsChecked="True" Margin="5"/>
                                     <Label>MySQL writer</Label>
                                 </StackPanel>
                             </ListBoxItem>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <CheckBox Margin="5"/>
+                                    <CheckBox Focusable="False" Margin="5"/>
                                     <Label>Air Domination War</Label>
                                 </StackPanel>
                             </ListBoxItem>
                             <ListBoxItem>
                                 <StackPanel Orientation="Horizontal">
-                                    <CheckBox Margin="5"/>
+                                    <CheckBox Focusable="False" Margin="5"/>
                                     <Label>Chat commands</Label>
                                 </StackPanel>
                             </ListBoxItem>
@@ -146,7 +150,7 @@
                     </Grid>
                 </Border>
             </TabItem>
-            <TabItem Header="RCON">
+            <!--<TabItem Header="RCON">
                 <Border Style="{StaticResource TabItemBorder}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -198,24 +202,14 @@
                         </GroupBox>
                     </Grid>
                 </Border>
-            </TabItem>
+            </TabItem>-->
             <TabItem Header="Settings">
                 <Border Style="{StaticResource TabItemBorder}">
                     <StackPanel Orientation="Vertical">
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Label HorizontalContentAlignment="Left" Grid.Column="0">IL2 folder:</Label>
-                            <TextBox Grid.Column="1" Text="{Binding Config.RootFolder, Mode=TwoWay}" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="IL2 root folder..."/>
-                            <Button Grid.Column="2" Command="{Binding SelectRootFolder}" Margin="5,0,0,0" Width="30" HorizontalAlignment="Left">..</Button>
-                        </Grid>
-                        <CheckBox Command="{Binding EnableMissionLogMonitor}" IsChecked="{Binding Config.IsMissionLogMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,10">Enable mission log monitoring</CheckBox>
-                        <CheckBox Command="{Binding EnableChatLogMonitor}" IsChecked="{Binding Config.IsChatMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,5">Enable chat log monitoring</CheckBox>
+                        <CheckBox Focusable="False" Command="{Binding EnableMissionLogMonitor}" IsChecked="{Binding Config.IsMissionLogMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,10">Enable mission log monitoring</CheckBox>
+                        <CheckBox Focusable="False" Command="{Binding EnableChatLogMonitor}" IsChecked="{Binding Config.IsChatMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,5">Enable chat log monitoring</CheckBox>
                         <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                            <CheckBox>Delete mission logs older than</CheckBox>
+                            <CheckBox Focusable="False">Delete mission logs older than</CheckBox>
                             <TextBox Margin="5,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding Config.MissionLogCleanupInterval, Mode=TwoWay}"></TextBox>
                             <Label>days</Label>
                         </DockPanel>

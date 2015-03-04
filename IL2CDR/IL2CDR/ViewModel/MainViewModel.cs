@@ -19,6 +19,7 @@ namespace IL2CDR.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+        private DServerManager dserverManager;
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -30,11 +31,14 @@ namespace IL2CDR.ViewModel
                 ServerList = new ObservableCollection<Server>(new List<Server>() { new Server("Xedoc playground", default(Guid), false, true) });
                 return;
             }
-            else
-            {
-                ServerList = new ObservableCollection<Server>();
-            }
 
+            dserverManager = (Application.Current as App).DServerManager;
+            dserverManager.DServers.CollectionChanged += DServers_CollectionChanged;
+            if( dserverManager != null && dserverManager.DServers != null)
+            {
+                ServerList = dserverManager.DServers;
+                UpdateServerList();
+            }
 
             Config = Properties.Settings.Default.Config;
             var messages = (Application.Current as App).AppLogDataService.LogMessages;
@@ -42,6 +46,25 @@ namespace IL2CDR.ViewModel
             messages.CollectionChanged += messages_CollectionChanged;
         }
 
+        void DServers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            UpdateServerList();
+        }
+        private void UpdateServerList()
+        {
+            UI.Dispatch(() =>
+            {
+                if (ServerList.Count == 0)
+                {
+                    IsServerListMessageVisible = true;
+                    ServerListMessage = "Run some DServer to start log monitoring...";
+                }
+                else
+                {
+                    IsServerListMessageVisible = false;
+                }
+            });
+        }
         void messages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems == null)
@@ -54,22 +77,63 @@ namespace IL2CDR.ViewModel
             UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, newLines));
         }
 
+        /// <summary>
+        /// The <see cref="ServerListMessage" /> property's name.
+        /// </summary>
+        public const string ServerListMessagePropertyName = "ServerListMessage";
 
-        private RelayCommand _selectRootFolder;
+        private string _serverListMessage = null;
 
         /// <summary>
-        /// Gets the SelectRootFolder.
+        /// Sets and gets the ServerListMessage property.
+        /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public RelayCommand SelectRootFolder
+        public string ServerListMessage
         {
             get
             {
-                return _selectRootFolder
-                    ?? (_selectRootFolder = new RelayCommand(
-                    () =>
-                    {
-                        Config.RootFolderDialog();
-                    }));
+                return _serverListMessage;
+            }
+
+            set
+            {
+                if (_serverListMessage == value)
+                {
+                    return;
+                }
+
+                _serverListMessage = value;
+                RaisePropertyChanged(ServerListMessagePropertyName);
+            }
+        }
+        
+        /// <summary>
+        /// The <see cref="IsServerListMessageVisible" /> property's name.
+        /// </summary>
+        public const string IsServerListMessageVisiblePropertyName = "IsServerListMessageVisible";
+
+        private bool _isServerListMessageVisible = false;
+
+        /// <summary>
+        /// Sets and gets the IsServerListMessageVisible property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsServerListMessageVisible
+        {
+            get
+            {
+                return _isServerListMessageVisible;
+            }
+
+            set
+            {
+                if (_isServerListMessageVisible == value)
+                {
+                    return;
+                }
+
+                _isServerListMessageVisible = value;
+                RaisePropertyChanged(IsServerListMessageVisiblePropertyName);
             }
         }
 
