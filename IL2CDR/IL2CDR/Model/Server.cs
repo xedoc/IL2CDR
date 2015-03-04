@@ -9,10 +9,10 @@ namespace IL2CDR.Model
 {
     public class Server : NotifyPropertyChangeBase
     {
-        private RconConnection rcon;
+        public RconConnection Rcon { get; set; }
         public Server(RconConnection rcon)
         {
-            this.rcon = rcon;
+            Rcon = rcon;
 
             Name = "Unknown";
             ServerId = default(Guid);
@@ -28,13 +28,13 @@ namespace IL2CDR.Model
         }
         ~Server()
         {
-            rcon.Stop();
+            Rcon.Stop();
         }
         public void Login()
         {
             while( true)
             {
-                var result = rcon.GetConsole();
+                var result = Rcon.GetConsole();
                 Name = Re.GetSubString(result, @"Server name '(.*?)'");
                 if (!String.IsNullOrWhiteSpace(Name))
                     break;
