@@ -477,3 +477,38 @@ namespace IL2CDR.Model
         public int Count { get; set; }
     }
 }
+
+//Sequence examples:
+//CPlane
+//Il-2 mod.1942
+
+//CTruck
+//Transport
+//GAZ-M
+
+
+//Interesting classes
+//CSpotter
+//CParachute
+//CPlatformTank
+//CPlatformTracks
+//CSpotlight
+//CTurretCamera
+//CAttachedVehicle
+//CSubmarine
+//CShip
+//CVehicleRocketTurret
+//CVehicleExplosionTurret
+//CVehicleTurret
+//CTurretRiffle
+//CTurret
+//CTruck
+//CTrainLocomotive
+//CTrainWagon
+//CTank
+//CStaticVehicle
+//CStaticEmitter
+//CStaticBlock
+//CSharedGroup
+//CPlane
+//CAerostat
