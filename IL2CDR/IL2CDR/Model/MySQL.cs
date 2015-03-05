@@ -15,19 +15,21 @@ namespace IL2CDR.Model
         public MySqlConnection conn;
         public MySqlCommand cmd = new MySqlCommand();
         private static object lockMysql = new object();
-        private const String mysqlConnString = @"Data Source={0};Initial Catalog={3};User Id={1};Password={2};UseCompression=true;Keepalive=1;Minimum Pool Size=1;Maximum Pool Size=100;Pooling=true;";
+        private const String mysqlConnString = @"Data Source={0};Port={4};Initial Catalog={3};User Id={1};Password={2};UseCompression=true;Keepalive=1;Minimum Pool Size=1;Maximum Pool Size=100;Pooling=true;";
 
-        public MySQLDatabase(string host, string user, string password, string database )
+        public MySQLDatabase(string host, string user, string password, string database, int port = 3306 )
         {
             Host = host;
             User = user;
             Password = password;
             Database = database;
+            Port = port;
             
             IsConfigIncorrect = false;
             IsConnected = false;
         }
 
+        public int Port { get; set; }
         public String Host { get; set; }
         public String User { get; set; }
         public String Password { get; set; }
@@ -35,7 +37,7 @@ namespace IL2CDR.Model
         public bool IsConnected { get; set; }
         public bool IsConfigIncorrect { get; set; }
 
-        public void Connect()
+        public bool Connect()
         {
             lock (lockMysql)
             {
@@ -45,11 +47,17 @@ namespace IL2CDR.Model
                     {
                         IsConnected = false;
                         conn.Close();
-                        conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
+                        conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database, Port));
                     }   
-                    conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database));
-                    Try(() => conn.Open());
+                    conn = new MySqlConnection(String.Format(mysqlConnString, Host, User, Password, Database, Port));
+                    if( Try(() => conn.Open()) == null )
+                    {
+                        IsConnected = true;
+                    }
+
                 }
+                return IsConnected;
+
             }
         }
         public void Disconnect()
@@ -154,13 +162,19 @@ namespace IL2CDR.Model
         private Exception Try( Action action )
         {
             if (action == null)
-                return null;
+                return new NullReferenceException();
 
             Exception error = Util.Try(action, false);
 
             if (error != null && error.InnerException != null)
             {
                 var mysqlError = error.InnerException as MySqlException;
+                if (mysqlError == null)
+                {
+                    IsConfigIncorrect = true;
+                    return error;
+                }
+
                 var errorCodes = new int[] { 1049, 1042, 1044, 1045, 1046 };
                 foreach (int code in errorCodes)
                 {

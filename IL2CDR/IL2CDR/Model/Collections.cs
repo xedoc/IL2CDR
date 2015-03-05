@@ -30,12 +30,17 @@ namespace IL2CDR
             Guid.TryParse(dict.GetString(name), out guid);
             return guid;
         }
-
         public static int GetInt(this Dictionary<string, string> dict, string name)
         {
             int i = -1;
             int.TryParse(dict.GetString(name), out i);
             return i;
+        }
+        public static double GetDouble(this Dictionary<string, string> dict, string name)
+        {
+            double d = -1;
+            double.TryParse(dict.GetString(name), out d);
+            return d;
         }
 
         public static string GetString(this Dictionary<string, string> dict, string name)

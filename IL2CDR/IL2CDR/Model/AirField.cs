@@ -9,7 +9,7 @@ namespace IL2CDR.Model
 {
     public class AirField
     {
-        public int AirFieldId { get; set; }
+        public int Id { get; set; }
         public Vector3D Position { get; set; }
         public Country Country { get; set; }
     }

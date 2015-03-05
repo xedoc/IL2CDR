@@ -10,10 +10,9 @@ namespace IL2CDR.Scripts
 {
     public class Example : ActionScriptBase
     {
-        private MySQLDatabase mysql;
         public Example()
         {
-            mysql = new MySQLDatabase("localhost", "user", "password", "database");
+        
         }
         public override ScriptConfig DefaultConfig
         {
@@ -21,25 +20,27 @@ namespace IL2CDR.Scripts
             {
                 return new ScriptConfig()
                 {
-                    IsEnabled = true,
-                    Title = "Frag counter",
-                    Description = "Sends frag event to MySQL DB",
+                    IsEnabled = false,
+                    Title = "Example script",
+                    Description = "This script does nothing",
+                    
+                    //field name must be unique
+                    ConfigFields = new ConfigFieldList()
+                    {
+                        { "fieldName1", "Text field label", "Text watermark", FieldType.Text, "Default value", true},
+                        { "fieldName2", "Password field label", "Password watermark", FieldType.Text, String.Empty, true},
+                    },
                 };
             }
         }
         public override void OnApplicationStartup(object data)
         {            
-            mysql.Connect();
         }
         public override void OnApplicationShutdown(object data)
         {
-            mysql.Disconnect();
         }
         public override void OnKill(MissionLogEventKill data)
         {
-            Log.WriteInfo("Kill event: {0} by {1}", data.AttackerId, data.TargetId);
-            
-            mysql.ExecSql("CALL RecordKill('{0}','{1}')", data.AttackerId, data.TargetId);
         }
     }
 

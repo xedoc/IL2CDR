@@ -22,6 +22,8 @@ namespace IL2CDR.Model
             ServerId = default(Guid);
             IsConfigSet = false;
             IsRconConnected = false;
+            Initialize();
+
         }
         public Server(string name, Guid guid, bool isConfigSet, bool isRconConnected )
         {
@@ -29,6 +31,13 @@ namespace IL2CDR.Model
             ServerId = guid;
             IsConfigSet = isConfigSet;
             IsRconConnected = isRconConnected;
+            Initialize();
+        }
+        private void Initialize()
+        {
+            Players = new PlayersCollection();
+            GameObjects = new GameObjectsCollection();
+            AirFields = new AirFieldCollection();
         }
         public void Login()
         {
@@ -83,13 +92,13 @@ namespace IL2CDR.Model
         /// </summary>
         public const string GameObjectsPropertyName = "GameObjects";
 
-        private ObservableCollection<GameObject> _gameObjects;
+        private GameObjectsCollection _gameObjects;
 
         /// <summary>
         /// Sets and gets the GameObjects property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<GameObject> GameObjects
+        public GameObjectsCollection GameObjects
         {
             get
             {
@@ -113,13 +122,13 @@ namespace IL2CDR.Model
         /// </summary>
         public const string AirFieldsPropertyName = "AirFields";
 
-        private ObservableCollection<AirField> _airFields;
+        private AirFieldCollection _airFields;
 
         /// <summary>
         /// Sets and gets the AirFields property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<AirField> AirFields
+        public AirFieldCollection AirFields
         {
             get
             {
@@ -143,13 +152,13 @@ namespace IL2CDR.Model
         /// </summary>
         public const string PlayersPropertyName = "Players";
 
-        private ObservableCollection<Player> _players;
+        private PlayersCollection _players;
 
         /// <summary>
         /// Sets and gets the Players property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public ObservableCollection<Player> Players
+        public PlayersCollection Players
         {
             get
             {
@@ -256,6 +265,135 @@ namespace IL2CDR.Model
                 RaisePropertyChanged(IsRconConnectedPropertyName);
             }
         }
+    }
+
+    public class PlayersCollection : Dictionary<int, Player>
+    {
+        private object lockList = new object();
+
+        /// <summary>
+        /// Get Player object by give bot/plane/player ID. 
+        /// Set/add works by Player ID only
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public new Player this[int id]
+        {
+            get
+            {
+                Player result = null;
+                //Search by player id
+                lock (lockList)
+                    this.TryGetValue(id, out result);
+
+                //If search failed - search by plane/bot id
+                if (result == null)
+                {
+                    result = this.Values.FirstOrDefault(player =>
+                        player != null &&
+                        (player.Plane != null && player.Plane.Id == id ) ||
+                        (player.BotPilot != null && player.BotPilot.Id == id));
+                }
+                return result;
+            }
+            set
+            {
+                if (value == null || value.Id <= 0)
+                    return;
+
+                lock (lockList)
+                {
+                    var existing = this[value.Id];
+                    if (existing == null)
+                        this.Add(value.Id, value);
+                    else
+                        existing = value;
+                }
+            }
+        }
+
+        public void PlayerLeave( Guid nickId )
+        {
+            if (nickId != null ||nickId != default(Guid))
+            {
+                if (this.Any((pair) => pair.Value.NickId.Equals(nickId)))
+                {
+                    var player = this.FirstOrDefault((pair) => pair.Value.NickId.Equals(nickId)).Value;
+                    if( player != null )
+                    {
+                        player.IsOnline = false;
+                        player.IsInAir = false;
+                    }
+                   
+                }
+            }   
+        }
+        public void PlayerKilled( int id )
+        {
+            var player = this[id];
+            if (player == null)
+                return;
+
+            player.IsInAir = false;
+        }
 
     }
+    public class GameObjectsCollection : Dictionary<int,GameObject>
+    {
+        private object lockList = new object();
+        public new GameObject this[int id]
+        {
+            get
+            {
+                GameObject result = null;
+                lock (lockList)
+                    this.TryGetValue(id, out result);
+                return result;
+            }
+            set
+            {
+                if (value == null || value.Id <= 0)
+                    return;
+                lock (lockList)
+                {
+                    var existing = this[value.Id];
+                    if (existing == null)
+                        this.Add(value.Id, value);
+                    else
+                        existing = value;
+                }
+            }
+        }
+    }
+
+    public class AirFieldCollection : Dictionary<int,AirField>
+    {
+        private object lockList = new object();
+        public new AirField this[int id]
+        {
+            get
+            {
+                AirField result = null;
+                lock( lockList )
+                    this.TryGetValue(id, out result);
+                return result;
+            }
+            set
+            {
+                if (value == null || value.Id <= 0)
+                    return;
+
+                lock (lockList)
+                {
+                    var existing = this[value.Id];
+                    if (existing == null)
+                        this.Add(value.Id, value);
+                    else
+                        existing = value;
+                }
+            }
+        }
+    }
+    
+    
 }

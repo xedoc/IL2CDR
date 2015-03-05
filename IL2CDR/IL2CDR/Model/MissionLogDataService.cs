@@ -20,6 +20,34 @@ namespace IL2CDR.Model
         private TextFileTracker tracker;
         private ActionManager actionManager;
         private Server server;
+        private Dictionary<EventType, Action<MissionLogEventHeader>> historyHandlers = new Dictionary<EventType, Action<MissionLogEventHeader>>()
+        {
+            { EventType.AirfieldInfo, (data) => { 
+                data.With( x => x as MissionLogEventAirfieldInfo)
+                    .With( x => x.AirField)
+                    .Do( x => data.Server.AirFields[x.Id] = x);
+            }},
+            { EventType.PlaneSpawn, (data) => {
+                data.With(x => x as MissionLogEventPlaneSpawn)
+                    .With(x => x.Player)
+                    .Do(x => data.Server.Players[x.Id] = x);
+            }},
+            { EventType.Leave, (data) => {
+                data.With(x => x as MissionLogEventPlayerLeave)
+                    .Do(x => {
+                        data.Server.Players.PlayerLeave(x.NickId);
+                    });
+
+            }},
+            { EventType.Kill, (data) => {
+                data.With(x => x as MissionLogEventKill)
+                    .Do(x => {
+                        data.Server.Players.PlayerKilled(x.TargetId);
+                    });
+            }},
+
+                
+        };
 
         public DateTime MissionStartDateTime { get; set; }
         public string MissionLogFolder { get; set; }
@@ -41,8 +69,8 @@ namespace IL2CDR.Model
                 var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
                 if( data != null && actionManager != null)
                 {
-                    actionManager.ProcessAction(data);
                     AddHistory(data);
+                    actionManager.ProcessAction(data);
                 }
             };
 
@@ -106,10 +134,22 @@ namespace IL2CDR.Model
         }
         private void AddHistory( object data )
         {
+
             if (data == null )
                 return;
+
             lock( lockHistory )
                 missionHistory.Add(data);
+
+            var header = (data as MissionLogEventHeader);
+            if( header != null )
+            {
+                Action<MissionLogEventHeader> action;
+                if( historyHandlers.TryGetValue( header.Type, out action ) )
+                {
+                    action(header);
+                }
+            }
         }
         private void ClearHistory()
         {

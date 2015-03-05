@@ -12,10 +12,13 @@ namespace IL2CDR.Model
     {
         Unknown = -1,
         Text = 0,
-        File = 1,
-        Folder = 2,
-        Number = 3,
-        Range = 4,
+        FileOpen = 1,
+        FileSave = 2,
+        Folder = 3,
+        Number = 4,
+        Range = 5,
+        Flag = 6,
+        Password = 7,
     }
     [Serializable]
     public class ConfigField : NotifyPropertyChangeBase 
@@ -24,10 +27,11 @@ namespace IL2CDR.Model
         {
 
         }
-        public ConfigField(string name, string label, FieldType dataType, bool isVisible, object value)
+        public ConfigField(string name, string label, string watermark, FieldType dataType, bool isVisible, object value)
         {
             Name = name;
             Label = label;
+            Watermark = watermark;
             Type = dataType;
             IsVisible = isVisible;
             Value = value;
@@ -185,5 +189,44 @@ namespace IL2CDR.Model
                 RaisePropertyChanged(NamePropertyName);
             }
         }
+        /// <summary>
+        /// The <see cref="Watermark" /> property's name.
+        /// </summary>
+        public const string WatermarkPropertyName = "Watermark";
+
+        private string _watermark = null;
+
+        /// <summary>
+        /// Sets and gets the Watermark property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string Watermark
+        {
+            get
+            {
+                return _watermark;
+            }
+
+            set
+            {
+                if (_watermark == value)
+                {
+                    return;
+                }
+
+                _watermark = value;
+                RaisePropertyChanged(WatermarkPropertyName);
+            }
+        }
     }
+
+    [Serializable]
+    public class ConfigFieldList : List<ConfigField>
+    {
+        public void Add( string name, string label, string watermark, FieldType dataType, object value, bool isVisible)
+        {
+            this.Add(new ConfigField(name, label, watermark, dataType, isVisible,  value));
+        }
+    }
+
 }

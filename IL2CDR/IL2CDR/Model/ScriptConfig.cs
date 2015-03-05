@@ -13,7 +13,19 @@ namespace IL2CDR.Model
     {
         public ScriptConfig()
         {
-            Parameters = new List<ConfigField>();
+            ConfigFields = new ConfigFieldList();
+        }
+
+        public string GetString(string name)
+        {
+            return ConfigFields.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).With(x => x.Value as string);
+        }
+        public int GetInt(string name)
+        {
+            int intValue = 0;
+            var value = ConfigFields.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).With( x => x.Value).With( x => x.ToString());
+            int.TryParse(value, out intValue);
+            return intValue;
         }
 
         /// <summary>
@@ -48,33 +60,33 @@ namespace IL2CDR.Model
         }
 
         /// <summary>
-        /// The <see cref="Parameters" /> property's name.
+        /// The <see cref="ConfigFields" /> property's name.
         /// </summary>
-        public const string ParametersPropertyName = "Parameters";
+        public const string ConfigFieldsPropertyName = "ConfigFields";
 
-        private List<ConfigField> _parameters = null;
+        private ConfigFieldList _configFields = null;
 
         /// <summary>
         /// Sets and gets the Parameters property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
         [XmlArray]
-        public List<ConfigField> Parameters
+        public ConfigFieldList ConfigFields
         {
             get
             {
-                return _parameters;
+                return _configFields;
             }
 
             set
             {
-                if (_parameters == value)
+                if (_configFields == value)
                 {
                     return;
                 }
 
-                _parameters = value;
-                RaisePropertyChanged(ParametersPropertyName);
+                _configFields = value;
+                RaisePropertyChanged(ConfigFieldsPropertyName);
             }
         }
 

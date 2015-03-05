@@ -55,7 +55,6 @@ namespace IL2CDR.Model
             { EventType.Join, (header) => {return new MissionLogEventPlayerJoin(header);}},
             { EventType.Leave, (header) => {return new MissionLogEventPlayerLeave(header);}},
         };
-
         public static object GetData(string text, DateTime missionStartTime, int eventNumber, Server server)
         {
             var header = new MissionLogEventHeader(text, missionStartTime);
@@ -132,15 +131,15 @@ namespace IL2CDR.Model
     //T:28250 AType:21 USERID:00000000-0000-0000-0000-000000000000 USERNICKID:00000000-0000-0000-0000-000000000000
     public class MissionLogEventPlayerLeave : MissionLogEventHeader
     {
-        
-        public Guid NickGuid { get; set; }
-        public Guid LoginGuid { get; set; }
+        public Guid NickId { get; set; }
+        public Guid LoginId { get; set; }
 
         public MissionLogEventPlayerLeave(MissionLogEventHeader header) 
             : base(header)
         {
-            NickGuid = RawParameters.GetGuid("USERNICKID");
-            LoginGuid = RawParameters.GetGuid("USERID");
+            Guid nickId, loginId;
+            Guid.TryParse(RawParameters["USERNICKID"], out nickId);
+            Guid.TryParse(RawParameters["USERID"], out loginId);
         }
     }
 
@@ -148,8 +147,7 @@ namespace IL2CDR.Model
     //USERID:xxxxxx-... USERNICKID:xxxxxx-...
     //Identify AType:20
     public class MissionLogEventPlayerJoin : MissionLogEventHeader
-    {
-        
+    {        
         public Guid NickGuid { get; set; } 
         public Guid LoginGuid { get; set; }
 
@@ -225,7 +223,7 @@ namespace IL2CDR.Model
             
             
             //TODO: Identify countries by ID 
-            Country = new Country(RawParameters.GetInt("COUNTRY"),String.Empty);
+            Country = new Country(RawParameters.GetInt("COUNTRY"));
             PlanesByCoalition = new List<CoalitionPlanesCount>();
             var planesNumber = Util.SequenceToIntArray(RawParameters.GetString("BC"));
             //TODO:Check numbers meaning - where is DE/RU and neutral?
@@ -247,11 +245,13 @@ namespace IL2CDR.Model
         public MissionLogEventGameObjectSpawn(MissionLogEventHeader header)
             : base(header)
         {
+            
             ObjectId = RawParameters.GetInt("ID");
             VehicleType = RawParameters.GetString("TYPE");
             Name = RawParameters.GetString("NAME");
-            //TODO: Identify countries by ID 
-            Country = new Country(RawParameters.GetInt("COUNTRY"), String.Empty);
+            Country = new Country(RawParameters.GetInt("COUNTRY"));
+            PlayerId = RawParameters.GetInt("PID");
+            
         }
     }
     //AType:11
@@ -298,7 +298,31 @@ namespace IL2CDR.Model
         public MissionLogEventPlaneSpawn(MissionLogEventHeader header)
             : base(header)
         {
+            GameObjectItem purpose;            
+            GameInfo.ObjectsClassification.TryGetValue(RawParameters.GetString("TYPE"), out purpose);
 
+            Player = new Player()
+            {
+                Id = RawParameters.GetInt("PID"),
+                Country = new Country(RawParameters.GetInt("COUNTRY")),
+                IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
+                IsOnline = true,
+                LoginId = RawParameters.GetGuid("LOGIN"),
+                NickId = RawParameters.GetGuid("IDS"),
+                NickName = RawParameters.GetString("NAME"),
+                Plane = new Plane(RawParameters.GetInt("PLID"), RawParameters.GetString("TYPE"))
+                {
+                    Bombs = RawParameters.GetInt("BOMB"),
+                    Classification = GameObjectClass.Plane,
+                    Fuel = RawParameters.GetDouble("FUEL"),
+                    Payload = RawParameters.GetInt("PAYLOAD"),
+                    Purpose = purpose == null ? null : purpose.Purpose,
+                    Shells = RawParameters.GetInt("SH"),
+                    Skin = RawParameters.GetString("SKIN"),
+                    WeaponMods = (WeaponMods)RawParameters.GetInt("WM"),                    
+                },
+                BotPilot = new GameObject(RawParameters.GetInt("PID"), "BotPilot"),
+            };
         }
     }
     //AType:9
@@ -393,9 +417,8 @@ namespace IL2CDR.Model
     //Kill
     public class MissionLogEventKill : MissionLogEventHeader
     {
-        
-        public int AttackerId { get; set; }
-        public int TargetId { get; set; }
+        public int AttackerId { get; set; } //Plane/vehicle ID
+        public int TargetId { get; set; }   //Plane/vehicle ID
         public Vector3D Position { get; set; }
         public MissionLogEventKill(MissionLogEventHeader header)
             : base(header)

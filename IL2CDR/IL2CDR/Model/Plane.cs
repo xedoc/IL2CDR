@@ -10,7 +10,8 @@ namespace IL2CDR.Model
     {
         public Plane(int id, string name) : base(id, name)
         {
-
+            Id = id;
+            Name = name;
         }
         public int Payload { get; set; }
         public int Rockets { get; set; }

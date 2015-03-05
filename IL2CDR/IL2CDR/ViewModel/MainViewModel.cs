@@ -31,16 +31,17 @@ namespace IL2CDR.ViewModel
                 ServerList = new ObservableCollection<Server>(new List<Server>() { new Server("Xedoc playground", default(Guid), false, true) });
                 return;
             }
-
+            Config = Properties.Settings.Default.Config;
+            
             dserverManager = (Application.Current as App).DServerManager;
             dserverManager.DServers.CollectionChanged += DServers_CollectionChanged;
-            if( dserverManager != null && dserverManager.DServers != null)
-            {
-                ServerList = dserverManager.DServers;
+            dserverManager.With(x => x.DServers).Do( x => {
+                ServerList = x;
                 UpdateServerList();
-            }
+            });
 
-            Config = Properties.Settings.Default.Config;
+            CurrentScriptSettings = Config.ScriptConfigs.FirstOrDefault();
+
             var messages = (Application.Current as App).AppLogDataService.LogMessages;
             LogMessages = String.Join( Environment.NewLine, messages);
             messages.CollectionChanged += messages_CollectionChanged;
@@ -67,14 +68,62 @@ namespace IL2CDR.ViewModel
         }
         void messages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems == null)
-                return; 
+                e.NewItems.Do( x => 
+                {
+                    var newLines = new string[x.Count + 1];
+                    newLines[0] = String.Empty;
+                    x.CopyTo(newLines, 1);
+                    UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, newLines));
+                });
+        }
 
-            var newLines = new string[e.NewItems.Count+1];
-            newLines[0] = String.Empty;
-            e.NewItems.CopyTo(newLines, 1);
 
-            UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, newLines));
+        /// <summary>
+        /// The <see cref="CurrentScriptSettings" /> property's name.
+        /// </summary>
+        public const string CurrentScriptSettingsPropertyName = "CurrentScriptSettings";
+
+        private ScriptConfig _currentScriptSettings = null;
+
+        /// <summary>
+        /// Sets and gets the CurrentScriptSettings property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public ScriptConfig CurrentScriptSettings
+        {
+            get
+            {
+                return _currentScriptSettings;
+            }
+
+            set
+            {
+                if (_currentScriptSettings == value)
+                {
+                    return;
+                }
+
+                _currentScriptSettings = value;
+                RaisePropertyChanged(CurrentScriptSettingsPropertyName);
+            }
+        }
+
+        private RelayCommand<ScriptConfig> _scriptSelectionChanged;
+
+        /// <summary>
+        /// Gets the ScriptSelectionChanged.
+        /// </summary>
+        public RelayCommand<ScriptConfig> ScriptSelectionChanged
+        {
+            get
+            {
+                return _scriptSelectionChanged
+                    ?? (_scriptSelectionChanged = new RelayCommand<ScriptConfig>(
+                    (config) =>
+                    {
+                        CurrentScriptSettings.ConfigFields = config.ConfigFields;
+                    }));
+            }
         }
 
         /// <summary>

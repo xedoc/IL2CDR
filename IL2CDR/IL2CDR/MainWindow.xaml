@@ -5,11 +5,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ie="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:mvvmlight="http://www.galasoft.ch/mvvmlight"
+        xmlns:my="clr-namespace:IL2CDR"
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
         UseLayoutRounding="True"
-        Height="300"
+        Height="436"
         Width="716"
         Title="IL2 CDR"
         Background="#252525"
@@ -99,54 +101,42 @@
             <TabItem Header="Scripts">
                 <Border Style="{StaticResource TabItemBorder}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="26*"/>
-                            <RowDefinition Height="7*"/>
-                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <ListBox ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0,0,1,0" BorderBrush="#FF494949">
-                            <ListBoxItem>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Focusable="False" IsChecked="True" Margin="5"/>
-                                    <Label>MySQL writer</Label>
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Focusable="False" Margin="5"/>
-                                    <Label>Air Domination War</Label>
-                                </StackPanel>
-                            </ListBoxItem>
-                            <ListBoxItem>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox Focusable="False" Margin="5"/>
-                                    <Label>Chat commands</Label>
-                                </StackPanel>
-                            </ListBoxItem>
+                        <ListBox SelectedItem="{Binding CurrentScriptSettings}" ItemsSource="{Binding Config.ScriptConfigs}" ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0,0,1,0" BorderBrush="#FF494949" x:Name="scriptListBox">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding ScriptSelectionChanged}"  CommandParameter="{Binding ElementName=scriptListBox, Path=SelectedItem}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Focusable="False" IsChecked="{Binding IsEnabled}" Margin="5"/>
+                                        <Label Content="{Binding Title}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
                         </ListBox>
-
                         <StackPanel Grid.Column="1" Orientation="Vertical">
-                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                                <Label MinWidth="100" HorizontalContentAlignment="Right">Host:</Label>
-                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="MySQL host IP or hostname..."/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                                <Label MinWidth="100" HorizontalContentAlignment="Right">User:</Label>
-                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="User name..."/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                                <Label MinWidth="100" HorizontalContentAlignment="Right">Password:</Label>
-                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="Password..."/>
-                            </DockPanel>
-                            <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                                <Label MinWidth="100" HorizontalContentAlignment="Right">Port:</Label>
-                                <TextBox Margin="1" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="3306"/>
-                            </DockPanel>
+                            <TextBlock Margin="10" Text="{Binding CurrentScriptSettings.Description}" VerticalAlignment="Top"/>
+                            <ItemsControl ItemsSource="{Binding CurrentScriptSettings.ConfigFields}" >
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <my:ScriptConfigField Margin="6" DataContext="{Binding}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                        </StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </StackPanel>
-                        <Button Width="100" Height="30" Grid.Row="1" HorizontalAlignment="Left">Reload scripts</Button>
+                        
                     </Grid>
                 </Border>
             </TabItem>

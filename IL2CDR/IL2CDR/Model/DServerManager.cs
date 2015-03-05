@@ -18,12 +18,10 @@ namespace IL2CDR.Model
             dserverProcMonitor = new ProcessMonitor("DServer.exe");
             DServers = new ObservableCollection<Server>();
             dserverProcMonitor.AddProcess = (process) => {
-                Log.WriteInfo("DServer added. PID: {0}", process.ProcessId);
                 AddServer(GetServer(process));
             };
             dserverProcMonitor.RemoveProcess = (id) =>
             {
-                Log.WriteInfo("DServer removed. PID: {0}", id);
                 RemoveServer(id);
             };
             dserverProcMonitor.Start();
