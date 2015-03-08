@@ -219,14 +219,10 @@ namespace IL2CDR.Model
             : base(header)
         {
             AirFieldId = RawParameters.GetInt("AID");
-            IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;
-            
-            
-            //TODO: Identify countries by ID 
+            IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;            
             Country = new Country(RawParameters.GetInt("COUNTRY"));
             PlanesByCoalition = new List<CoalitionPlanesCount>();
             var planesNumber = Util.SequenceToIntArray(RawParameters.GetString("BC"));
-            //TODO:Check numbers meaning - where is DE/RU and neutral?
         }
     }
     //AType:12
@@ -303,14 +299,14 @@ namespace IL2CDR.Model
 
             Player = new Player()
             {
-                Id = RawParameters.GetInt("PID"),
+                Id = RawParameters.GetInt("PLID"),
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
                 IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
                 IsOnline = true,
                 LoginId = RawParameters.GetGuid("LOGIN"),
                 NickId = RawParameters.GetGuid("IDS"),
                 NickName = RawParameters.GetString("NAME"),
-                Plane = new Plane(RawParameters.GetInt("PLID"), RawParameters.GetString("TYPE"))
+                Plane = new Plane(RawParameters.GetInt("PID"), RawParameters.GetString("TYPE"))
                 {
                     Bombs = RawParameters.GetInt("BOMB"),
                     Classification = GameObjectClass.Plane,
@@ -337,7 +333,11 @@ namespace IL2CDR.Model
         public MissionLogEventAirfieldInfo(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            AirField = new AirField() { 
+                Country = new Country( RawParameters.GetInt("COUNTRY")),
+                Id = RawParameters.GetInt("AID"),
+                Position = RawParameters.GetVector3D("POS"),
+            };
         }
     }
     //AType:8
@@ -350,11 +350,19 @@ namespace IL2CDR.Model
     //RES - (mission result, completed/not completed)
     public class MissionLogEventObjectiveCompleted : MissionLogEventHeader
     {
-
+        public int ObjectiveId { get; set; }
+        public Vector3D Position { get; set; }
+        public int Type { get; set; }
+        public int Coalition { get; set; }
+        public bool IsCompleted { get; set; }
         public MissionLogEventObjectiveCompleted(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            ObjectiveId = RawParameters.GetInt("OBJID");
+            Position = RawParameters.GetVector3D("POS");
+            Type = RawParameters.GetInt("TYPE");
+            Coalition = RawParameters.GetInt("COAL");
+            IsCompleted = RawParameters.GetInt("RES") == 1 ? true : false;
         }
     }
     //AType:7
@@ -367,7 +375,7 @@ namespace IL2CDR.Model
         public MissionLogEventMissionEnd(MissionLogEventHeader header) 
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            
         }
     }
     //AType:6
@@ -376,11 +384,14 @@ namespace IL2CDR.Model
     //Landing
     public class MissionLogEventLanding : MissionLogEventHeader
     {
-
+        public int PlaneId { get; set; }
+        public Vector3D Position { get; set; }
         public MissionLogEventLanding(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            PlaneId = RawParameters.GetInt("PID");
+            Position = RawParameters.GetVector3D("POS");
+
         }
     }
     //AType:5
@@ -389,11 +400,13 @@ namespace IL2CDR.Model
     //Takeoff 
     public class MissionLogEventTakeOff : MissionLogEventHeader
     {
-
+        public int PlaneId { get; set; }
+        public Vector3D Position { get; set; }
         public MissionLogEventTakeOff(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            PlaneId = RawParameters.GetInt("PID");
+            Position = RawParameters.GetVector3D("POS");
         }
     }
     //AType:4
@@ -405,11 +418,23 @@ namespace IL2CDR.Model
     //BUL, BOMB - bullets and bpmbs left on the end of mission
     public class MissionLogEventPlayerAmmo : MissionLogEventHeader
     {
+        public int PlaneId { get; set; }
+        public int PlayerId { get; set; }
+        public int Bullets { get; set; }
+        public int Shells { get; set; }
+        public int Bombs { get; set; }
+        public int Rockets { get; set; }
 
         public MissionLogEventPlayerAmmo(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            PlaneId = RawParameters.GetInt("PID");
+            PlayerId = RawParameters.GetInt("PLID");
+            Bullets = RawParameters.GetInt("BUL");
+            Shells = RawParameters.GetInt("SH");
+            Bombs = RawParameters.GetInt("BOMB");
+            Rockets = RawParameters.GetInt("RCT");
+
         }
     }
     //AType:3
@@ -425,7 +450,7 @@ namespace IL2CDR.Model
         {
             AttackerId = RawParameters.GetInt("AID");
             TargetId = RawParameters.GetInt("TID");
-            Position = Util.POSToVector3D(RawParameters.GetString("POS"));
+            Position = RawParameters.GetVector3D("POS");
         }
     }
     //AType:2
@@ -434,11 +459,18 @@ namespace IL2CDR.Model
     //Damage
     public class MissionLogEventDamage: MissionLogEventHeader
     {
+        public double Damage { get; set; }
+        public int AttackerId { get; set; }
+        public int TargetId { get; set; }
+        public Vector3D Position { get; set; }
 
         public MissionLogEventDamage(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            AttackerId = RawParameters.GetInt("AID");
+            TargetId = RawParameters.GetInt("TID");
+            Damage = RawParameters.GetDouble("DMG");
+            Position = RawParameters.GetVector3D("POS");
         }
     }
     //AType:1
@@ -447,11 +479,15 @@ namespace IL2CDR.Model
     //Bullet hit on mission object
     public class MissionLogEventHit : MissionLogEventHeader
     {
-
+        public int AttackerId { get; set; }
+        public int TargetId { get; set; }
+        public string AmmoName { get; set; }
         public MissionLogEventHit(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            AttackerId = RawParameters.GetInt("AID");
+            TargetId = RawParameters.GetInt("TID");
+            AmmoName = RawParameters.GetString("AMMO");
         }
     }
     //AType:0
