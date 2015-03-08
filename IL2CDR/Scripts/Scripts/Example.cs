@@ -43,5 +43,12 @@ namespace IL2CDR.Scripts
         {
         }
     }
+    public class Test
+    {
+        public void TestMethod()
+        {
+            Log.WriteInfo("Test method called from another script");
+        }
+    }
 
 }

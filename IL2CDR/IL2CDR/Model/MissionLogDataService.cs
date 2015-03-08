@@ -22,31 +22,16 @@ namespace IL2CDR.Model
         private Server server;
         private Dictionary<EventType, Action<MissionLogEventHeader>> historyHandlers = new Dictionary<EventType, Action<MissionLogEventHeader>>()
         {
-            { EventType.AirfieldInfo, (data) => { 
-                data.With( x => x as MissionLogEventAirfieldInfo)
-                    .With( x => x.AirField)
-                    .Do( x => data.Server.AirFields[x.Id] = x);
-            }},
-            { EventType.PlaneSpawn, (data) => {
-                data.With(x => x as MissionLogEventPlaneSpawn)
-                    .With(x => x.Player)
-                    .Do(x => data.Server.Players[x.Id] = x);
-            }},
-            { EventType.Leave, (data) => {
-                data.With(x => x as MissionLogEventPlayerLeave)
-                    .Do(x => {
-                        data.Server.Players.PlayerLeave(x.NickId);
-                    });
-
-            }},
-            { EventType.Kill, (data) => {
-                data.With(x => x as MissionLogEventKill)
-                    .Do(x => {
-                        data.Server.Players.PlayerKilled(x.TargetId);
-                    });
-            }},
-
-                
+            { EventType.AirfieldInfo, (data) => data.With( x => x as MissionLogEventAirfieldInfo)
+                    .With( x => x.AirField).Do( x => data.Server.AirFields[x.Id] = x)},
+            { EventType.PlaneSpawn, (data) => data.With(x => x as MissionLogEventPlaneSpawn)
+                    .With(x => x.Player).Do(x => data.Server.Players[x.Id] = x)},
+            { EventType.Leave, (data) =>data.With(x => x as MissionLogEventPlayerLeave)
+                    .Do(x => data.Server.Players.PlayerLeave(x.NickId))},
+            { EventType.Kill, (data) => data.With(x => x as MissionLogEventKill)
+                .Do(x => data.Server.Players.PlayerKilled(x.TargetId))},
+            { EventType.MissionStart, (data) => data.With(x => x as MissionLogEventStart)
+                .Do(x => data.Server.CoalitionIndexes = x.CoalitionIndexes)},
         };
 
         public DateTime MissionStartDateTime { get; set; }
@@ -60,9 +45,7 @@ namespace IL2CDR.Model
         }
         public void Initialize()
         {
-            
             missionHistory = new List<object>();
-
             tracker = new TextFileTracker(MissionLogFolder, mask);
             tracker.OnNewLine = (line) => {
                 actionManager = (Application.Current as App).ActionManager;

@@ -13,6 +13,7 @@ namespace IL2CDR.Model
         public RconConnection Rcon { get; set; }
         public MissionLogDataService MissionLogService { get; set; }
         public ProcessItem Process { get; set; }
+
         public Server(RconConnection rcon, ProcessItem process)
         {
             Name = String.Format(@"PID: {0} {1}\DServer.exe", process.ProcessId, process.ProcessPath);
@@ -38,6 +39,7 @@ namespace IL2CDR.Model
             Players = new PlayersCollection();
             GameObjects = new GameObjectsCollection();
             AirFields = new AirFieldCollection();
+            CoalitionIndexes = new Dictionary<int, int>();
         }
         public void Login()
         {
@@ -54,6 +56,36 @@ namespace IL2CDR.Model
                 {
                     Thread.Sleep(1000);
                 }
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="CoalitionIndexes" /> property's name.
+        /// </summary>
+        public const string CoalitionIndexesPropertyName = "CoalitionIndexes";
+
+        private Dictionary<int,int> _coalitionIndexes;
+
+        /// <summary>
+        /// Sets and gets the CoalitionIndexes property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public Dictionary<int,int> CoalitionIndexes
+        {
+            get
+            {
+                return _coalitionIndexes;
+            }
+
+            set
+            {
+                if (_coalitionIndexes == value)
+                {
+                    return;
+                }
+
+                _coalitionIndexes = value;
+                RaisePropertyChanged(CoalitionIndexesPropertyName);
             }
         }
 

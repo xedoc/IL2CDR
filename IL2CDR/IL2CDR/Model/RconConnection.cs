@@ -139,7 +139,7 @@ namespace IL2CDR.Model
         private void Authorize()
         {
             var result = WriteLine(String.Format("auth {0} {1}", Config.Login, Config.Password));
-            Log.WriteInfo(result["STATUS"]);
+            //Log.WriteInfo(result["STATUS"]);
         }
 
         private NameValueCollection WriteLine(string line)
