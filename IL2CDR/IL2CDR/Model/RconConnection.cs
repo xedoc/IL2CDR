@@ -179,7 +179,12 @@ namespace IL2CDR.Model
                 Util.Try(() => connection.Close());
             }
         }
-        private NameValueCollection RawCommand(string line)
+        /// <summary>
+        /// Send raw command to server
+        /// </summary>
+        /// <param name="line">command</param>
+        /// <returns>NameValueCollection with parameter name/value pairs</returns>
+        public NameValueCollection RawCommand(string line)
         {
             lock( lockConnection )
             {
