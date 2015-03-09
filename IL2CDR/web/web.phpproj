@@ -59,6 +59,7 @@
   <ItemGroup>
     <Folder Include="css\" />
     <Folder Include="js\" />
+    <Folder Include="fonts\" />
     <Folder Include="plates\" />
     <Folder Include="plates\Extension\" />
     <Folder Include="plates\Template\" />
@@ -72,5 +73,15 @@
   <ItemGroup>
     <Content Include="css\bootstrap.css" />
     <Content Include="css\bootstrap.min.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="js\bootstrap.js" />
+    <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\il2info.js" />
+    <Content Include="js\jquery.min.js" />
+    <Content Include="js\npm.js" />
   </ItemGroup>
 </Project>

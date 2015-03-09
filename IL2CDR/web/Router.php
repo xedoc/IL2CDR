@@ -1,14 +1,14 @@
 <?php
-require_once 'plates\Template\Directory.php';
-require_once 'plates\Template\Data.php';
-require_once 'plates\Template\FileExtension.php';
-require_once 'plates\Template\Folder.php';
-require_once 'plates\Template\Folders.php';
-require_once 'plates\Template\Func.php';
-require_once 'plates\Template\Functions.php';
-require_once 'plates\Template\Name.php';
-require_once 'plates\Template\Template.php';
-require_once 'plates\Engine.php';
+require_once 'plates/Template/Directory.php';
+require_once 'plates/Template/Data.php';
+require_once 'plates/Template/FileExtension.php';
+require_once 'plates/Template/Folder.php';
+require_once 'plates/Template/Folders.php';
+require_once 'plates/Template/Func.php';
+require_once 'plates/Template/Functions.php';
+require_once 'plates/Template/Name.php';
+require_once 'plates/Template/Template.php';
+require_once 'plates/Engine.php';
 
 require 'IndexController.php';
 require 'Slim/Slim.php';
