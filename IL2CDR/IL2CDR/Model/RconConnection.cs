@@ -275,6 +275,135 @@ namespace IL2CDR.Model
 
             return false;
         }
+        /// <summary>
+        /// Request player list 
+        /// </summary>
+        /// <returns>List of Player objects</returns>
+        public List<Player> GetPlayerList()
+        {
+            List<Player> result = new List<Player>();
+            var rconResult = RawCommand("getplayerlist");
+            if( rconResult["STATUS"] == "1")
+            {
+                var playerList = rconResult["playerList"];
+                if( !String.IsNullOrEmpty( playerList ))
+                {
+                    var table = playerList.Split('|');
+                    if( table.Length > 1 )
+                    {
+                        result = new List<Player>(
+                            table.Select(line => line.Split(',')).Select(x => {
+                                    int cid, ping;
+                                    Guid nickGuid, userGuid;
+                                    PlayerStatus status;
+                                    if (x.Length == 6 &&
+                                        int.TryParse(x[0], out cid) &&
+                                        Guid.TryParse(x[1], out nickGuid) &&
+                                        Guid.TryParse(x[2], out userGuid) &&
+                                        int.TryParse(x[5], out ping) && 
+                                        Enum.TryParse<PlayerStatus>( x[4], out status))
+                                    {
+                                        return new Player()
+                                        {
+                                            ClientId = cid,
+                                            IsOnline = true,
+                                            LoginId = userGuid,
+                                            NickId = nickGuid,
+                                            NickName = x[3],
+                                            Ping = ping,
+                                            Status = status,
+                                        };
+                                    }
+                                    else
+                                    {
+                                        return null;
+                                    }
+                            }));
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Check server status
+        /// </summary>
+        /// <returns>true if server alive</returns>
+        public bool GetServerStatus()
+        {
+            return RawCommand("serverstatus")["STATUS"] == "1";
+        }
+                
+        /// <summary>
+        /// Kick player
+        /// </summary>
+        /// <param name="id">nickname, client id or nick/user guid</param>
+        public void Kick(object id)
+        {
+            if( id is string || id is Guid || id is int )
+            {
+                RawCommand(String.Format("kick {0}", id.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// Ban player
+        /// </summary>
+        /// <param name="id">nickname, client id or nick/user guid</param>
+        public void Ban( object id )
+        {
+            if (id is string || id is Guid || id is int)
+            {
+                RawCommand(String.Format("ban {0}", id.ToString()));
+            }
+        }
+
+        /// <summary>
+        /// Unban all players
+        /// </summary>
+        public void UnBanAll()
+        {
+            RawCommand("unbanall");
+        }
+
+        /// <summary>
+        /// Call named action in mision
+        /// </summary>
+        /// <param name="name">name of action</param>
+        public void ServerInput(string name)
+        {
+            RawCommand(String.Format("serverinput {0}", name));
+        }
+
+        /// <summary>
+        /// Send server stats immediately
+        /// </summary>
+        public void SendStats()
+        {
+            RawCommand("sendstatnow");
+        }
+
+        /// <summary>
+        /// Write chat log to file immediately
+        /// </summary>
+        public void FlushChatLog()
+        {
+            RawCommand("cutchatlog");
+        }
+
+        /// <summary>
+        /// Send chat message
+        /// </summary>
+        /// <param name="roomType">where to send a message: all, player, coalition or country</param>
+        /// <param name="text">message text</param>
+        /// <param name="id">optional. Client id, country id, coalition id</param>
+        public void ChatMessage(RoomType roomType, string text, object id = null)
+        {
+            if( id == null )
+                id = -1;
+
+            RawCommand(String.Format("chatmsg {0} {1} {2}", (int)roomType, id, text ));
+        }
 
         public void Start()
         {
@@ -293,5 +422,12 @@ namespace IL2CDR.Model
         {
             
         }
+    }
+    public enum RoomType
+    {
+        All = 0,
+        Client = 1,
+        Coalition = 2,
+        Country = 3
     }
 }
