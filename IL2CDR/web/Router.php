@@ -40,6 +40,9 @@ class Router
     {
         $this->indexController = new IndexController( new Engine('templates') );
     	$this->app->get('/', function() { echo $this->indexController->GetIndex(); } );
+    	$this->app->get('/kd/', function() { echo $this->indexController->GetKD(); } );
+    	$this->app->get('/snipers/', function() { echo $this->indexController->GetSnipers(); } );
+    	$this->app->get('/survivors/', function() { echo $this->indexController->GetSurvivors(); } );
         $this->app->run();
     }
     

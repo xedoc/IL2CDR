@@ -53,7 +53,9 @@
     <Compile Include="Slim\Router.php" />
     <Compile Include="Slim\Slim.php" />
     <Compile Include="Slim\View.php" />
-    <Compile Include="templates\index.php" />
+    <Compile Include="templates\survivors.php" />
+    <Compile Include="templates\snipers.php" />
+    <Compile Include="templates\kd.php" />
     <Compile Include="templates\layout.php" />
   </ItemGroup>
   <ItemGroup>

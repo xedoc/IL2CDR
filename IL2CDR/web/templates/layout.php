@@ -15,9 +15,9 @@
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Kills/Deaths</a></li>
-        <li><a href="#">Snipers</a></li>
-        <li><a href="#">Survivors</a></li>
+        <li <?=activeIfMatch("kd")?>><a href="/kd">Kills/Deaths</a></li>
+        <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
+        <li <?=activeIfMatch("survivors")?>><a href="/survivors">Survivors</a></li>
       </ul>
       <form class="navbar-form navbar-right" role="search">
         <div class="form-group">
@@ -30,6 +30,16 @@
 </nav>
 
 <?=$this->section('content')?>
+
+
+
+<div class="navbar-fixed-bottom">
+    <footer class="navbar-fixed-bottom text-muted small">
+        &copy; 2015.<br />
+        This site is not affiliated with 1C Game Studios nor with 777 Studios.<br />
+        Official site of the game is: <a href="http://www.il2.sturmovik.com">www.il2sturmovik.com</a>
+    </footer>
+</div>
 
 </body>
 
