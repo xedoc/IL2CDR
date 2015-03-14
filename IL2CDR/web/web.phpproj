@@ -16,8 +16,11 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Model\iStatistics.php" />
     <Compile Include="index.php" />
     <Compile Include="IndexController.php" />
+    <Compile Include="Model\MockDatabase.php" />
+    <Compile Include="Model\Player.php" />
     <Compile Include="plates\Engine.php" />
     <Compile Include="plates\Extension\Asset.php" />
     <Compile Include="plates\Extension\ExtensionInterface.php" />
@@ -62,6 +65,7 @@
     <Folder Include="css\" />
     <Folder Include="js\" />
     <Folder Include="fonts\" />
+    <Folder Include="Model\" />
     <Folder Include="plates\" />
     <Folder Include="plates\Extension\" />
     <Folder Include="plates\Template\" />
