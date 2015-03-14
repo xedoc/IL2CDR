@@ -21,6 +21,7 @@
     <Compile Include="IndexController.php" />
     <Compile Include="Model\MockDatabase.php" />
     <Compile Include="Model\Player.php" />
+    <Compile Include="Model\Utils.php" />
     <Compile Include="plates\Engine.php" />
     <Compile Include="plates\Extension\Asset.php" />
     <Compile Include="plates\Extension\ExtensionInterface.php" />

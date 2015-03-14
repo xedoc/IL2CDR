@@ -10,7 +10,7 @@
  */
 interface iStatistics
 {
-    public function getKD();
-    public function getSnipers();
-    public function getSurvivors();
+    public function getBestByKD();
+    public function getBestSnipers();
+    public function getBestSurvivors();
 }

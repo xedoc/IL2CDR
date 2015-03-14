@@ -38,7 +38,8 @@
         &copy; 2015.<br />
         This site is not affiliated with 1C Game Studios nor with 777 Studios.<br />
         Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a>
-    </footer>
+    </footer>
+
 </div>
 
 </body>

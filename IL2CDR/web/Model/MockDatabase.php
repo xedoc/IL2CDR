@@ -1,5 +1,7 @@
 <?php
 
+require_once 'Player.php';
+
 /**
  * MockDatabase short summary.
  *
@@ -10,17 +12,18 @@
  */
 class MockDatabase implements iStatistics
 {
-    public function getKD()
+    public function getBestByKD()
     {
+        $player =  new Player();
         
+        $player->setKills()
     }
     
-    public function getSnipers()
+    public function getBestSnipers()
     {
         
-        
     }
-    public function getSurvivors()
+    public function getBestSurvivors()
     {
         
     }

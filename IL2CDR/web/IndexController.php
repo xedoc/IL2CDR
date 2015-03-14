@@ -43,3 +43,5 @@ function activeIfMatch($requestUri)
     if ($current_file_name == $requestUri)
         echo 'class="active"';
 }
+
+?>

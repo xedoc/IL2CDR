@@ -1,5 +1,5 @@
 <?php
-
+require_once 'Utils.php';
 /**
  * Player short summary.
  *
@@ -19,7 +19,15 @@ class Player
     
     public function getKD()
     {
-        return max(1,$kills) / max(1,$deaths);
+        return format_2dp( max(1,$this->getKills()) / max(1,$this->getDeaths()) );
+    }
+    public function getHitsPerKill()
+    {
+        return format_2dp( max(1,$this->getKills()) / max(1, $this->getHits()) );
+    }
+    public function getSurviveRate()
+    {
+        return format_2dp( max(1, $this->getSorties()) / max(1, $this->getDeaths() ));
     }
     
     public function getKills()
@@ -32,26 +40,34 @@ class Player
     }
     public function getNickname()
     {
+        return $this->nickname;
     }
-    public function setNickname()
+    public function setNickname($value)
     {
+        $this->nickname = $value;
     }
-    public function setDeaths()
+    public function setDeaths($value)
     {
+        $this->deaths = $value;
     }
     public function getDeaths()
     {
+        return $this->deaths;
     }
-    public function setHits()
+    public function setHits($value)
     {
+        $this->hits = $value;
     }
     public function getHits()
     {
+        return $this->hits;
     }
-    public function setSorties()
+    public function setSorties($value)
     {
+        $this->sorties = $value;
     }
     public function getSorties()
     {
+        return $this->sorties;
     }
 }
