@@ -52,6 +52,7 @@ namespace IL2CDR.Model
             { EventType.InfluenceAreaInfo, (header) => {return new MissionLogEventInfluenceAreaInfo(header);}},
             { EventType.InfluenceAreaBoundary, (header) => {return new MissionLogEventInfluenceAreaBoundary(header);}},
             { EventType.Version, (header) => {return new MissionLogEventVersion(header);}},
+            { EventType.BotPilotSpawn, (header) => {return new MissionLogBotSpawn(header);}},
             { EventType.Join, (header) => {return new MissionLogEventPlayerJoin(header);}},
             { EventType.Leave, (header) => {return new MissionLogEventPlayerLeave(header);}},
         };
@@ -113,7 +114,7 @@ namespace IL2CDR.Model
                 int type = RawParameters.GetInt("AType");
 
                 //TODO:Handle new ATypes here if EventType enum changed
-                if((type >=0 && type <= 15) || type == 20 || type == 21)
+                if((type >=0 && type <= 16) || type == 20 || type == 21)
                 {
                     Type = (EventType)type;
                     Ticks = (uint)RawParameters.GetInt("T");
