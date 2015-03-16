@@ -58,109 +58,127 @@ namespace IL2CDR.Model.Tests
         [TestMethod()]
         public void MissionLogEventHitTest()
         {
-
+            var result = EventSerializationTest(EventType.Hit);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventDamageTest()
         {
-
+            var result = EventSerializationTest(EventType.Damage);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventKillTest()
         {
-
+            var result = EventSerializationTest(EventType.Kill);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventPlayerAmmoTest()
         {
-
+            var result = EventSerializationTest(EventType.PlayerAmmo);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventTakeOffTest()
         {
-
+            var result = EventSerializationTest(EventType.TakeOff);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventLandingTest()
         {
-
+            var result = EventSerializationTest(EventType.Landing);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventMissionEndTest()
         {
-
+            var result = EventSerializationTest(EventType.MissionEnd);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventObjectiveCompletedTest()
         {
-
+            var result = EventSerializationTest(EventType.ObjectiveCompleted);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventAirfieldInfoTest()
         {
-
+            var result = EventSerializationTest(EventType.AirfieldInfo);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventPlaneSpawnTest()
         {
-
+            var result = EventSerializationTest(EventType.PlaneSpawn);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventGroupInitInfoTest()
         {
-
+            var result = EventSerializationTest(EventType.GroupInit);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventGameObjectSpawnTest()
         {
-
+            var result = EventSerializationTest(EventType.GameObjectSpawn);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventInfluenceAreaInfoTest()
         {
-
+            var result = EventSerializationTest(EventType.InfluenceAreaInfo);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventInfluenceAreaBoundaryTest()
         {
-
+            var result = EventSerializationTest(EventType.InfluenceAreaBoundary);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventVersionTest()
         {
-
+            var result = EventSerializationTest(EventType.Version);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogBotSpawnTest()
         {
-
+            var result = EventSerializationTest(EventType.BotPilotSpawn);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventPlayerJoinTest()
         {
-
+            var result = EventSerializationTest(EventType.Join);
+            Assert.IsTrue(result);
         }
 
         [TestMethod()]
         public void MissionLogEventPlayerLeaveTest()
         {
-
+            var result = EventSerializationTest(EventType.Leave);
+            Assert.IsTrue(result);
         }
 
     }
