@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CDR", "IL2CDR\IL2CDR.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripts", "Scripts\Scripts.csproj", "{3DF1DBE1-792A-46ED-AEEF-4B73F4029473}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CDRTests", "IL2CDRTests\IL2CDRTests.csproj", "{8B273546-2EFC-48E6-85FF-404B2B911E3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3DF1DBE1-792A-46ED-AEEF-4B73F4029473}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DF1DBE1-792A-46ED-AEEF-4B73F4029473}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DF1DBE1-792A-46ED-AEEF-4B73F4029473}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

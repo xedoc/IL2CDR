@@ -134,8 +134,12 @@ namespace IL2CDR.Model
             if( !conn.Ping() )
             {
                 Connect();
+                if (!IsConnected)
+                    return false;
             }
             
+           
+
             return true;
 
         }
@@ -176,15 +180,8 @@ namespace IL2CDR.Model
                 }
 
                 var errorCodes = new int[] { 1049, 1042, 1044, 1045, 1046 };
-                foreach (int code in errorCodes)
-                {
-                    if (code == mysqlError.Number)
-                    {
-                        IsConfigIncorrect = true;
-                        break;
-                    }
-                    
-                }
+                if (errorCodes.Contains(mysqlError.Number))
+                    IsConfigIncorrect = true;
             }
             
             return error;

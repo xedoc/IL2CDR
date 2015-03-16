@@ -61,6 +61,8 @@ namespace IL2CDR.Model
             if (header.Type != EventType.Unknown )
             {
                 header.EventID = GuidUtility.Create(GuidUtility.IsoOidNamespace, String.Concat(server.ServerId,"_",missionStartTime,"_",eventNumber));
+                header.Server = server;
+
                 if (dataFactory.ContainsKey(header.Type))
                     return dataFactory[header.Type](header);
             }
@@ -465,7 +467,7 @@ namespace IL2CDR.Model
         public string MissionFile { get; set; }
         public int MissionID { get; set; }
         public int GameType { get; set; }
-        public Dictionary<int, int> CountryCounters { get; set; }
+        public Dictionary<int, int> CoallitionIDs { get; set; }
         public bool[] SettingsFlags { get; set; }
         public int Mods { get; set; }
         public int Preset { get; set; }
