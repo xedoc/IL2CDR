@@ -27,7 +27,7 @@ namespace IL2CDR.Model
         InfluenceAreaInfo = 13,         //LET_INFLUENCEAREA_HEADER 
         InfluenceAreaBoundary = 14,     //LET_INFLUENCEAREA_BOUNDARY
         Version = 15,                   //LET_LOG_VERSION 
-        Disconnect = 16,                //LET_DISCONNECT 
+        BotPilotSpawn = 16,                  //TODO: check if that parachute spawn
         Position = 17,                  //LET_POSITION
         Join = 20,                      
         Leave = 21,                     
@@ -296,9 +296,7 @@ namespace IL2CDR.Model
     //LOGIN:00000000-0000-0000-0000-000000000000 NAME:blahblah TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 
     //PAYLOAD:0 FUEL:1.000 SKIN: WM:1
     //Another example with InAir=2
-    //T:8120 AType:10 PLID:675841 PID:676865 BUL:1620 SH:0 BOMB:0 RCT:0 (133952.922,83.792,185683.047) IDS:00000000-0000-0000-0000-000000000000 
-    //LOGIN:00000000-0000-0000-0000-000000000000 NAME:NIK TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:861184 INAIR:2 PARENT:-1 
-    //PAYLOAD:0 FUEL:0.380 SKIN: WM:1
+    //T:8120 AType:10 PLID:675841 PID:676865 BUL:1620 SH:0 BOMB:0 RCT:0 (133952.922,83.792,185683.047) IDS:00000000-0000-0000-0000-000000000000 LOGIN:00000000-0000-0000-0000-000000000000 NAME:NIK TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:861184 INAIR:2 PARENT:-1 PAYLOAD:0 FUEL:0.380 SKIN: WM:1
 
     public class MissionLogEventPlaneSpawn : MissionLogEventHeader
     {        
@@ -507,7 +505,7 @@ namespace IL2CDR.Model
         public string MissionFile { get; set; }
         public int MissionID { get; set; }
         public int GameType { get; set; }
-        public Dictionary<int, int> CoalitionIndexes { get; set; }
+        public List<CoalitionIndex> CoalitionIndexes { get; set; }
         public bool[] SettingsFlags { get; set; }
         public int Mods { get; set; }
         public int Preset { get; set; }
@@ -526,7 +524,7 @@ namespace IL2CDR.Model
             var coalitions = RawParameters.GetString("CNTRS");
 
             var countryPairs = coalitions.Split(',').Select(p => p.Split(':')).ToArray();
-            CoalitionIndexes = new Dictionary<int, int>();
+            CoalitionIndexes = new List<CoalitionIndex>();
 
             int country, index;
             foreach (var pair in countryPairs)
@@ -535,11 +533,20 @@ namespace IL2CDR.Model
                     int.TryParse( pair[0], out country ) && 
                     int.TryParse( pair[1], out index ))
                 {
-                    if( !CoalitionIndexes.ContainsKey(country))
-                        CoalitionIndexes.Add(country, index);
+                    CoalitionIndexes.Add( new CoalitionIndex() 
+                    { 
+                        Country = new Country(country),
+                        Index = index,
+                    });
                 }
             }
         }
+    }
+
+    public class CoalitionIndex
+    {
+        public Country Country { get; set; }
+        public int Index { get; set; }
     }
 
     public class CoalitionPlanesCount

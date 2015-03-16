@@ -39,7 +39,7 @@ namespace IL2CDR.Model
             Players = new PlayersCollection();
             GameObjects = new GameObjectsCollection();
             AirFields = new AirFieldCollection();
-            CoalitionIndexes = new Dictionary<int, int>();
+            CoalitionIndexes = new List<CoalitionIndex>();
         }
         public void Login()
         {
@@ -64,13 +64,13 @@ namespace IL2CDR.Model
         /// </summary>
         public const string CoalitionIndexesPropertyName = "CoalitionIndexes";
 
-        private Dictionary<int,int> _coalitionIndexes;
+        private List<CoalitionIndex> _coalitionIndexes;
 
         /// <summary>
         /// Sets and gets the CoalitionIndexes property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public Dictionary<int,int> CoalitionIndexes
+        public List<CoalitionIndex> CoalitionIndexes
         {
             get
             {
