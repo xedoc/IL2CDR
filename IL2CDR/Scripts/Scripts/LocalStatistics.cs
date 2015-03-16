@@ -40,6 +40,8 @@ namespace IL2CDR.Scripts
         }
         public override void OnApplicationStartup(object data)
         {
+            var test = new Test();
+            test.TestMethod();
             mysql = new MySQLDatabase(Config.GetString("host"),
                                         Config.GetString("user"),
                                         Config.GetString("pass"),

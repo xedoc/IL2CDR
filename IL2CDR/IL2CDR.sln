@@ -9,6 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scripts", "Scripts\Scripts.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CDRTests", "IL2CDRTests\IL2CDRTests.csproj", "{8B273546-2EFC-48E6-85FF-404B2B911E3E}"
 EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "web", "web\web.phpproj", "{09C6CF6B-C0A4-4F42-B2E0-F9570CB4A126}"
+EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +30,10 @@ Global
 		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B273546-2EFC-48E6-85FF-404B2B911E3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09C6CF6B-C0A4-4F42-B2E0-F9570CB4A126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09C6CF6B-C0A4-4F42-B2E0-F9570CB4A126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09C6CF6B-C0A4-4F42-B2E0-F9570CB4A126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09C6CF6B-C0A4-4F42-B2E0-F9570CB4A126}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

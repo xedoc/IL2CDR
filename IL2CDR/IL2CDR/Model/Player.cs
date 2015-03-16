@@ -21,5 +21,19 @@ namespace IL2CDR.Model
         public GameObject BotPilot { get; set; }
         public bool IsInAir { get; set; }
         public bool IsOnline { get; set; }
+        public PlayerStatus Status { get; set; }
+        public int ClientId { get; set; }
+        public int Ping { get; set; }
+
     }
+
+    public enum PlayerStatus
+    {
+        Spectator = 0,
+        LobbyReady = 1,
+        None = 2,
+        DogfightReady = 3,
+        CraftSiteReady = 4
+    }
+
 }

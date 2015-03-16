@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>web</Name>
+    <ProjectGuid>09c6cf6b-c0a4-4f42-b2e0-f9570cb4a126</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>web</RootNamespace>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <AssemblyName>web</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Model\iStatistics.php" />
+    <Compile Include="index.php" />
+    <Compile Include="IndexController.php" />
+    <Compile Include="Model\MockDatabase.php" />
+    <Compile Include="Model\Player.php" />
+    <Compile Include="Model\Utils.php" />
+    <Compile Include="plates\Engine.php" />
+    <Compile Include="plates\Extension\Asset.php" />
+    <Compile Include="plates\Extension\ExtensionInterface.php" />
+    <Compile Include="plates\Extension\URI.php" />
+    <Compile Include="plates\Template\Data.php" />
+    <Compile Include="plates\Template\Directory.php" />
+    <Compile Include="plates\Template\FileExtension.php" />
+    <Compile Include="plates\Template\Folder.php" />
+    <Compile Include="plates\Template\Folders.php" />
+    <Compile Include="plates\Template\Func.php" />
+    <Compile Include="plates\Template\Functions.php" />
+    <Compile Include="plates\Template\Name.php" />
+    <Compile Include="plates\Template\Template.php" />
+    <Compile Include="Router.php" />
+    <Compile Include="Slim\Environment.php" />
+    <Compile Include="Slim\Exception\Pass.php" />
+    <Compile Include="Slim\Exception\Stop.php" />
+    <Compile Include="Slim\Helper\Set.php" />
+    <Compile Include="Slim\Http\Cookies.php" />
+    <Compile Include="Slim\Http\Headers.php" />
+    <Compile Include="Slim\Http\Request.php" />
+    <Compile Include="Slim\Http\Response.php" />
+    <Compile Include="Slim\Http\Util.php" />
+    <Compile Include="Slim\Log.php" />
+    <Compile Include="Slim\LogWriter.php" />
+    <Compile Include="Slim\Middleware.php" />
+    <Compile Include="Slim\Middleware\ContentTypes.php" />
+    <Compile Include="Slim\Middleware\Flash.php" />
+    <Compile Include="Slim\Middleware\MethodOverride.php" />
+    <Compile Include="Slim\Middleware\PrettyExceptions.php" />
+    <Compile Include="Slim\Middleware\SessionCookie.php" />
+    <Compile Include="Slim\Route.php" />
+    <Compile Include="Slim\Router.php" />
+    <Compile Include="Slim\Slim.php" />
+    <Compile Include="Slim\View.php" />
+    <Compile Include="templates\survivors.php" />
+    <Compile Include="templates\snipers.php" />
+    <Compile Include="templates\kd.php" />
+    <Compile Include="templates\layout.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="css\" />
+    <Folder Include="js\" />
+    <Folder Include="fonts\" />
+    <Folder Include="Model\" />
+    <Folder Include="plates\" />
+    <Folder Include="plates\Extension\" />
+    <Folder Include="plates\Template\" />
+    <Folder Include="Slim\" />
+    <Folder Include="Slim\Exception\" />
+    <Folder Include="Slim\Helper\" />
+    <Folder Include="Slim\Http\" />
+    <Folder Include="Slim\Middleware\" />
+    <Folder Include="templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\bootstrap.css" />
+    <Content Include="css\bootstrap.min.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="js\bootstrap.js" />
+    <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\il2info.js" />
+    <Content Include="js\jquery.min.js" />
+    <Content Include="js\npm.js" />
+  </ItemGroup>
+</Project>

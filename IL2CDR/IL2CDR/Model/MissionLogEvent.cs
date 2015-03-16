@@ -58,11 +58,10 @@ namespace IL2CDR.Model
         public static object GetData(string text, DateTime missionStartTime, int eventNumber, Server server)
         {
             var header = new MissionLogEventHeader(text, missionStartTime);
+            header.Server = server;
             if (header.Type != EventType.Unknown )
             {
                 header.EventID = GuidUtility.Create(GuidUtility.IsoOidNamespace, String.Concat(server.ServerId,"_",missionStartTime,"_",eventNumber));
-                header.Server = server;
-
                 if (dataFactory.ContainsKey(header.Type))
                     return dataFactory[header.Type](header);
             }
@@ -161,9 +160,15 @@ namespace IL2CDR.Model
             LoginGuid = RawParameters.GetGuid("USERID");
         }
     }
+
+    //TODO: Handle Atype:19
+    //T:180021 AType:19 
+
+    //TODO: Handle AType:18
+    //T:1982216 AType:18 BOTID:725017 PARENTID:723993 POS(112101.023,1238.855,99265.477)
+
     //AType:16
     //T:28250 AType:16 BOTID:182273 POS(113655.180,129.202,243216.594)
-    //TODO:Identify AType:16
     public class MissionLogBotSpawn : MissionLogEventHeader
     {
         
@@ -209,6 +214,8 @@ namespace IL2CDR.Model
     //Area info
     //T:0 AType:13 AID:16384 COUNTRY:201 ENABLED:1 BC(0,0,0)
     //T:0 AType:13 AID:18432 COUNTRY:101 ENABLED:1 BC(0,0,0)
+    //T:92117 AType:13 AID:16384 COUNTRY:201 ENABLED:1 BC(0,1,0)
+
     public class MissionLogEventInfluenceAreaInfo : MissionLogEventHeader
     {
         
@@ -221,14 +228,10 @@ namespace IL2CDR.Model
             : base(header)
         {
             AirFieldId = RawParameters.GetInt("AID");
-            IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;
-            
-            
-            //TODO: Identify countries by ID 
+            IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;            
             Country = new Country(RawParameters.GetInt("COUNTRY"));
             PlanesByCoalition = new List<CoalitionPlanesCount>();
             var planesNumber = Util.SequenceToIntArray(RawParameters.GetString("BC"));
-            //TODO:Check numbers meaning - where is DE/RU and neutral?
         }
     }
     //AType:12
@@ -292,9 +295,13 @@ namespace IL2CDR.Model
     //T:13129 AType:10 PLID:402433 PID:182273 BUL:1620 SH:0 BOMB:0 RCT:0 (113655.359,129.266,243216.766) IDS:00000000-0000-0000-0000-000000000000 
     //LOGIN:00000000-0000-0000-0000-000000000000 NAME:blahblah TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:308224 INAIR:1 PARENT:-1 
     //PAYLOAD:0 FUEL:1.000 SKIN: WM:1
+    //Another example with InAir=2
+    //T:8120 AType:10 PLID:675841 PID:676865 BUL:1620 SH:0 BOMB:0 RCT:0 (133952.922,83.792,185683.047) IDS:00000000-0000-0000-0000-000000000000 
+    //LOGIN:00000000-0000-0000-0000-000000000000 NAME:NIK TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:861184 INAIR:2 PARENT:-1 
+    //PAYLOAD:0 FUEL:0.380 SKIN: WM:1
+
     public class MissionLogEventPlaneSpawn : MissionLogEventHeader
     {        
-        //TODO: what is RCT ? Rectangle or rockets ?
         public Player Player { get; set; }
         public int Formation { get; set; }
         public MissionLogEventPlaneSpawn(MissionLogEventHeader header)
@@ -305,14 +312,14 @@ namespace IL2CDR.Model
 
             Player = new Player()
             {
-                Id = RawParameters.GetInt("PID"),
+                Id = RawParameters.GetInt("PLID"),
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
                 IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
                 IsOnline = true,
                 LoginId = RawParameters.GetGuid("LOGIN"),
                 NickId = RawParameters.GetGuid("IDS"),
                 NickName = RawParameters.GetString("NAME"),
-                Plane = new Plane(RawParameters.GetInt("PLID"), RawParameters.GetString("TYPE"))
+                Plane = new Plane(RawParameters.GetInt("PID"), RawParameters.GetString("TYPE"))
                 {
                     Bombs = RawParameters.GetInt("BOMB"),
                     Classification = GameObjectClass.Plane,
@@ -334,12 +341,14 @@ namespace IL2CDR.Model
     public class MissionLogEventAirfieldInfo : MissionLogEventHeader
     {
         public AirField AirField { get; set; }
-        //TODO: what is ids ? Players ?
-
         public MissionLogEventAirfieldInfo(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            AirField = new AirField() { 
+                Country = new Country( RawParameters.GetInt("COUNTRY")),
+                Id = RawParameters.GetInt("AID"),
+                Position = RawParameters.GetVector3D("POS"),
+            };
         }
     }
     //AType:8
@@ -352,16 +361,23 @@ namespace IL2CDR.Model
     //RES - (mission result, completed/not completed)
     public class MissionLogEventObjectiveCompleted : MissionLogEventHeader
     {
-
+        public int ObjectiveId { get; set; }
+        public Vector3D Position { get; set; }
+        public bool IsPrimary { get; set; }
+        public int CoalitionIndex { get; set; }
+        public bool IsCompleted { get; set; }
         public MissionLogEventObjectiveCompleted(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            ObjectiveId = RawParameters.GetInt("OBJID");
+            Position = RawParameters.GetVector3D("POS");
+            IsPrimary = RawParameters.GetInt("TYPE") == 1 ? true : false;
+            CoalitionIndex = RawParameters.GetInt("COAL");
+            IsCompleted = RawParameters.GetInt("RES") == 1 ? true : false;
         }
     }
     //AType:7
     //End of mission
-    //TODO: RoF example - find BoS one
     //T:38919 AType:7
     public class MissionLogEventMissionEnd : MissionLogEventHeader
     {
@@ -369,49 +385,63 @@ namespace IL2CDR.Model
         public MissionLogEventMissionEnd(MissionLogEventHeader header) 
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            
         }
     }
     //AType:6
-    //TODO: RoF example - find BoS one
-    //T:24847 AType:6 PID:45073 POS(270413.250, 12.709, 94380.633)
+    //T:30670 AType:6 PID:311297 POS(124200.461, 131.916, 240163.281)
     //Landing
     public class MissionLogEventLanding : MissionLogEventHeader
     {
-
+        public int PlaneId { get; set; }
+        public Vector3D Position { get; set; }
         public MissionLogEventLanding(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            PlaneId = RawParameters.GetInt("PID");
+            Position = RawParameters.GetVector3D("POS");
+
         }
     }
     //AType:5
-    //TODO: RoF example - find BoS one
-    //T:17512 AType:5 PID:45071 POS(272113.000, 33.734, 92909.977)
+    //T:8500 AType:5 PID:311297 POS(112283.617, 46.384, 260226.063)    
     //Takeoff 
     public class MissionLogEventTakeOff : MissionLogEventHeader
     {
-
+        public int PlaneId { get; set; }
+        public Vector3D Position { get; set; }
         public MissionLogEventTakeOff(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            PlaneId = RawParameters.GetInt("PID");
+            Position = RawParameters.GetVector3D("POS");
         }
     }
     //AType:4
-    //TODO: RoF example - find BoS one
-    //T:38910 AType:4 PLID:45067 PID:46091 BUL:271 SH:0 BOMB:0 RCT:0 (271304.063,111.273,95750.898)
+    //T:31598 AType:4 PLID:311297 PID:394241 BUL:1158 SH:0 BOMB:0 RCT:0 (124204.711,131.871,240163.422)
     //Mission End
     //PLID - player plane id
     //PID - player (bot or player) plane id
     //BUL, BOMB - bullets and bpmbs left on the end of mission
     public class MissionLogEventPlayerAmmo : MissionLogEventHeader
     {
+        public int PlaneId { get; set; }
+        public int PlayerId { get; set; }
+        public int Bullets { get; set; }
+        public int Shells { get; set; }
+        public int Bombs { get; set; }
+        public int Rockets { get; set; }
 
         public MissionLogEventPlayerAmmo(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            PlaneId = RawParameters.GetInt("PID");
+            PlayerId = RawParameters.GetInt("PLID");
+            Bullets = RawParameters.GetInt("BUL");
+            Shells = RawParameters.GetInt("SH");
+            Bombs = RawParameters.GetInt("BOMB");
+            Rockets = RawParameters.GetInt("RCT");
+
         }
     }
     //AType:3
@@ -427,33 +457,43 @@ namespace IL2CDR.Model
         {
             AttackerId = RawParameters.GetInt("AID");
             TargetId = RawParameters.GetInt("TID");
-            Position = Util.POSToVector3D(RawParameters.GetString("POS"));
+            Position = RawParameters.GetVector3D("POS");
         }
     }
     //AType:2
     //TODO: RoF example - find BoS one
-    //T:23244 AType:2 DMG:0.008 AID:45068 TID:45071 POS(270402.344,467.873,93469.750)
+    //T:26458 AType:2 DMG:0.030 AID:311297 TID:454656 POS(123603.250,145.485,242323.359)
     //Damage
     public class MissionLogEventDamage: MissionLogEventHeader
     {
+        public double Damage { get; set; }
+        public int AttackerId { get; set; }
+        public int TargetId { get; set; }
+        public Vector3D Position { get; set; }
 
         public MissionLogEventDamage(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            AttackerId = RawParameters.GetInt("AID");
+            TargetId = RawParameters.GetInt("TID");
+            Damage = RawParameters.GetDouble("DMG");
+            Position = RawParameters.GetVector3D("POS");
         }
     }
     //AType:1
-    //TODO: RoF example - find BoS one
-    //T:22188 AType:1 AMMO:BULLET_GBR_77x56R_MK7 AID:45067 TID:45073
+    //T:26455 AType:1 AMMO:BULLET_RUS_7-62x54_AP AID:311297 TID:454656
     //Bullet hit on mission object
     public class MissionLogEventHit : MissionLogEventHeader
     {
-
+        public int AttackerId { get; set; }
+        public int TargetId { get; set; }
+        public string AmmoName { get; set; }
         public MissionLogEventHit(MissionLogEventHeader header)
             : base(header)
         {
-            //TODO: Parse key/value pairs
+            AttackerId = RawParameters.GetInt("AID");
+            TargetId = RawParameters.GetInt("TID");
+            AmmoName = RawParameters.GetString("AMMO");
         }
     }
     //AType:0
@@ -467,7 +507,7 @@ namespace IL2CDR.Model
         public string MissionFile { get; set; }
         public int MissionID { get; set; }
         public int GameType { get; set; }
-        public Dictionary<int, int> CoallitionIDs { get; set; }
+        public Dictionary<int, int> CoalitionIndexes { get; set; }
         public bool[] SettingsFlags { get; set; }
         public int Mods { get; set; }
         public int Preset { get; set; }
@@ -480,11 +520,25 @@ namespace IL2CDR.Model
             //TODO: find example of MID
             //MissionID = RawParameters.GetString("MID")
             GameType = RawParameters.GetInt("GType");
-            //TODO: handle dictionary values
-            //TODO: handle bool array
             Mods = RawParameters.GetInt("MODS");
             Preset = RawParameters.GetInt("Preset");
             AQMId = RawParameters.GetInt("AWMID");
+            var coalitions = RawParameters.GetString("CNTRS");
+
+            var countryPairs = coalitions.Split(',').Select(p => p.Split(':')).ToArray();
+            CoalitionIndexes = new Dictionary<int, int>();
+
+            int country, index;
+            foreach (var pair in countryPairs)
+            {
+                if( pair.Length == 2 && 
+                    int.TryParse( pair[0], out country ) && 
+                    int.TryParse( pair[1], out index ))
+                {
+                    if( !CoalitionIndexes.ContainsKey(country))
+                        CoalitionIndexes.Add(country, index);
+                }
+            }
         }
     }
 

@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
+using IL2CDR.Model;
 
 namespace IL2CDR
 {
@@ -30,6 +32,11 @@ namespace IL2CDR
             Guid.TryParse(dict.GetString(name), out guid);
             return guid;
         }
+        public static Vector3D GetVector3D( this Dictionary<string, string> dict, string posName )
+        {
+            return Util.POSToVector3D( dict.GetString( posName ));
+        }
+
         public static int GetInt(this Dictionary<string, string> dict, string name)
         {
             int i = -1;
