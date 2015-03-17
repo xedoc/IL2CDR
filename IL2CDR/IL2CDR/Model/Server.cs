@@ -5,13 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 
 namespace IL2CDR.Model
 {
     public class Server : NotifyPropertyChangeBase
     {
+        [ScriptIgnore]
         public RconConnection Rcon { get; set; }
+        [ScriptIgnore]
         public MissionLogDataService MissionLogService { get; set; }
+        [ScriptIgnore]
         public ProcessItem Process { get; set; }
 
         public Server(RconConnection rcon, ProcessItem process)
@@ -70,6 +74,7 @@ namespace IL2CDR.Model
         /// Sets and gets the CoalitionIndexes property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [ScriptIgnore]
         public List<CoalitionIndex> CoalitionIndexes
         {
             get
@@ -130,6 +135,7 @@ namespace IL2CDR.Model
         /// Sets and gets the GameObjects property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [ScriptIgnore]
         public GameObjectsCollection GameObjects
         {
             get
@@ -160,6 +166,7 @@ namespace IL2CDR.Model
         /// Sets and gets the AirFields property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [ScriptIgnore]
         public AirFieldCollection AirFields
         {
             get
@@ -190,6 +197,7 @@ namespace IL2CDR.Model
         /// Sets and gets the Players property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [ScriptIgnore]
         public PlayersCollection Players
         {
             get
@@ -249,6 +257,7 @@ namespace IL2CDR.Model
         /// Sets and gets the IsConfigSet property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [ScriptIgnore]
         public bool IsConfigSet
         {
             get
@@ -279,6 +288,7 @@ namespace IL2CDR.Model
         /// Sets and gets the IsRconConnected property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [ScriptIgnore]
         public bool IsRconConnected
         {
             get

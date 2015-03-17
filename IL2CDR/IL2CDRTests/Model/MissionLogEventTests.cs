@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IL2CDR.Model;
 using System.Web.Script.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
 namespace IL2CDR.Model.Tests
 {
     [TestClass()]
@@ -23,6 +24,7 @@ namespace IL2CDR.Model.Tests
             var serializer = new JavaScriptSerializer();
             var wrapped = GetTestMissionEvent(testLines[type]);
             var json = serializer.Serialize(wrapped);
+            Debug.Print(json);
             var unwrapped = (Dictionary<string, object>)serializer.DeserializeObject(json);
 
             return unwrapped.ContainsKey("Server");

@@ -84,7 +84,6 @@ namespace IL2CDR.Model
             { "Wagon_GondolaB", new  GameObjectItem(GameObjectClass.TrainWagon, "")},
             { "Wagon_GondolaNB", new  GameObjectItem(GameObjectClass.TrainWagon, "")},
             { "Wagon_Pass", new  GameObjectItem(GameObjectClass.TrainWagon, "Passenger train wagon")},
-            { "Wagon_Pass", new  GameObjectItem(GameObjectClass.TrainWagon, "")},
             { "Wagon_PassC", new  GameObjectItem(GameObjectClass.TrainWagon, "Passenger train wagon")},
             { "Wagon_PlatformB", new  GameObjectItem(GameObjectClass.TrainWagon, "")},
             { "Wagon_PlatformEmptyB", new  GameObjectItem(GameObjectClass.TrainWagon, "")},

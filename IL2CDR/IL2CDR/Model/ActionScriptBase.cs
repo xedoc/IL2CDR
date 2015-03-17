@@ -8,8 +8,6 @@ namespace IL2CDR.Model
 {
     public class ActionScriptBase : IActionScript, IScriptConfig
     {
-        //virtual public void OnVersion(MissionLogEventVersion data){}
-
         virtual public void OnInfluenceAreaBoundary(MissionLogEventInfluenceAreaBoundary data){}
         virtual public void OnInfluenceAreaInfo(MissionLogEventInfluenceAreaInfo data){}
         virtual public void OnGameObjectSpawn(MissionLogEventGameObjectSpawn data){}
@@ -30,6 +28,7 @@ namespace IL2CDR.Model
         virtual public void OnApplicationShutdown(object data) { }
         virtual public void OnApplicationStartup(object data) { }
         virtual public void OnOther(object data) { }
+        virtual public void OnAny(object data) { }
 
         virtual public ScriptConfig DefaultConfig
         {

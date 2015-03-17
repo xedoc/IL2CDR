@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace IL2CDR
         public static double GetDouble(this Dictionary<string, string> dict, string name)
         {
             double d = -1;
-            double.TryParse(dict.GetString(name), out d);
+            double.TryParse(dict.GetString(name), NumberStyles.Any, CultureInfo.InvariantCulture, out d);
             return d;
         }
 

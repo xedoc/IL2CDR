@@ -29,6 +29,7 @@ namespace IL2CDR.Model
         void OnApplicationShutdown(object data);
         void OnApplicationStartup(object data);
         void OnOther(object data);
+        void OnAny(object data);
 
     }
 }

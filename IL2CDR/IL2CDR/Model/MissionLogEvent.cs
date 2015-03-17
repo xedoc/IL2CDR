@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Windows.Media.Media3D;
 
 namespace IL2CDR.Model
@@ -78,6 +79,8 @@ namespace IL2CDR.Model
         public Server Server { get; set; }
         public Guid EventID { get; set; }
         public DateTime MissionStartTime { get; set; }
+        
+        [ScriptIgnore]
         public Dictionary<string, string> RawParameters { get; set; }
 
         public MissionLogEventHeader(MissionLogEventHeader header)
@@ -515,6 +518,18 @@ namespace IL2CDR.Model
             : base(header)
         {
             //TODO: handle DateTime type
+            var gameDate = Regex.Match( RawParameters.GetString("GDate"), @"(\d+)\.(\d+)\.(\d+)");
+            var gameTime = Regex.Match( RawParameters.GetString("GTime"), @"(\d+)\:(\d+)\:(\d+)");
+            if( gameDate.Success && gameTime.Success)
+            {
+                GameDateTime = new DateTime(
+                    int.Parse(gameDate.Groups[1].Value), 
+                    int.Parse(gameDate.Groups[2].Value), 
+                    int.Parse(gameDate.Groups[3].Value), 
+                    int.Parse(gameTime.Groups[1].Value), 
+                    int.Parse(gameTime.Groups[2].Value), 
+                    int.Parse(gameTime.Groups[3].Value));
+            }
             MissionFile = RawParameters.GetString("MFile");
             //TODO: find example of MID
             //MissionID = RawParameters.GetString("MID")
@@ -528,11 +543,11 @@ namespace IL2CDR.Model
             CoalitionIndexes = new List<CoalitionIndex>();
 
             int country, index;
-            foreach (var pair in countryPairs)
-            {
-                if( pair.Length == 2 && 
-                    int.TryParse( pair[0], out country ) && 
-                    int.TryParse( pair[1], out index ))
+            for (int i = 0; i < countryPairs.Length; i++)
+			{
+                if (countryPairs[i].Length == 2 &&
+                    int.TryParse(countryPairs[i][0], out country) &&
+                    int.TryParse(countryPairs[i][1], out index))
                 {
                     CoalitionIndexes.Add( new CoalitionIndex() 
                     { 

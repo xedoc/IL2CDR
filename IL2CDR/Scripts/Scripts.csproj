@@ -44,6 +44,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scripts\GlobalStatistics.cs" />
     <Compile Include="Scripts\LocalStatistics.cs" />
     <Compile Include="Scripts\Example.cs" />
   </ItemGroup>

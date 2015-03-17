@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -72,11 +73,11 @@ namespace IL2CDR.Model
                 return result;
             
             var xyz = values.Split(',');
-            if (pos.Length == 3)
+            if (xyz.Length == 3)
             {
-                double.TryParse(xyz[0], out x);
-                double.TryParse(xyz[1], out y);
-                double.TryParse(xyz[2], out z);                
+                x = double.Parse(xyz[0], CultureInfo.InvariantCulture);
+                y = double.Parse(xyz[1], CultureInfo.InvariantCulture);
+                z = double.Parse(xyz[2], CultureInfo.InvariantCulture);                
             }
             return new Vector3D(x, y, z);
         }

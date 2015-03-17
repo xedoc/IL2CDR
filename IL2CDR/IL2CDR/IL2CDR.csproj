@@ -104,6 +104,9 @@
       <Link>Scripts\LocalStatistics.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Compile Include="..\Scripts\Scripts\GlobalStatistics.cs">
+      <Link>Scripts\GlobalStatistics.cs</Link>
+    </Compile>
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Interactiviy\PasswordBoxAssistant.cs" />
     <Compile Include="Model\ActionManager.cs" />

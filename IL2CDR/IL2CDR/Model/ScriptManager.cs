@@ -75,6 +75,8 @@ namespace IL2CDR.Model
                     actionScripts[header.Type](script, data);
                 else
                     script.OnOther(data);
+                
+                script.OnAny(data);
             }
         }
 
