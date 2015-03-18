@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
 using IL2CDR;
 using IL2CDR.Model;
 
@@ -13,14 +13,18 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        private ConcurrentQueue<string> jsonPackets;
+        private const string DOMAIN = "il2.info";
+        private const string URL = "http://" + DOMAIN + "/e/";
+        private const string BACKLOGFILE = "eventback.log";
+        private ConcurrentQueue<object> events;
         private Timer sendTimer;
         private const int SENDTIMEOUT = 5 * 60 * 1000;
         private object lockSend = new object();
+        private string lastPacket = String.Empty;
 
         public GlobalStatistics()
         {
-            jsonPackets = new ConcurrentQueue<string>();
+            events = new ConcurrentQueue<object>();
             sendTimer = new Timer(SendTimerCallback, this, Timeout.Infinite, Timeout.Infinite);
         }
         public override ScriptConfig DefaultConfig
@@ -38,7 +42,6 @@ namespace IL2CDR.Scripts
                     //Settings in GUI
                     ConfigFields = new ConfigFieldList()
                     {
-                        { "url", "URL", "Stats URL", FieldType.Text, String.Empty, true},
                         { "token", "Token", "Server authentication token", FieldType.Text, String.Empty, true},
                     },
                 };
@@ -53,40 +56,80 @@ namespace IL2CDR.Scripts
             sendTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
-        private void SendDataToServer()
+        public void SendDataToServer()
         {
             lock( lockSend )
             {
-                string content = String.Empty;
-                while( !jsonPackets.IsEmpty )
+                string result = "FAIL";
+                if( String.IsNullOrWhiteSpace( lastPacket ) )
+                    lastPacket = GetNextPacket();
+
+                using( WebClientBase webClient = new WebClientBase())
                 {
-                    string packet;
-                    if( jsonPackets.TryDequeue( out packet ) )
+                    webClient.ContentType = ContentType.JsonUTF8;
+                    webClient.KeepAlive = false;
+                    webClient.SetCookie("srvtoken", "test", DOMAIN);
+                    if (lastPacket.Length >= 500)
                     {
-                        content = String.Concat(content, packet);
-                    }
+                        result = webClient.Upload(URL, lastPacket);
+                    }                        
+                    else
+                    {
+                        result = webClient.Upload(URL, lastPacket);
+                    }                        
                 }
-                //TODO: post via WebClient
+                Log.WriteInfo("Packet sent to statistics server. Result: {0}", result);
+                if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
+                    lastPacket = String.Empty;
+
             }
+        }
+
+        public string GetNextPacket()
+        {
+            if (events.IsEmpty)
+                return null;
+
+            string content = String.Empty;
+            var jsonPackets = new List<object>();
+
+            while (!events.IsEmpty)
+            {
+                object obj;
+                if (events.TryDequeue(out obj))
+                {
+                    jsonPackets.Add(obj);
+                }
+            }
+            return Json.Serialize(jsonPackets);
+        }
+
+        public void AddToQueue( object data )
+        {
+            events.Enqueue(data);
+
+            if (events.Count >= 10)
+                Task.Factory.StartNew( () => SendDataToServer() );
         }
 
         private void SendTimerCallback( object sender )
         {
-            if (jsonPackets.Count > 0)
+            if (events.Count > 0)
                 SendDataToServer();
         }
-        public override void OnAny(object data)
+        public override void OnHistory(object data)
         {
-            if (data == null)
+            if (data == null || 
+                !(data is MissionLogEventHeader) ||
+                data is MissionLogEventVersion)
                 return;
-            
-            var json = new JavaScriptSerializer().Serialize(data);
-            jsonPackets.Enqueue(json);
-            if (jsonPackets.Count >= 10)
-                SendDataToServer();
+
+            AddToQueue(data);
         }
         
 
+
     }
+   
 
 }

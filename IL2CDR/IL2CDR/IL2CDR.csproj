@@ -104,9 +104,10 @@
       <Link>Scripts\LocalStatistics.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="..\Scripts\Scripts\GlobalStatistics.cs">
+    <Content Include="..\Scripts\Scripts\GlobalStatistics.cs">
       <Link>Scripts\GlobalStatistics.cs</Link>
-    </Compile>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Interactiviy\PasswordBoxAssistant.cs" />
     <Compile Include="Model\ActionManager.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Model\IScriptManager.cs" />
     <Compile Include="Model\IStopStart.cs" />
     <Compile Include="Model\IMissionLogDataService.cs" />
+    <Compile Include="Model\Json.cs" />
     <Compile Include="Model\Log.cs" />
     <Compile Include="Model\LogDataService.cs" />
     <Compile Include="Model\MissionLogDataService.cs" />
@@ -150,6 +152,9 @@
     <Compile Include="Model\TextFileTracker.cs" />
     <Compile Include="Model\UI.cs" />
     <Compile Include="Model\Util.cs" />
+    <Compile Include="Model\WebClientBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\PortableSettingsProvider.cs" />
     <Compile Include="ScriptConfigField.xaml.cs">
       <DependentUpon>ScriptConfigField.xaml</DependentUpon>

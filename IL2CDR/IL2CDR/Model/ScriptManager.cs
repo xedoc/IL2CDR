@@ -38,6 +38,7 @@ namespace IL2CDR.Model
 
         public ScriptManager()
         {
+            CSScript.AssemblyResolvingEnabled = true;  
             Scripts = new List<object>();
             config = Settings.Default.Config;
         }
@@ -77,6 +78,22 @@ namespace IL2CDR.Model
                     script.OnOther(data);
                 
                 script.OnAny(data);
+            }
+        }
+
+        public void RunHistoryScripts( object data )
+        {
+            var header = data as MissionLogEventHeader;
+            if (header == null)
+                return;
+
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
+                script.OnHistory(data);
             }
         }
 

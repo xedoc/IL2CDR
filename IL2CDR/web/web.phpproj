@@ -16,11 +16,14 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model\iStatistics.php" />
+    <Compile Include="config.php">
+      <Publishable>False</Publishable>
+    </Compile>
     <Compile Include="index.php" />
     <Compile Include="IndexController.php" />
-    <Compile Include="Model\MockDatabase.php" />
-    <Compile Include="Model\Player.php" />
+    <Compile Include="Model\iDatabase.php" />
+    <Compile Include="Model\MissionEvent.php" />
+    <Compile Include="Model\MySQL.php" />
     <Compile Include="Model\Utils.php" />
     <Compile Include="plates\Engine.php" />
     <Compile Include="plates\Extension\Asset.php" />
