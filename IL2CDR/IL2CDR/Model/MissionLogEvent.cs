@@ -507,10 +507,10 @@ namespace IL2CDR.Model
         
         public DateTime GameDateTime { get; set; }
         public string MissionFile { get; set; }
-        public int MissionID { get; set; }
+        public string MissionID { get; set; }
         public int GameType { get; set; }
         public List<CoalitionIndex> CoalitionIndexes { get; set; }
-        public bool[] SettingsFlags { get; set; }
+        public string SettingsFlags { get; set; }
         public int Mods { get; set; }
         public int Preset { get; set; }
         public int AQMId { get; set; }
@@ -531,12 +531,12 @@ namespace IL2CDR.Model
                     int.Parse(gameTime.Groups[3].Value));
             }
             MissionFile = RawParameters.GetString("MFile");
-            //TODO: find example of MID
-            //MissionID = RawParameters.GetString("MID")
+            MissionID = RawParameters.GetString("MID");
             GameType = RawParameters.GetInt("GType");
             Mods = RawParameters.GetInt("MODS");
             Preset = RawParameters.GetInt("Preset");
             AQMId = RawParameters.GetInt("AWMID");
+            SettingsFlags = RawParameters.GetString("SETTS");
             var coalitions = RawParameters.GetString("CNTRS");
 
             var countryPairs = coalitions.Split(',').Select(p => p.Split(':')).ToArray();

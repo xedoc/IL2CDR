@@ -52,13 +52,20 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Model\WebClientBaseTests.cs" />
+    <Compile Include="Scripts\Data.cs" />
     <Compile Include="Model\MissionLogEventTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\GlobalStatisticsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IL2CDR\IL2CDR.csproj">
       <Project>{59DB358A-01CF-446F-954D-0C993DADB561}</Project>
       <Name>IL2CDR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Scripts\Scripts.csproj">
+      <Project>{3DF1DBE1-792A-46ED-AEEF-4B73F4029473}</Project>
+      <Name>Scripts</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

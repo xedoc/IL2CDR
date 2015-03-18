@@ -52,14 +52,15 @@ namespace IL2CDR
                     typeof(Timeline),
                     new FrameworkPropertyMetadata { DefaultValue = 20 });
 
-            DServerManager = new DServerManager();
-            DServerManager.Start();
-
             ScriptManager = new ScriptManager();
             ScriptManager.LoadScripts();
-            ScriptManager.Start();
-
             ActionManager = new ActionManager(ScriptManager);
+
+            DServerManager = new DServerManager();
+
+            ScriptManager.Start();
+            DServerManager.Start();
+
         }
         protected override void OnExit(ExitEventArgs e)
         {

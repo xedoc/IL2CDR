@@ -32,6 +32,28 @@ class IndexController
         return $this->templates->render('survivors');
     }
     
+    public function PostEvent()               
+    {
+        if( !isset($_COOKIE['srvtoken']) && empty($_COOKIE['srvtoken'])  )
+            return "FAIL";
+        
+        $eventparam = 'event';
+        if( isset($_POST[$eventparam]) && !empty($_POST[$eventparam])  )
+        {        
+            $json = $_POST[$eventparam];
+            $event = new MissionEvent( $json );
+        
+            if( $event )
+            {
+                if( $event->SaveToDB() )
+                {
+                    return "OK";
+                }
+            }        
+        }
+        return "FAIL";          
+        
+    }
     
     
 }

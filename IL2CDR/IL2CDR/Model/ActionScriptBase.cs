@@ -29,6 +29,7 @@ namespace IL2CDR.Model
         virtual public void OnApplicationStartup(object data) { }
         virtual public void OnOther(object data) { }
         virtual public void OnAny(object data) { }
+        virtual public void OnHistory(object data) { }
 
         virtual public ScriptConfig DefaultConfig
         {

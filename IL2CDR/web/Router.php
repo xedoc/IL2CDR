@@ -43,6 +43,7 @@ class Router
     	$this->app->get('/kd/', function() { echo $this->indexController->GetKD(); } );
     	$this->app->get('/snipers/', function() { echo $this->indexController->GetSnipers(); } );
     	$this->app->get('/survivors/', function() { echo $this->indexController->GetSurvivors(); } );
+        $this->app->post('/e/', function() { echo $this->indexController->PostEvent(); });
         $this->app->run();
     }
     

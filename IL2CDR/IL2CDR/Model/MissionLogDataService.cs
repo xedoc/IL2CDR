@@ -48,7 +48,6 @@ namespace IL2CDR.Model
             missionHistory = new List<object>();
             tracker = new TextFileTracker(MissionLogFolder, mask);
             tracker.OnNewLine = (line) => {
-                actionManager = (Application.Current as App).ActionManager;
                 var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
                 if( data != null && actionManager != null)
                 {
@@ -133,6 +132,8 @@ namespace IL2CDR.Model
                     action(header);
                 }
             }
+            Log.WriteInfo("Procesing history event Type: {0}", header.Type);
+            actionManager.ProcessHistory(data);
         }
         private void ClearHistory()
         {
@@ -146,6 +147,8 @@ namespace IL2CDR.Model
 
             if (!Directory.Exists(MissionLogFolder))
                 return;
+
+            actionManager = (Application.Current as App).ActionManager;
 
             ClearHistory();
             ReadMissionHistory();
