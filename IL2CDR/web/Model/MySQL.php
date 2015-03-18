@@ -1,5 +1,5 @@
 <?php
-
+require_once 'iDatabase.php';
 /**
  * MySQL short summary.
  *

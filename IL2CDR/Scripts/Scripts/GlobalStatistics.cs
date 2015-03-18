@@ -13,8 +13,8 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        private const string DOMAIN = "il2.info";
-        private const string URL = "http://" + DOMAIN + "/e/";
+        private const string DOMAIN = "localhost";
+        private const string URL = "http://" + DOMAIN + ":3992/e/";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
@@ -78,9 +78,13 @@ namespace IL2CDR.Scripts
                         result = webClient.Upload(URL, lastPacket);
                     }                        
                 }
-                Log.WriteInfo("Packet sent to statistics server. Result: {0}", result);
-                if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
-                    lastPacket = String.Empty;
+                if( !String.IsNullOrWhiteSpace(result) )
+                {
+                    Log.WriteInfo("Packet sent to statistics server. Result: {0}", result);
+                    if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
+                        lastPacket = String.Empty;
+
+                }
 
             }
         }
@@ -101,7 +105,7 @@ namespace IL2CDR.Scripts
                     jsonPackets.Add(obj);
                 }
             }
-            return Json.Serialize(jsonPackets);
+            return Json.Serialize(jsonPackets.ToList());
         }
 
         public void AddToQueue( object data )
@@ -109,7 +113,7 @@ namespace IL2CDR.Scripts
             events.Enqueue(data);
 
             if (events.Count >= 10)
-                Task.Factory.StartNew( () => SendDataToServer() );
+                SendDataToServer();
         }
 
         private void SendTimerCallback( object sender )

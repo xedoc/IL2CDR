@@ -50,7 +50,8 @@ namespace IL2CDR.Model
 
         private static void AppendToLogFile(string text)
         {
-            (Application.Current as App).AppLogDataService.AddMessage(text);
+            if( Application.Current != null)
+                (Application.Current as App).AppLogDataService.AddMessage(text);
             //try
             //{
             //    File.AppendAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\il2cdr_log.txt", text + Environment.NewLine);

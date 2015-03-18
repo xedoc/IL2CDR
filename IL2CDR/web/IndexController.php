@@ -1,4 +1,5 @@
 <?php
+require_once 'Model/MissionEvent.php';
 /**
  * IndexController short summary.
  *
@@ -32,17 +33,13 @@ class IndexController
         return $this->templates->render('survivors');
     }
     
-    public function PostEvent()               
+    public function PostEvent($json)               
     {
         if( !isset($_COOKIE['srvtoken']) && empty($_COOKIE['srvtoken'])  )
-            return "FAIL";
-        
-        $eventparam = 'event';
-        if( isset($_POST[$eventparam]) && !empty($_POST[$eventparam])  )
-        {        
-            $json = $_POST[$eventparam];
-            $event = new MissionEvent( $json );
-        
+            return "TOKEN FAIL";
+        if( isset($json)  )
+        {                    
+            $event = new MissionEvent( $json );        
             if( $event )
             {
                 if( $event->SaveToDB() )
@@ -51,7 +48,7 @@ class IndexController
                 }
             }        
         }
-        return "FAIL";          
+        return "UNKNOWN EVENT";          
         
     }
     
