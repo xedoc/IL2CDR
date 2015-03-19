@@ -11,6 +11,6 @@
 interface iDatabase
 {
     function query($query);
-    function connect($host, $user, $password, $database);
+    function connect();
     function disconnect();
 }

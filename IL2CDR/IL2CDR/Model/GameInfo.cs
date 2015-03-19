@@ -8,14 +8,14 @@ namespace IL2CDR.Model
 {
     public enum GameObjectClass
     {
-        Other,
-        Plane,
-        Static,
-        Tank,
-        TrainLocomotive,
-        TrainWagon,
-        Truck,
-        Turret,
+        Other = 0,
+        Plane = 1,
+        Static = 2,
+        Tank = 3,
+        TrainLocomotive = 4,
+        TrainWagon = 5,
+        Truck = 6,
+        Turret = 7,
     }
 
     public class GameObjectItem

@@ -28,7 +28,7 @@ namespace IL2CDR.ViewModel
         {
             if( IsInDesignMode )
             {
-                ServerList = new ObservableCollection<Server>(new List<Server>() { new Server("Xedoc playground", default(Guid), false, true) });
+                ServerList = new ObservableCollection<Server>(new List<Server>() { new Server("Xedoc playground", false, true) });
                 return;
             }
             Config = Properties.Settings.Default.Config;

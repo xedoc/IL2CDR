@@ -14,13 +14,15 @@ namespace IL2CDR.Scripts
     public class GlobalStatistics : ActionScriptBase
     {
         private const string DOMAIN = "localhost";
-        private const string URL = "http://" + DOMAIN + ":3992/e/";
+        private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
         private const int SENDTIMEOUT = 5 * 60 * 1000;
         private object lockSend = new object();
         private string lastPacket = String.Empty;
+        private string token = String.Empty;
+        private bool dictionarySent = false;
 
         public GlobalStatistics()
         {
@@ -47,6 +49,23 @@ namespace IL2CDR.Scripts
                 };
             }
         }
+        public override void OnServerLogStart(Server server)
+        {
+            var packet = new { Type = 9999, Server = server };
+            AddToQueue(packet);
+        }
+
+        public string Token {
+            get
+            {
+                if (Config == null)
+                    return String.Empty;
+
+                return Config.GetString("token");
+            }
+
+        }
+
         public override void OnApplicationStartup(object data)
         {
             sendTimer.Change(0, SENDTIMEOUT);
@@ -64,23 +83,19 @@ namespace IL2CDR.Scripts
                 if( String.IsNullOrWhiteSpace( lastPacket ) )
                     lastPacket = GetNextPacket();
 
+                if (String.IsNullOrWhiteSpace(lastPacket))
+                    return;
+
                 using( WebClientBase webClient = new WebClientBase())
                 {
                     webClient.ContentType = ContentType.JsonUTF8;
                     webClient.KeepAlive = false;
-                    webClient.SetCookie("srvtoken", "test", DOMAIN);
-                    if (lastPacket.Length >= 500)
-                    {
-                        result = webClient.Upload(URL, lastPacket);
-                    }                        
-                    else
-                    {
-                        result = webClient.Upload(URL, lastPacket);
-                    }                        
+                    webClient.SetCookie("srvtoken", Token, DOMAIN);
+                    result = webClient.Upload(URL, lastPacket);
                 }
                 if( !String.IsNullOrWhiteSpace(result) )
                 {
-                    Log.WriteInfo("Packet sent to statistics server. Result: {0}", result);
+                    Log.WriteInfo("Packet sent to statistics server. Size(bytes): {0}, Result: {1}", lastPacket.Length, result);
                     if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
                         lastPacket = String.Empty;
 
@@ -110,6 +125,9 @@ namespace IL2CDR.Scripts
 
         public void AddToQueue( object data )
         {
+            if (String.IsNullOrWhiteSpace(Token))
+                return;
+
             events.Enqueue(data);
 
             if (events.Count >= 10)
@@ -127,6 +145,26 @@ namespace IL2CDR.Scripts
                 !(data is MissionLogEventHeader) ||
                 data is MissionLogEventVersion)
                 return;
+
+            if (!dictionarySent)
+            {
+                //Send game objects classification info
+                var packet = new
+                {
+                    Token = Token,
+                    Type = 9998,
+                    ObjectInfo = GameInfo.ObjectsClassification.Select(
+                    pair => new
+                    {
+                        ObjectId = GuidUtility.Create(GuidUtility.IsoOidNamespace, pair.Key),
+                        Name = pair.Key,
+                        Class = pair.Value.Classification.ToString("g"),
+                        Purpose = pair.Value.Purpose
+                    }).ToArray()
+                };
+
+                AddToQueue(packet);
+            }
 
             AddToQueue(data);
         }

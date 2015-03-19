@@ -11,7 +11,7 @@ namespace IL2CDRTests
     {
         public static object GetTestMissionEvent(string text)
         {
-            var server = new Server("Test server", Guid.NewGuid(), true, true);
+            var server = new Server("Test server", true, true);
             return MissionLogDataBuilder.GetData(text, DateTime.Now, 1, server);
         }
         public static Dictionary<EventType, string> testLines = new Dictionary<EventType, string>()

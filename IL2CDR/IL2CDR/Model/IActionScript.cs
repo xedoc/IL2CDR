@@ -31,6 +31,7 @@ namespace IL2CDR.Model
         void OnOther(object data);
         void OnAny(object data);
         void OnHistory(object data);
+        void OnServerLogStart(Server server);
 
     }
 }

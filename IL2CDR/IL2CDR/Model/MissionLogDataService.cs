@@ -26,6 +26,8 @@ namespace IL2CDR.Model
                     .With( x => x.AirField).Do( x => data.Server.AirFields[x.Id] = x)},
             { EventType.PlaneSpawn, (data) => data.With(x => x as MissionLogEventPlaneSpawn)
                     .With(x => x.Player).Do(x => data.Server.Players[x.Id] = x)},
+            { EventType.GameObjectSpawn, (data) => data.With(x => x as MissionLogEventGameObjectSpawn)
+                    .With(x => x.Object).Do(x => data.Server.GameObjects[x.Id] = x)},
             { EventType.Leave, (data) =>data.With(x => x as MissionLogEventPlayerLeave)
                     .Do(x => data.Server.Players.PlayerLeave(x.NickId))},
             { EventType.Kill, (data) => data.With(x => x as MissionLogEventKill)
@@ -73,6 +75,7 @@ namespace IL2CDR.Model
             if (String.IsNullOrWhiteSpace(missionDateTimePrefix))
                 return;
 
+            server.CurrentMissionId = GuidUtility.Create(GuidUtility.IsoOidNamespace, String.Concat(server.ServerId, "_", missionDateTimePrefix)).ToString(); 
             MissionStartDateTime = Util.ParseDate(missionDateTimePrefix);
         }
         public void ReadMissionHistory()
@@ -149,7 +152,7 @@ namespace IL2CDR.Model
                 return;
 
             actionManager = (Application.Current as App).ActionManager;
-
+            actionManager.ProcessServerLogStart(server);
             ClearHistory();
             ReadMissionHistory();
             tracker.Start();

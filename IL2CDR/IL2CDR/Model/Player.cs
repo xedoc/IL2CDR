@@ -17,6 +17,7 @@ namespace IL2CDR.Model
         public Guid LoginId { get; set; }
         public string NickName { get; set; }
         public Country Country { get; set; }
+        public int CoalitionIndex { get; set; }
         public Plane Plane { get; set; }
         public GameObject BotPilot { get; set; }
         public bool IsInAir { get; set; }

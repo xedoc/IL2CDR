@@ -16,7 +16,7 @@ class MySQL implements iDatabase
     function __construct()
     {
         $this->config = include('/config.php');
-        
+        $this->connect();
     }
     public function query($query)
     {
@@ -27,24 +27,39 @@ class MySQL implements iDatabase
     }
     public function callproc($proc, $params = array())
     {
+        if( !$this->isConnected )
+            return;
+        
         $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
     }
     
     public function setvars($params)
     {
+        if( !$this->isConnected )
+            return;
+        
         $this->query( sprintf("SET %s", $this->GetSetParams( $params ) ));
     }
     
-    public function connect($host, $user, $password, $database)
+    public function connect()
     {
-        $this->my = new mysqli( $this->config["mysql_host"], 
-            $this->config["mysql_user"], 
-            $this->config["mysql_pass"],
-            $this->config["mysql_db"]);        
+        try
+        {
+            $this->my = new mysqli( $this->config["mysql_host"], 
+                $this->config["mysql_user"], 
+                $this->config["mysql_pass"],
+                $this->config["mysql_db"]);        
         
-        if (!mysqli_connect_errno()) { 
-            $this->isConnected = true;
-        } 
+            if (!mysqli_connect_errno()) { 
+                $this->isConnected = true;
+            }
+        	    
+        }
+        catch (Exception $exception)
+        {
+                $this->isConnected = false;
+        }
+        
     }
     public function disconnect()
     {
@@ -52,14 +67,23 @@ class MySQL implements iDatabase
             $this->my->close();
     }
     
-    public function GetSetParams($pairs)
+    public function GetSetParams($p)
     {
-        array_walk($p, create_function('&$i,$k','$i=" $k=\'$i\'";'));
+        array_walk($p, create_function('&$i,$k','$i=" @$k=$i";'));
         return implode(",", $p);
     }
-    public function GetProcParams($pairs)
+    public function GetProcParams($p)
     {
-        array_walk($p, create_function('&$i,$k','$i=" \'$i\'";'));
+        array_walk($p, create_function('&$i,$k','$i=" $i";'));
         return implode(",", $p);
+    }
+    
+    //Escape and quote given string
+    public function EaQ($text)
+    {
+        if( !$this->isConnected )
+            return null;
+
+        return sprintf("'%s'", $this->my->real_escape_string( $text ));
     }
 }

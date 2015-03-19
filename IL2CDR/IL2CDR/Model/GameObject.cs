@@ -26,5 +26,7 @@ namespace IL2CDR.Model
         public string Name { get; set; }
         public GameObjectClass Classification { get; set; }
         public string Purpose { get; set; }
+        public Country Country { get; set; }
+        public int CoalitionIndex {get; set;}
     }
 }

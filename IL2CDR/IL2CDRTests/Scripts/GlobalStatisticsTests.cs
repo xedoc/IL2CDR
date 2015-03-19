@@ -40,17 +40,6 @@ namespace IL2CDR.Scripts.Tests
         [TestMethod()]
         public void GetNextPacketTest()
         {
-            var gs = new GlobalStatistics();
-            gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.MissionStart]));
-            gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Hit]));
-            gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Damage]));
-            gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Join]));
-
-            var packet = gs.GetNextPacket();
-            Debug.Print("{0}\nuncompressed length:{1}, compressed length:{2}",packet,packet.Length, new WebClientBase().GZipBytes(packet).Length);
-            
-            Assert.IsNotNull(packet);
-
         }
 
         [TestMethod()]
@@ -63,7 +52,17 @@ namespace IL2CDR.Scripts.Tests
         public void SendDataToServerTest()
         {
             var gs = new GlobalStatistics();
-            gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.MissionStart]));
+            gs.Config = new ScriptConfig()
+            {
+                ConfigFields = new ConfigFieldList()
+                    {
+                        { "token", "Token", "Server authentication token", FieldType.Text, "0695da663534558c209f052ac2af4112", true},
+                    },
+            };
+
+            var startPacket = Data.GetTestMissionEvent(Data.testLines[EventType.MissionStart]);
+            gs.AddToQueue(new { Type = 9999, Server = ((MissionLogEventHeader)startPacket).Server });
+            gs.AddToQueue(startPacket);
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Hit]));
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Damage]));
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Join]));

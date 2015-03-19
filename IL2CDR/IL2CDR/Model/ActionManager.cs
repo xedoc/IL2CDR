@@ -19,7 +19,10 @@ namespace IL2CDR.Model
         {
             scriptManager.RunActionScripts(data);
         }
-
+        public void ProcessServerLogStart( Server server )
+        {
+            scriptManager.RunServerLogStartScripts(server);
+        }
         public void ProcessHistory( object data )
         {
             scriptManager.RunHistoryScripts(data);

@@ -18,6 +18,9 @@ namespace IL2CDR.Model
         [ScriptIgnore]
         public ProcessItem Process { get; set; }
 
+        public string CurrentMissionId { get; set; }
+        public int TimeZoneOffset { get; set; }
+
         public Server(RconConnection rcon, ProcessItem process)
         {
             Name = String.Format(@"PID: {0} {1}\DServer.exe", process.ProcessId, process.ProcessPath);
@@ -27,13 +30,14 @@ namespace IL2CDR.Model
             ServerId = default(Guid);
             IsConfigSet = false;
             IsRconConnected = false;
+            TimeZoneOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
             Initialize();
 
         }
-        public Server(string name, Guid guid, bool isConfigSet, bool isRconConnected )
+        public Server(string name, bool isConfigSet, bool isRconConnected )
         {
             Name = name;
-            ServerId = guid;
+            ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, name); 
             IsConfigSet = isConfigSet;
             IsRconConnected = isRconConnected;
             Initialize();
@@ -61,6 +65,15 @@ namespace IL2CDR.Model
                     Thread.Sleep(1000);
                 }
             }
+        }
+
+        public int GetCoalitionIndex( Country country )
+        {
+            var coalition = CoalitionIndexes.FirstOrDefault(c => c.Country.Id == country.Id);
+            if (coalition != null)
+                return coalition.Index;
+            else
+                return -1;
         }
 
         /// <summary>

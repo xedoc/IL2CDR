@@ -28,10 +28,10 @@ namespace IL2CDR.Model
         InfluenceAreaInfo = 13,         //LET_INFLUENCEAREA_HEADER 
         InfluenceAreaBoundary = 14,     //LET_INFLUENCEAREA_BOUNDARY
         Version = 15,                   //LET_LOG_VERSION 
-        BotPilotSpawn = 16,                  //TODO: check if that parachute spawn
+        BotPilotSpawn = 16,             //TODO: check if that parachute spawn
         Position = 17,                  //LET_POSITION
         Join = 20,                      
-        Leave = 21,                     
+        Leave = 21,
     }                                   
 
     public class MissionLogDataBuilder
@@ -64,8 +64,10 @@ namespace IL2CDR.Model
             if (header.Type != EventType.Unknown )
             {
                 header.EventID = GuidUtility.Create(GuidUtility.IsoOidNamespace, String.Concat(server.ServerId,"_",missionStartTime,"_",eventNumber));
-                if (dataFactory.ContainsKey(header.Type))
-                    return dataFactory[header.Type](header);
+
+                Func<MissionLogEventHeader, object> handler;
+                if (dataFactory.TryGetValue(header.Type, out handler))
+                    return handler(header);
             }
             return null;
         }
@@ -117,7 +119,9 @@ namespace IL2CDR.Model
                 int type = RawParameters.GetInt("AType");
 
                 //TODO:Handle new ATypes here if EventType enum changed
-                if((type >=0 && type <= 16) || type == 20 || type == 21)
+                if((type >=0 && type <= 17) || 
+                    type == 20 || 
+                    type == 21)
                 {
                     Type = (EventType)type;
                     Ticks = (uint)RawParameters.GetInt("T");
@@ -244,23 +248,23 @@ namespace IL2CDR.Model
     //T:16459 AType:12 ID:630784 TYPE:Sd Kfz 10 Flak 38 COUNTRY:201 NAME:Vehicle PID:-1
     public class MissionLogEventGameObjectSpawn : MissionLogEventHeader
     {
-        
-        public int ObjectId { get; set; }
-        public string VehicleType { get; set; }
-        public string Name { get; set; }
-        public Country Country { get; set; }
+        public GameObject Object { get; set; }
         public int PlayerId { get; set; }
 
         public MissionLogEventGameObjectSpawn(MissionLogEventHeader header)
             : base(header)
         {
-            
-            ObjectId = RawParameters.GetInt("ID");
-            VehicleType = RawParameters.GetString("TYPE");
-            Name = RawParameters.GetString("NAME");
-            Country = new Country(RawParameters.GetInt("COUNTRY"));
+            GameObjectItem purpose;
+            GameInfo.ObjectsClassification.TryGetValue(RawParameters.GetString("TYPE"), out purpose);
+
+            Object = new GameObject(RawParameters.GetInt("ID"), RawParameters.GetString("NAME")) { 
+                Classification = purpose.Classification,
+                Name = RawParameters.GetString("TYPE"),
+                Country = new Country(RawParameters.GetInt("COUNTRY")),
+            };
+
+            Object.CoalitionIndex = Server.GetCoalitionIndex(Object.Country);
             PlayerId = RawParameters.GetInt("PID");
-            
         }
     }
     //AType:11
@@ -314,14 +318,14 @@ namespace IL2CDR.Model
 
             Player = new Player()
             {
-                Id = RawParameters.GetInt("PLID"),
+                Id = RawParameters.GetInt("PID"),
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
                 IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
                 IsOnline = true,
                 LoginId = RawParameters.GetGuid("LOGIN"),
                 NickId = RawParameters.GetGuid("IDS"),
                 NickName = RawParameters.GetString("NAME"),
-                Plane = new Plane(RawParameters.GetInt("PID"), RawParameters.GetString("TYPE"))
+                Plane = new Plane(RawParameters.GetInt("PLID"), RawParameters.GetString("TYPE"))
                 {
                     Bombs = RawParameters.GetInt("BOMB"),
                     Classification = GameObjectClass.Plane,
@@ -334,6 +338,7 @@ namespace IL2CDR.Model
                 },
                 BotPilot = new GameObject(RawParameters.GetInt("PID"), "BotPilot"),
             };
+            Player.CoalitionIndex = Server.GetCoalitionIndex(Player.Country);
         }
     }
     //AType:9
@@ -383,11 +388,11 @@ namespace IL2CDR.Model
     //T:38919 AType:7
     public class MissionLogEventMissionEnd : MissionLogEventHeader
     {
-
+        public DateTime MissionEndTime { get; set; }
         public MissionLogEventMissionEnd(MissionLogEventHeader header) 
             : base(header)
         {
-            
+            MissionEndTime = DateTime.Now;
         }
     }
     //AType:6
@@ -397,12 +402,17 @@ namespace IL2CDR.Model
     {
         public int PlaneId { get; set; }
         public Vector3D Position { get; set; }
+        public Player Player { get; set; }
+        public GameObject Bot { get; set; }
+
         public MissionLogEventLanding(MissionLogEventHeader header)
             : base(header)
         {
             PlaneId = RawParameters.GetInt("PID");
             Position = RawParameters.GetVector3D("POS");
-
+            Player = Server.Players[PlaneId];
+            if (Player == null)
+                Bot = Server.GameObjects[PlaneId];
         }
     }
     //AType:5
@@ -412,11 +422,18 @@ namespace IL2CDR.Model
     {
         public int PlaneId { get; set; }
         public Vector3D Position { get; set; }
+        public Player Player { get; set; }
+        public GameObject Bot { get; set; }
+
         public MissionLogEventTakeOff(MissionLogEventHeader header)
             : base(header)
         {
             PlaneId = RawParameters.GetInt("PID");
             Position = RawParameters.GetVector3D("POS");
+
+            Player = Server.Players[PlaneId];
+            if( Player == null )
+                Bot = Server.GameObjects[PlaneId];
         }
     }
     //AType:4
@@ -434,16 +451,22 @@ namespace IL2CDR.Model
         public int Bombs { get; set; }
         public int Rockets { get; set; }
 
+        public Player Player { get; set; }
+        public GameObject Bot { get; set; }
+
         public MissionLogEventPlayerAmmo(MissionLogEventHeader header)
             : base(header)
         {
-            PlaneId = RawParameters.GetInt("PID");
-            PlayerId = RawParameters.GetInt("PLID");
+            PlaneId = RawParameters.GetInt("PLID");
+            PlayerId = RawParameters.GetInt("PID");
             Bullets = RawParameters.GetInt("BUL");
             Shells = RawParameters.GetInt("SH");
             Bombs = RawParameters.GetInt("BOMB");
             Rockets = RawParameters.GetInt("RCT");
 
+            Player = Server.Players[PlayerId];
+            if (Player == null)
+                Bot = Server.GameObjects[PlaneId];
         }
     }
     //AType:3
@@ -454,17 +477,29 @@ namespace IL2CDR.Model
         public int AttackerId { get; set; } //Plane/vehicle ID
         public int TargetId { get; set; }   //Plane/vehicle ID
         public Vector3D Position { get; set; }
+        public Player AttackerPlayer { get; set; }
+        public Player TargetPlayer { get; set; }
+        public GameObject AttackerObject { get; set; }
+        public GameObject TargetObject { get; set; }
+
         public MissionLogEventKill(MissionLogEventHeader header)
             : base(header)
         {
             AttackerId = RawParameters.GetInt("AID");
             TargetId = RawParameters.GetInt("TID");
             Position = RawParameters.GetVector3D("POS");
+
+            AttackerPlayer = Server.Players[AttackerId];
+            if (AttackerPlayer == null)
+                AttackerObject = Server.GameObjects[AttackerId];
+
+            TargetPlayer = Server.Players[TargetId];
+            if( TargetPlayer == null )
+                TargetObject = Server.GameObjects[TargetId];
         }
     }
     //AType:2
-    //TODO: RoF example - find BoS one
-    //T:26458 AType:2 DMG:0.030 AID:311297 TID:454656 POS(123603.250,145.485,242323.359)
+    //T:26263 AType:2 DMG:0.013 AID:612352 TID:311297 POS(123759.180,255.837,242953.906)
     //Damage
     public class MissionLogEventDamage: MissionLogEventHeader
     {
@@ -472,6 +507,10 @@ namespace IL2CDR.Model
         public int AttackerId { get; set; }
         public int TargetId { get; set; }
         public Vector3D Position { get; set; }
+        public Player AttackerPlayer { get; set; }
+        public Player TargetPlayer { get; set; }
+        public GameObject AttackerObject { get; set; }
+        public GameObject TargetObject { get; set; }
 
         public MissionLogEventDamage(MissionLogEventHeader header)
             : base(header)
@@ -480,6 +519,14 @@ namespace IL2CDR.Model
             TargetId = RawParameters.GetInt("TID");
             Damage = RawParameters.GetDouble("DMG");
             Position = RawParameters.GetVector3D("POS");
+
+            AttackerPlayer = Server.Players[AttackerId];
+            if (AttackerPlayer == null)
+                AttackerObject = Server.GameObjects[AttackerId];
+
+            TargetPlayer = Server.Players[TargetId];
+            if (TargetPlayer == null)
+                TargetObject = Server.GameObjects[TargetId];
         }
     }
     //AType:1
@@ -489,6 +536,11 @@ namespace IL2CDR.Model
     {
         public int AttackerId { get; set; }
         public int TargetId { get; set; }
+        public Player AttackerPlayer { get; set; }
+        public Player TargetPlayer { get; set; }
+        public GameObject AttackerObject { get; set; }
+        public GameObject TargetObject { get; set; }
+
         public string AmmoName { get; set; }
         public MissionLogEventHit(MissionLogEventHeader header)
             : base(header)
@@ -496,6 +548,15 @@ namespace IL2CDR.Model
             AttackerId = RawParameters.GetInt("AID");
             TargetId = RawParameters.GetInt("TID");
             AmmoName = RawParameters.GetString("AMMO");
+
+            AttackerPlayer = Server.Players[AttackerId];
+            if (AttackerPlayer == null)
+                AttackerObject = Server.GameObjects[AttackerId];
+
+            TargetPlayer = Server.Players[TargetId];
+            if (TargetPlayer == null)
+                TargetObject = Server.GameObjects[TargetId];
+
         }
     }
     //AType:0

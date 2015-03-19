@@ -45,7 +45,12 @@ namespace IL2CDR.Model
 
 
         public List<object> Scripts { get; set; }
-
+        public void RunServerLogStartScripts(Server server)
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+                script.OnServerLogStart(server);
+        }
         public void RunStartupMethod()
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
