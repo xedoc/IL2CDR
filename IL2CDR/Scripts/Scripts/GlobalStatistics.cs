@@ -18,7 +18,7 @@ namespace IL2CDR.Scripts
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
-        private const int SENDTIMEOUT = 5 * 60 * 1000;
+        private const int SENDTIMEOUT = 2000;
         private object lockSend = new object();
         private string lastPacket = String.Empty;
         private string token = String.Empty;
@@ -83,22 +83,27 @@ namespace IL2CDR.Scripts
                 if( String.IsNullOrWhiteSpace( lastPacket ) )
                     lastPacket = GetNextPacket();
 
-                if (String.IsNullOrWhiteSpace(lastPacket))
+                if (String.IsNullOrWhiteSpace(lastPacket))                
                     return;
+
 
                 using( WebClientBase webClient = new WebClientBase())
                 {
+                    var data = webClient.GZipBytes(lastPacket);
+                    
                     webClient.ContentType = ContentType.JsonUTF8;
                     webClient.KeepAlive = false;
                     webClient.SetCookie("srvtoken", Token, DOMAIN);
-                    result = webClient.Upload(URL, lastPacket);
-                }
-                if( !String.IsNullOrWhiteSpace(result) )
-                {
-                    Log.WriteInfo("Packet sent to statistics server. Size(bytes): {0}, Result: {1}", lastPacket.Length, result);
-                    if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
-                        lastPacket = String.Empty;
+                    result = webClient.UploadCompressed(URL, lastPacket);
+                    Log.WriteInfo("Send result: {0}", result);
+                    if (!String.IsNullOrWhiteSpace(result))
+                    {
+                        if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
+                            lastPacket = String.Empty;
+                        else
+                            Log.WriteInfo("Error sending packet to statistics server. Size(bytes): {0}, Result: {1}", data.Length, result);
 
+                    }
                 }
 
             }
@@ -128,10 +133,32 @@ namespace IL2CDR.Scripts
             if (String.IsNullOrWhiteSpace(Token))
                 return;
 
-            events.Enqueue(data);
+            if (data is MissionLogEventStart ||
+                data is MissionLogEventMissionEnd ||
+                data is MissionLogEventKill ||
+                data is MissionLogEventPlayerAmmo ||
+                data is MissionLogEventTakeOff ||
+                data is MissionLogEventLanding ||
+                data is MissionLogEventPlaneSpawn ||
+                data is MissionLogEventObjectiveCompleted ||
+                !(data is MissionLogEventHeader))
+            {
+
+                if (data is MissionLogEventKill)
+                {
+                    var kill = data as MissionLogEventKill;
+                    //Record kill only if player participate
+                    if (kill.TargetPlayer == null && kill.AttackerPlayer == null)
+                        return;
+                }
+
+                events.Enqueue(data);
+
+            }
 
             if (events.Count >= 10)
                 SendDataToServer();
+
         }
 
         private void SendTimerCallback( object sender )
@@ -141,9 +168,7 @@ namespace IL2CDR.Scripts
         }
         public override void OnHistory(object data)
         {
-            if (data == null || 
-                !(data is MissionLogEventHeader) ||
-                data is MissionLogEventVersion)
+            if (data == null )
                 return;
 
             if (!dictionarySent)
@@ -164,9 +189,13 @@ namespace IL2CDR.Scripts
                 };
 
                 AddToQueue(packet);
+                dictionarySent = true;
+            }
+            else
+            {
+                AddToQueue(data);
             }
 
-            AddToQueue(data);
         }
         
 

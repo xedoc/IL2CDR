@@ -257,7 +257,14 @@ namespace IL2CDR.Model
         private void Authenticate()
         {
             var result = RawCommand(String.Format("auth {0} {1}", Config.Login, Config.Password));
-            Log.WriteInfo(result["STATUS"]);
+            Log.WriteInfo("Rcon authentication: {0}", GetResult(result["STATUS"]) );
+        }
+
+        private string GetResult(string result)
+        {
+            string code;
+            errorCodes.TryGetValue(result, out code);
+            return code ?? "UNKNOWN";
         }
 
         /// <summary>

@@ -257,8 +257,12 @@ namespace IL2CDR.Model
             GameObjectItem purpose;
             GameInfo.ObjectsClassification.TryGetValue(RawParameters.GetString("TYPE"), out purpose);
 
+            if (purpose == null)
+                purpose = new GameObjectItem(GameObjectClass.Other, "Unknown");
+
             Object = new GameObject(RawParameters.GetInt("ID"), RawParameters.GetString("NAME")) { 
-                Classification = purpose.Classification,
+                Classification = purpose.Classification.ToString("g"),
+                Purpose = purpose.Purpose,
                 Name = RawParameters.GetString("TYPE"),
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
             };
@@ -315,6 +319,8 @@ namespace IL2CDR.Model
         {
             GameObjectItem purpose;            
             GameInfo.ObjectsClassification.TryGetValue(RawParameters.GetString("TYPE"), out purpose);
+            if (purpose == null)
+                purpose = new GameObjectItem(GameObjectClass.Other, "Unknown");
 
             Player = new Player()
             {
@@ -327,14 +333,15 @@ namespace IL2CDR.Model
                 NickName = RawParameters.GetString("NAME"),
                 Plane = new Plane(RawParameters.GetInt("PLID"), RawParameters.GetString("TYPE"))
                 {
+                    Bullets = RawParameters.GetInt("BUL"),
                     Bombs = RawParameters.GetInt("BOMB"),
-                    Classification = GameObjectClass.Plane,
+                    Classification = GameObjectClass.Plane.ToString("g"),
                     Fuel = RawParameters.GetDouble("FUEL"),
-                    Payload = RawParameters.GetInt("PAYLOAD"),
+                    Payload = RawParameters.GetString("PAYLOAD"),
                     Purpose = purpose == null ? null : purpose.Purpose,
                     Shells = RawParameters.GetInt("SH"),
                     Skin = RawParameters.GetString("SKIN"),
-                    WeaponMods = (WeaponMods)RawParameters.GetInt("WM"),                    
+                    WeaponMods = RawParameters.GetString("WM"),                    
                 },
                 BotPilot = new GameObject(RawParameters.GetInt("PID"), "BotPilot"),
             };

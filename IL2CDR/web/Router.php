@@ -44,7 +44,7 @@ class Router
     	$this->app->get('/snipers/', function() { echo $this->indexController->GetSnipers(); } );
     	$this->app->get('/survivors/', function() { echo $this->indexController->GetSurvivors(); } );
         $this->app->post('/e/', function() { 
-            echo $this->indexController->PostEvent($this->app->request->getBody()); 
+            echo $this->indexController->PostEvent( gzdecode($this->app->request->getBody())); 
         });
         $this->app->run();
     }

@@ -97,11 +97,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Content Include="..\Scripts\Scripts\Example.cs">
-      <Link>Scripts\Example.cs</Link>
+      <Link>ScriptExamples\Example.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Scripts\Scripts\LocalStatistics.cs">
-      <Link>Scripts\LocalStatistics.cs</Link>
+      <Link>ScriptExamples\LocalStatistics.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Scripts\Scripts\GlobalStatistics.cs">
@@ -113,6 +113,7 @@
     <Compile Include="Model\ActionManager.cs" />
     <Compile Include="Model\ActionScriptBase.cs" />
     <Compile Include="Model\AirField.cs" />
+    <Compile Include="Model\AirFieldCollection.cs" />
     <Compile Include="Model\Bot.cs" />
     <Compile Include="Model\Collections.cs" />
     <Compile Include="Model\Config.cs" />
@@ -122,7 +123,10 @@
     <Compile Include="Model\DServerManager.cs" />
     <Compile Include="Model\GameInfo.cs" />
     <Compile Include="Model\GameObject.cs" />
+    <Compile Include="Model\GameObjectBase.cs" />
+    <Compile Include="Model\GameObjectsCollection.cs" />
     <Compile Include="Model\GuidUtility.cs" />
+    <Compile Include="Model\Hits.cs" />
     <Compile Include="Model\IActionScript.cs" />
     <Compile Include="Model\IL2StartupConfig.cs" />
     <Compile Include="Model\Installer.cs" />
@@ -141,6 +145,7 @@
     <Compile Include="Model\NotifyPropertyChangeBase.cs" />
     <Compile Include="Model\Plane.cs" />
     <Compile Include="Model\Player.cs" />
+    <Compile Include="Model\PlayersCollection.cs" />
     <Compile Include="Model\ProcessMonitor.cs" />
     <Compile Include="Model\RconConnection.cs" />
     <Compile Include="Model\Re.cs" />

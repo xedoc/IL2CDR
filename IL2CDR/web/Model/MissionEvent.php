@@ -13,9 +13,11 @@ class MissionEvent
 {
     private $db;
     private $events;
+    private $text;
     function __construct($text)
     {
         $this->db = new MySQL();
+        $this->text = $text;
         $this->events = json_decode( $text );
     }
     private function GetTimeStamp($jsdate)
@@ -42,8 +44,7 @@ class MissionEvent
     }
     
     public function SaveToDB( )
-    {
-        
+    {        
         if( !isset( $this->events) || 
             empty($this->events) ||
             !is_array($this->events))
@@ -56,17 +57,30 @@ class MissionEvent
                 continue;            
             
             $globalparams = array( 
-                    'ServerId'=> $this->db->EaQ($event->Server->ServerId),
-                    'MissionUUID'=> $this->db->EaQ($event->Server->CurrentMissionId),
                     'Token' => $this->db->EaQ($_COOKIE["srvtoken"]),
-                );                    
+                );
+            
+            if( isset( $event->Server ) )
+            {
+                $globalparams += array(
+                    'MissionUUID'=> $this->db->EaQ($event->Server->CurrentMissionId),
+                    'ServerId'=> $this->db->EaQ($event->Server->ServerId),                    
+                );
+            }
+
+            if( isset( $event->EventID ) )
+            {
+                $globalparams += array(
+                    'EventID'=> $this->db->EaQ($event->EventID),
+                );
+            }
+            
             $this->db->setvars($globalparams);
             
             switch( $event->Type)
             {
                 case 0:
                     $params = array( 
-                            'EventID'=> $this->db->EaQ($event->EventID),
                             'GameDateTime' => $this->GetTimeStamp( $event->GameDateTime ),
                             'MissionFile' => $this->db->EaQ( $event->MissionFile ),
                             'MissionID' => $this->db->EaQ($event->MissionID),
@@ -85,6 +99,11 @@ class MissionEvent
                 case 2:
                     break;
                 case 3:
+                    $params = array( 
+                        
+                    );                    
+                    $this->db->setvars($params);
+                    $this->db->callproc("AddKill");
                     break;
                 case 4:
                     break;
@@ -94,17 +113,37 @@ class MissionEvent
                     break;
                 case 7:
                     $params = array( 
-                           'EventID'=> $this->db->EaQ($event->EventID),
                            'MissionEndTime'=>  $this->GetTimeStamp( $event->MissionEndTime )
-                       );                    
+                       );
                     $this->db->setvars($params);
                     $this->db->callproc("AddMissionEndEvent");
                     break;
                 case 8:
                     break;
                 case 9:
-                    break;
+                    break;                    
+                //Plane spawn
                 case 10:
+                    if( !isset( $event->Player ) || 
+                        !isset( $event->Player->NickId ) || 
+                        !isset( $event->Player->Plane ))
+                        continue;
+                    $params = array( 
+                           'NickId' => $this->db->EaQ( $event->Player->NickId ),
+                           'LoginId' => $this->db->EaQ( $event->Player->LoginId ),
+                           'NickName' => $this->db->EaQ( $event->Player->NickName ),
+                           'Plane' => $this->db->EaQ( $event->Player->Plane->Name ),
+                           'Bullets' => $this->db->EaQ( $event->Player->Plane->Bullets ),
+                           'Shells' => $this->db->EaQ( $event->Player->Plane->Shells ),
+                           'Fuel' => $this->db->EaQ( $event->Player->Plane->Fuel ),
+                           'Payload' => $this->db->EaQ( $event->Player->Plane->Payload ),
+                           'Skin' => $this->db->EaQ( $event->Player->Plane->Skin ),
+                           'WeaponMods' => $this->db->EaQ( $event->Player->Plane->WeaponMods ),
+                           'Country' => $this->db->EaQ( $event->Player->Country->Name ),
+                           'CoalitionIndex' => $this->db->EaQ( $event->Player->CoalitionIndex ),
+                       );
+                    $this->db->setvars($params);
+                    $this->db->callproc("AddPlaneSpawn");
                     break;
                 case 11:
                     break;
@@ -139,7 +178,7 @@ class MissionEvent
                     
                     break;
                 case 9999:
-                    $params = array(                         
+                    $params = array(      
                         'ServerName'=> $this->db->EaQ($event->Server->Name),
                     );                    
                     $this->db->setvars($params);

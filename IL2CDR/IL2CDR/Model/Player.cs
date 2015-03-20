@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
-    public class Player
+    public class Player : GameObjectBase
     {
         public Player()
         {
             IsOnline = true;
+           
         }
         public int Id { get; set; }
         public Guid NickId { get; set; }
@@ -25,7 +26,9 @@ namespace IL2CDR.Model
         public PlayerStatus Status { get; set; }
         public int ClientId { get; set; }
         public int Ping { get; set; }
-
+        public bool IsKilled { get; set; }
+        public int Hits { get; set; }
+        public int Shots { get; set; }
     }
 
     public enum PlayerStatus

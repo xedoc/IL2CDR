@@ -31,9 +31,13 @@ namespace IL2CDR.Model
             { EventType.Leave, (data) =>data.With(x => x as MissionLogEventPlayerLeave)
                     .Do(x => data.Server.Players.PlayerLeave(x.NickId))},
             { EventType.Kill, (data) => data.With(x => x as MissionLogEventKill)
-                .Do(x => data.Server.Players.PlayerKilled(x.TargetId))},
+                .Do(x => data.Server.DestroyObject(x.TargetId))},
             { EventType.MissionStart, (data) => data.With(x => x as MissionLogEventStart)
                 .Do(x => data.Server.CoalitionIndexes = x.CoalitionIndexes)},
+            { EventType.Hit, (data) => data.With(x => x as MissionLogEventHit)
+                .Do(x => data.Server.AddHit( x as MissionLogEventHit))},
+            { EventType.Damage, (data) => data.With(x => x as MissionLogEventDamage)
+                .Do(x => data.Server.AddDamage( x as MissionLogEventDamage))},
         };
 
         public DateTime MissionStartDateTime { get; set; }
@@ -129,13 +133,13 @@ namespace IL2CDR.Model
             var header = (data as MissionLogEventHeader);
             if( header != null )
             {
+                Log.WriteInfo(header.Type.ToString("g"));
                 Action<MissionLogEventHeader> action;
                 if( historyHandlers.TryGetValue( header.Type, out action ) )
                 {
                     action(header);
                 }
             }
-            Log.WriteInfo("Procesing history event Type: {0}", header.Type);
             actionManager.ProcessHistory(data);
         }
         private void ClearHistory()

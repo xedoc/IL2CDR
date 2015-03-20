@@ -70,7 +70,6 @@ namespace IL2CDR.Model
             if (header == null)
                 return;
 
-            Log.WriteInfo("Running action script for action type {0}", header.Type);
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach( IActionScript script in actScripts )
             {

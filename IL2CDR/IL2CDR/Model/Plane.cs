@@ -13,12 +13,13 @@ namespace IL2CDR.Model
             Id = id;
             Name = name;
         }
-        public int Payload { get; set; }
+        public string Payload { get; set; }
         public int Rockets { get; set; }
-        public int Shells { get; set; } 
+        public int Shells { get; set; }
+        public int Bullets { get; set; }
         public int Bombs { get; set; }
         public double Fuel { get; set; }
-        public WeaponMods WeaponMods { get; set; }
+        public string WeaponMods { get; set; }
         public string Skin { get; set; }
 
     }

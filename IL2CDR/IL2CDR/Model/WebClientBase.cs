@@ -238,8 +238,26 @@ namespace IL2CDR.Model
                 {
                     lock (downloadLock)
                     {
-                        this.Headers.Add("Content-Encoding", "gzip");
+                        //this.Headers.Add("Content-Encoding", "gzip");
                         result = Encoding.UTF8.GetString(UploadData(url, "POST", GZipBytes(args)));
+                        SuccessHandler();
+                    }
+                }
+                catch
+                {
+                    ErrorHandler(String.Format("Error uploading to {0}", url));
+                }
+                return result;
+            }
+            public String Upload(string url, byte[] args)
+            {
+                string result = null;
+                try
+                {
+                    lock (downloadLock)
+                    {
+                        //this.Headers.Add("Content-Encoding", "gzip");
+                        result = Encoding.UTF8.GetString(UploadData(url, "POST", args));
                         SuccessHandler();
                     }
                 }
