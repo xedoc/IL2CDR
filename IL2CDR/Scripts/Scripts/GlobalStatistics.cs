@@ -15,11 +15,12 @@ namespace IL2CDR.Scripts
     {
         private const string DOMAIN = "il2.info";
         //private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
-        private const string URL = "http://" + DOMAIN + "/e/";
+        //private const string URL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
+        private const string URL = "http://" + DOMAIN + "/e";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
-        private const int SENDTIMEOUT = 2000;
+        private const int SENDTIMEOUT = 10000;
         private object lockSend = new object();
         private string lastPacket = String.Empty;
         private string token = String.Empty;
@@ -100,14 +101,13 @@ namespace IL2CDR.Scripts
                         if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
                             lastPacket = String.Empty;
                         else
-                            Log.WriteError("Error sending packet to statistics server. Size(bytes): {0}, Result: {1}", data.Length, result);
+                            Log.WriteInfo("Send result: {0}", result);
 
                     }
                     else
                     {
-                        result = "FAIL (HTTP error)";
+                        Log.WriteInfo("Send result: FAIL (HTTP error)");
                     }
-                    Log.WriteInfo("Send result: {0}", result);
                 }
 
             }

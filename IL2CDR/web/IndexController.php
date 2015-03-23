@@ -46,6 +46,10 @@ class IndexController
                 {
                     return "OK";
                 }
+                else 
+                {
+                    return "FAIL";
+                }
             }        
         }
         return "UNKNOWN EVENT";          

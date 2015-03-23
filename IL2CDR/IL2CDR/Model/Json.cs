@@ -4,20 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace IL2CDR.Model
 {
     public class Json
     {
-        private static JavaScriptSerializer serializer = new JavaScriptSerializer();
         public static string Serialize(object obj)
         {
-            return serializer.Serialize(obj);
+            return JsonConvert.SerializeObject(obj, Formatting.None, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                DateFormatHandling = DateFormatHandling.MicrosoftDateFormat
+            });
         }
 
         public static object Deserialize(string text)
         {
-            return serializer.DeserializeObject(text);
+            return JsonConvert.DeserializeObject(text);
         }
     }
 }

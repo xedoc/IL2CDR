@@ -45,6 +45,9 @@ class MissionEvent
     
     public function SaveToDB( )
     {        
+        if( !$this->db->IsConnected )
+            return false;
+        
         if( !isset( $this->events) || 
             empty($this->events) ||
             !is_array($this->events))
@@ -114,8 +117,8 @@ class MissionEvent
                     else
                     {
                         $params += array(     
-                           'AttackerPlayerID' => null,
-                           'SortieID' => null
+                           'AttackerPlayerID' => 'null',
+                           'SortieID' => 'null'
                            );
                     }
                     
@@ -128,7 +131,7 @@ class MissionEvent
                     else
                     {
                         $params += array(     
-                           'AttackerObjectID' => null,
+                           'AttackerObjectID' => 'null',
                            );
                     }
                     
@@ -141,7 +144,7 @@ class MissionEvent
                     else
                     {
                         $params += array(     
-                           'TargetPlayerID' => null,
+                           'TargetPlayerID' => 'null',
                            );
                     }
                     if( isset( $event->TargetObject ) )
@@ -153,11 +156,12 @@ class MissionEvent
                     else
                     {
                         $params += array(     
-                           'TargetObjectID' => null,
+                           'TargetObjectID' => 'null',
                            );
                     }
                     $params += array(
                             'Hits' =>  $this->db->EaQ( $event->Hits ),
+                            'Damage' => $this->db->EaQ( $event->Damage),
                             'AttackerCoalition' => $this->db->EaQ( $event->AttackerCoalition ),
                             'TargetCoalition' => $this->db->EaQ( $event->TargetCoalition ),
                         );
@@ -169,6 +173,16 @@ class MissionEvent
                     
                     break;
                 case 4:
+                    if(  !isset( $event->Player ) || 
+                         !isset( $event->Player->Plane ))
+                        continue;
+                    $params = array( 
+                           'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
+                           'EndBullets' => $this->db->EaQ( $event->Bullets ),
+                           'EndShells' => $this->db->EaQ( $event->Shells ),
+                       );
+                    $this->db->setvars($params);
+                    $this->db->callproc("AddSortieEnd");
                     break;
                 case 5:
                     break;
@@ -208,7 +222,7 @@ class MissionEvent
                            'CoalitionIndex' => $this->db->EaQ( $event->Player->CoalitionIndex ),
                        );
                     $this->db->setvars($params);
-                    $this->db->callproc("AddPlaneSpawn");
+                    $this->db->callproc("AddSortieStart");
                     break;
                 case 11:
                     break;

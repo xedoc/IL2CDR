@@ -12,22 +12,22 @@ class MySQL implements iDatabase
 {
     private $config;    
     private $my;
-    private $isConnected = false;
+    public $IsConnected = false;
     function __construct()
     {
-        $this->config = include('/config.php');
+        $this->config = include(__DIR__ . '/../config.php');
         $this->connect();
     }
     public function query($query)
     {
-        if( $this->isConnected )
+        if( $this->IsConnected )
             return $this->my->query($query);
         else
             return null;
     }
     public function callproc($proc, $params = array())
     {
-        if( !$this->isConnected )
+        if( !$this->IsConnected )
             return;
         
         $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
@@ -35,7 +35,7 @@ class MySQL implements iDatabase
     
     public function setvars($params)
     {
-        if( !$this->isConnected )
+        if( !$this->IsConnected )
             return;
         
         $this->query( sprintf("SET %s", $this->GetSetParams( $params ) ));
@@ -51,19 +51,19 @@ class MySQL implements iDatabase
                 $this->config["mysql_db"]);        
         
             if (!mysqli_connect_errno()) { 
-                $this->isConnected = true;
+                $this->IsConnected = true;
             }
         	    
         }
         catch (Exception $exception)
         {
-                $this->isConnected = false;
+            $this->IsConnected = false;
         }
         
     }
     public function disconnect()
     {
-        if( $this->isConnected )
+        if( $this->IsConnected )
             $this->my->close();
     }
     
@@ -81,7 +81,7 @@ class MySQL implements iDatabase
     //Escape and quote given string
     public function EaQ($text)
     {
-        if( !$this->isConnected )
+        if( !$this->IsConnected )
             return null;
 
         return sprintf("'%s'", $this->my->real_escape_string( $text ));

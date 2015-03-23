@@ -137,7 +137,6 @@ namespace IL2CDR.Model
             var header = (data as MissionLogEventHeader);
             if( header != null )
             {
-                Log.WriteInfo(header.Type.ToString("g"));
                 Action<MissionLogEventHeader> action;
                 if( historyHandlers.TryGetValue( header.Type, out action ) )
                 {

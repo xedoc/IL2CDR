@@ -6,16 +6,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace IL2CDR.Model
 {
     public class Server : NotifyPropertyChangeBase
     {
-        [ScriptIgnore]
+        [JsonIgnore]
         public RconConnection Rcon { get; set; }
-        [ScriptIgnore]
+        [JsonIgnore]
         public MissionLogDataService MissionLogService { get; set; }
-        [ScriptIgnore]
+        [JsonIgnore]
         public ProcessItem Process { get; set; }
 
         public string CurrentMissionId { get; set; }
@@ -92,7 +93,7 @@ namespace IL2CDR.Model
         /// Sets and gets the CoalitionIndexes property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [ScriptIgnore]
+        [JsonIgnore]
         public List<CoalitionIndex> CoalitionIndexes
         {
             get
@@ -153,7 +154,7 @@ namespace IL2CDR.Model
         /// Sets and gets the GameObjects property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [ScriptIgnore]
+        [JsonIgnore]
         public GameObjectsCollection GameObjects
         {
             get
@@ -184,7 +185,7 @@ namespace IL2CDR.Model
         /// Sets and gets the AirFields property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [ScriptIgnore]
+        [JsonIgnore]
         public AirFieldCollection AirFields
         {
             get
@@ -215,7 +216,7 @@ namespace IL2CDR.Model
         /// Sets and gets the Players property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [ScriptIgnore]
+        [JsonIgnore]
         public PlayersCollection Players
         {
             get
@@ -275,7 +276,7 @@ namespace IL2CDR.Model
         /// Sets and gets the IsConfigSet property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [ScriptIgnore]
+        [JsonIgnore]
         public bool IsConfigSet
         {
             get
@@ -306,7 +307,7 @@ namespace IL2CDR.Model
         /// Sets and gets the IsRconConnected property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        [ScriptIgnore]
+        [JsonIgnore]
         public bool IsRconConnected
         {
             get

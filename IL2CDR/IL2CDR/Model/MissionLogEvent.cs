@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows.Media.Media3D;
+using Newtonsoft.Json;
 
 namespace IL2CDR.Model
 {
@@ -83,7 +84,7 @@ namespace IL2CDR.Model
         public DateTime EventTime { get; set; }
         public DateTime MissionStartTime { get; set; }
         
-        [ScriptIgnore]
+        [JsonIgnore]
         public Dictionary<string, string> RawParameters { get; set; }
 
         public MissionLogEventHeader(MissionLogEventHeader header)
@@ -475,8 +476,8 @@ namespace IL2CDR.Model
             Rockets = RawParameters.GetInt("RCT");
 
             Player = Server.Players[PlayerId];
-            if (Player == null)
-                Bot = Server.GameObjects[PlaneId];
+            //if (Player == null)
+            //    Bot = Server.GameObjects[PlaneId];
         }
     }
     //AType:3
