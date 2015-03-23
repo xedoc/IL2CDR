@@ -13,8 +13,9 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        private const string DOMAIN = "localhost";
-        private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
+        private const string DOMAIN = "il2.info";
+        //private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
+        private const string URL = "http://" + DOMAIN + "/e/";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
