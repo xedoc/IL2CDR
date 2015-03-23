@@ -15,6 +15,48 @@ namespace IL2CDR.Model
         {
             HitsSources = new List<HitsSource>();
         }
+        public int GetHitsCountBy( object obj )
+        {
+            if (obj == null)
+                return 0;
+
+            if (obj is Player)
+            {
+                var source = HitsSources.FirstOrDefault(p => p.Player != null && p.Player.Id == (obj as Player).Id);
+                if (source != null)
+                    return source.Hits.HitCount;
+            }
+            else if (obj is GameObject)
+            {
+                var source = HitsSources.FirstOrDefault(p => p.Object != null && p.Object.Id == (obj as GameObject).Id);
+                if (source != null)
+                    return source.Hits.HitCount;
+            }
+
+            
+            return 0;
+        }
+        public double GetDamageBy(object obj)
+        {
+            if (obj == null)
+                return 0;
+
+            if (obj is Player)
+            {
+                var source = HitsSources.FirstOrDefault(p => p.Player != null && p.Player.Id == (obj as Player).Id);
+                if (source != null)
+                    return source.Hits.Damage;
+            }
+            else if (obj is GameObject)
+            {
+                var source = HitsSources.FirstOrDefault(p => p.Object != null && p.Object.Id == (obj as GameObject).Id);
+                if (source != null)
+                    return source.Hits.Damage;
+            }
+
+
+            return 0;
+        }
         public void AddHit(object source, MissionLogEventHit e)
         {
             if (source == null)

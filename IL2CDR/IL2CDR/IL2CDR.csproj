@@ -108,6 +108,7 @@
       <Link>Scripts\GlobalStatistics.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Compile Include="Control\ScrollingTextBox.cs" />
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Interactiviy\PasswordBoxAssistant.cs" />
     <Compile Include="Model\ActionManager.cs" />

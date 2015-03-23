@@ -80,6 +80,7 @@ namespace IL2CDR.Model
         public uint Ticks { get; set; } // 1/50 of second
         public Server Server { get; set; }
         public Guid EventID { get; set; }
+        public DateTime EventTime { get; set; }
         public DateTime MissionStartTime { get; set; }
         
         [ScriptIgnore]
@@ -94,6 +95,7 @@ namespace IL2CDR.Model
             this.EventID = header.EventID;
             this.MissionStartTime = header.MissionStartTime;
             this.RawParameters = new Dictionary<string, string>(header.RawParameters);
+            this.EventTime = DateTime.UtcNow;
         }
         public MissionLogEventHeader(string logLine, DateTime missionStartTime)
         {
@@ -325,6 +327,7 @@ namespace IL2CDR.Model
             Player = new Player()
             {
                 Id = RawParameters.GetInt("PID"),
+                SortieId = EventID,
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
                 IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
                 IsOnline = true,
@@ -399,7 +402,7 @@ namespace IL2CDR.Model
         public MissionLogEventMissionEnd(MissionLogEventHeader header) 
             : base(header)
         {
-            MissionEndTime = DateTime.Now;
+            MissionEndTime = DateTime.UtcNow;
         }
     }
     //AType:6
@@ -488,6 +491,69 @@ namespace IL2CDR.Model
         public Player TargetPlayer { get; set; }
         public GameObject AttackerObject { get; set; }
         public GameObject TargetObject { get; set; }
+        public bool IsTeamKill
+        {
+            get
+            {
+                return AttackerCoalition == TargetCoalition;
+            }
+        }
+
+        public int Hits
+        {
+            get
+            {
+                if (TargetPlayer != null)
+                    return TargetPlayer.GetHitsCountBy(AttackerObject) + TargetPlayer.GetHitsCountBy(AttackerPlayer);
+                else if (TargetObject != null)
+                    return TargetObject.GetHitsCountBy(AttackerObject) + TargetObject.GetHitsCountBy(AttackerPlayer);
+                else
+                    return 0;
+            }
+
+        }
+        public double Damage
+        {
+            get
+            {
+                if (TargetPlayer != null)
+                    return TargetPlayer.GetDamageBy(AttackerObject) + TargetPlayer.GetDamageBy(AttackerPlayer);
+                else if (TargetObject != null)
+                    return TargetObject.GetDamageBy(AttackerObject) + TargetObject.GetDamageBy(AttackerPlayer);
+                else
+                    return 0;
+            }
+
+        }
+
+        public int AttackerCoalition
+        {
+            get
+            {
+                if (AttackerPlayer != null)
+                    return AttackerPlayer.CoalitionIndex;
+                else if (AttackerObject != null)
+                    return AttackerObject.CoalitionIndex;
+                else
+                    return 0;
+            }
+        }
+        public int TargetCoalition
+        {
+            get
+            {
+                if (TargetPlayer != null)
+                    return TargetPlayer.CoalitionIndex;
+                else if (TargetObject != null)
+                    return TargetObject.CoalitionIndex;
+                else
+                    return 0;
+            }
+        }
+
+
+        
+        
 
         public MissionLogEventKill(MissionLogEventHeader header)
             : base(header)
@@ -497,12 +563,9 @@ namespace IL2CDR.Model
             Position = RawParameters.GetVector3D("POS");
 
             AttackerPlayer = Server.Players[AttackerId];
-            if (AttackerPlayer == null)
-                AttackerObject = Server.GameObjects[AttackerId];
-
+            AttackerObject = Server.GameObjects[AttackerId];   
             TargetPlayer = Server.Players[TargetId];
-            if( TargetPlayer == null )
-                TargetObject = Server.GameObjects[TargetId];
+            TargetObject = Server.GameObjects[TargetId];     
         }
     }
     //AType:2

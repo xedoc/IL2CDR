@@ -78,9 +78,13 @@ namespace IL2CDR.Model
 
             if (String.IsNullOrWhiteSpace(missionDateTimePrefix))
                 return;
+            
+            server.ResetMission();
 
             server.CurrentMissionId = GuidUtility.Create(GuidUtility.IsoOidNamespace, String.Concat(server.ServerId, "_", missionDateTimePrefix)).ToString(); 
-            MissionStartDateTime = Util.ParseDate(missionDateTimePrefix);
+            MissionStartDateTime = Util.ParseDate(missionDateTimePrefix).ToUniversalTime();
+
+            
         }
         public void ReadMissionHistory()
         {

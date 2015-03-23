@@ -90,20 +90,23 @@ namespace IL2CDR.Scripts
                 using( WebClientBase webClient = new WebClientBase())
                 {
                     var data = webClient.GZipBytes(lastPacket);
-                    
                     webClient.ContentType = ContentType.JsonUTF8;
                     webClient.KeepAlive = false;
                     webClient.SetCookie("srvtoken", Token, DOMAIN);
                     result = webClient.UploadCompressed(URL, lastPacket);
-                    Log.WriteInfo("Send result: {0}", result);
                     if (!String.IsNullOrWhiteSpace(result))
                     {
                         if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
                             lastPacket = String.Empty;
                         else
-                            Log.WriteInfo("Error sending packet to statistics server. Size(bytes): {0}, Result: {1}", data.Length, result);
+                            Log.WriteError("Error sending packet to statistics server. Size(bytes): {0}, Result: {1}", data.Length, result);
 
                     }
+                    else
+                    {
+                        result = "FAIL (HTTP error)";
+                    }
+                    Log.WriteInfo("Send result: {0}", result);
                 }
 
             }
@@ -140,6 +143,7 @@ namespace IL2CDR.Scripts
                 data is MissionLogEventTakeOff ||
                 data is MissionLogEventLanding ||
                 data is MissionLogEventPlaneSpawn ||
+                data is MissionLogEventGameObjectSpawn ||
                 data is MissionLogEventObjectiveCompleted ||
                 !(data is MissionLogEventHeader))
             {
@@ -151,7 +155,6 @@ namespace IL2CDR.Scripts
                     if (kill.TargetPlayer == null && kill.AttackerPlayer == null)
                         return;
                 }
-
                 events.Enqueue(data);
 
             }

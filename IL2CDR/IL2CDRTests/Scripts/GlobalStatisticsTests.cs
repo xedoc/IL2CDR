@@ -66,6 +66,7 @@ namespace IL2CDR.Scripts.Tests
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Hit]));
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Damage]));
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Join]));
+            gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Kill]));
             gs.SendDataToServer();
         }
     }

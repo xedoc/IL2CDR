@@ -66,7 +66,12 @@ namespace IL2CDR.Model
                 }
             }
         }
-
+        public void ResetMission()
+        {
+            Players.Clear();
+            AirFields.Clear();
+            GameObjects.Clear();
+        }
         public int GetCoalitionIndex( Country country )
         {
             var coalition = CoalitionIndexes.FirstOrDefault(c => c.Country.Id == country.Id);

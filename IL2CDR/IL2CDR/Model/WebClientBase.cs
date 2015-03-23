@@ -231,41 +231,32 @@ namespace IL2CDR.Model
                     return Encoding.UTF8.GetString(output.ToArray());
                 }
             }
-            public String UploadCompressed(string url, string args)
+            public string UploadCompressed(string url, string args)
             {
-                string result = null;
-                try
+                return (string)TryWeb(url, () =>
                 {
                     lock (downloadLock)
                     {
                         //this.Headers.Add("Content-Encoding", "gzip");
-                        result = Encoding.UTF8.GetString(UploadData(url, "POST", GZipBytes(args)));
+                        var result = Encoding.UTF8.GetString(UploadData(url, "POST", GZipBytes(args)));
                         SuccessHandler();
+                        return result;
                     }
-                }
-                catch
-                {
-                    ErrorHandler(String.Format("Error uploading to {0}", url));
-                }
-                return result;
+                });
+
             }
             public String Upload(string url, byte[] args)
             {
-                string result = null;
-                try
+                return (string)TryWeb(url, () =>
                 {
                     lock (downloadLock)
                     {
                         //this.Headers.Add("Content-Encoding", "gzip");
-                        result = Encoding.UTF8.GetString(UploadData(url, "POST", args));
+                        var result = Encoding.UTF8.GetString(UploadData(url, "POST", args));
                         SuccessHandler();
+                        return result;
                     }
-                }
-                catch
-                {
-                    ErrorHandler(String.Format("Error uploading to {0}", url));
-                }
-                return result;
+                });
             }
             public String Upload(string url, string args)
             {
@@ -521,10 +512,14 @@ namespace IL2CDR.Model
                 }
                 catch ( Exception e )
                 {
+                    var msg = String.Concat( url, " ", e.Message);
+                    if (e.InnerException != null)
+                        msg = String.Concat( url, " ", e.InnerException.Message);
+
                     if (ErrorHandler != null)
-                        ErrorHandler(e.Message);
+                        ErrorHandler(msg);
                     else
-                        Log.WriteError("{0}, url: {1}", e.Message, url);
+                        Log.WriteError(msg);
 
                 }
                 return null;

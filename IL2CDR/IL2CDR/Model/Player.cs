@@ -29,6 +29,7 @@ namespace IL2CDR.Model
         public bool IsKilled { get; set; }
         public int Hits { get; set; }
         public int Shots { get; set; }
+        public Guid SortieId { get; set; }
     }
 
     public enum PlayerStatus

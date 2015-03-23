@@ -14,7 +14,7 @@ namespace IL2CDR.Model
             Name = name;
             Classification = GameObjectClass.Other.ToString("g");
             Purpose = String.Empty;
-
+            ObjectId = GuidUtility.Create(GuidUtility.IsoOidNamespace, Name);
             GameObjectItem objInfo;
             if( GameInfo.ObjectsClassification.TryGetValue(name, out objInfo) )
             {
@@ -24,6 +24,7 @@ namespace IL2CDR.Model
             HitsSources = new List<HitsSource>();
         }
         public int Id { get; set; }
+        public Guid ObjectId { get; set; }
         public string Name { get; set; }
         public string Classification { get; set; }
         public string Purpose { get; set; }

@@ -72,6 +72,7 @@ class MissionEvent
             {
                 $globalparams += array(
                     'EventID'=> $this->db->EaQ($event->EventID),
+                    'EventTime' => $this->GetTimeStamp($event->EventTime),
                 );
             }
             
@@ -99,11 +100,73 @@ class MissionEvent
                 case 2:
                     break;
                 case 3:
-                    $params = array( 
-                        
-                    );                    
+                    $params = array(
+                        'IsTeamKill' => $this->db->EaQ( $event->IsTeamKill ),                                                
+                        );
+                    
+                    if( isset( $event->AttackerPlayer ) )
+                    {
+                        $params += array(
+                            'AttackerPlayerID' => $this->db->EaQ( $event->AttackerPlayer->NickId ),  
+                            'SortieID' => $this->db->EaQ( $event->AttackerPlayer->SortieId )
+                            );
+                    }
+                    else
+                    {
+                        $params += array(     
+                           'AttackerPlayerID' => null,
+                           'SortieID' => null
+                           );
+                    }
+                    
+                    if( isset( $event->AttackerObject ) )
+                    {
+                        $params += array(
+                            'AttackerObjectID' => $this->db->EaQ( $event->AttackerObject->ObjectId ),                            
+                            );
+                    }
+                    else
+                    {
+                        $params += array(     
+                           'AttackerObjectID' => null,
+                           );
+                    }
+                    
+                    if( isset( $event->TargetPlayer ) )
+                    {
+                        $params += array(
+                            'TargetPlayerID' => $this->db->EaQ( $event->TargetPlayer->NickId ),                            
+                            );
+                    }
+                    else
+                    {
+                        $params += array(     
+                           'TargetPlayerID' => null,
+                           );
+                    }
+                    if( isset( $event->TargetObject ) )
+                    {
+                        $params += array(
+                            'TargetObjectID' => $this->db->EaQ( $event->TargetObject->ObjectId ),                            
+                            );
+                    }
+                    else
+                    {
+                        $params += array(     
+                           'TargetObjectID' => null,
+                           );
+                    }
+                    $params += array(
+                            'Hits' =>  $this->db->EaQ( $event->Hits ),
+                            'AttackerCoalition' => $this->db->EaQ( $event->AttackerCoalition ),
+                            'TargetCoalition' => $this->db->EaQ( $event->TargetCoalition ),
+                        );
+                    
                     $this->db->setvars($params);
                     $this->db->callproc("AddKill");
+                    
+                    
+                    
                     break;
                 case 4:
                     break;
@@ -132,6 +195,7 @@ class MissionEvent
                            'NickId' => $this->db->EaQ( $event->Player->NickId ),
                            'LoginId' => $this->db->EaQ( $event->Player->LoginId ),
                            'NickName' => $this->db->EaQ( $event->Player->NickName ),
+                           'PlaneId' => $this->db->EaQ( $event->Player->Plane->ObjectId ),
                            'Plane' => $this->db->EaQ( $event->Player->Plane->Name ),
                            'Bullets' => $this->db->EaQ( $event->Player->Plane->Bullets ),
                            'Shells' => $this->db->EaQ( $event->Player->Plane->Shells ),
@@ -140,6 +204,7 @@ class MissionEvent
                            'Skin' => $this->db->EaQ( $event->Player->Plane->Skin ),
                            'WeaponMods' => $this->db->EaQ( $event->Player->Plane->WeaponMods ),
                            'Country' => $this->db->EaQ( $event->Player->Country->Name ),
+                           'SortieId' => $this->db->EaQ( $event->Player->SortieId ),
                            'CoalitionIndex' => $this->db->EaQ( $event->Player->CoalitionIndex ),
                        );
                     $this->db->setvars($params);
@@ -148,6 +213,18 @@ class MissionEvent
                 case 11:
                     break;
                 case 12:
+                    if( !isset( $event->Object ) )
+                        continue;
+                    
+                    $params = array(
+                        'ObjectId'=> $this->db->EaQ($event->Object->ObjectId),
+                        'Name'=> $this->db->EaQ($event->Object->Name),
+                        'Class'=> $this->db->EaQ($event->Object->Classification),
+                        'Purpose'=> $this->db->EaQ($event->Object->Purpose),
+                    );                    
+                    $this->db->setvars($params);
+                    $this->db->callproc("AddObjectInfo");   
+                   
                     break;
                 case 13:
                     break;
