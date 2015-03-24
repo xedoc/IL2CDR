@@ -28,9 +28,10 @@ class MySQL implements iDatabase
     public function callproc($proc, $params = array())
     {
         if( !$this->IsConnected )
-            return;
+            return null;
         
-        $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
+        return $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
+        
     }
     
     public function setvars($params)

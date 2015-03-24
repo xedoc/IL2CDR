@@ -2,7 +2,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-        <table class="table table-striped table-hover ">
+        <table id="table_snipers" class="nowrap table table-striped table-bordered">
       <thead>
         <tr>
           <th>#</th>

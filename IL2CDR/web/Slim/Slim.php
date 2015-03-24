@@ -128,7 +128,7 @@ class Slim
         $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 
         if (file_exists($fileName)) {
-            require $fileName;
+            require_once $fileName;
         }
     }
 

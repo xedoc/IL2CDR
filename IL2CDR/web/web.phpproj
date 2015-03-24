@@ -21,7 +21,11 @@
     </Compile>
     <Compile Include="index.php" />
     <Compile Include="IndexController.php" />
+    <Compile Include="Model\Auth.php" />
+    <Compile Include="Model\class.phpmailer.php" />
+    <Compile Include="Model\class.smtp.php" />
     <Compile Include="Model\iDatabase.php" />
+    <Compile Include="Model\Mailer.php" />
     <Compile Include="Model\MissionEvent.php" />
     <Compile Include="Model\MySQL.php" />
     <Compile Include="Model\Utils.php" />
@@ -60,6 +64,12 @@
     <Compile Include="Slim\Router.php" />
     <Compile Include="Slim\Slim.php" />
     <Compile Include="Slim\View.php" />
+    <Compile Include="templates\mail_confirmation.php" />
+    <Compile Include="templates\message.php" />
+    <Compile Include="templates\partial_loginarea.php" />
+    <Compile Include="templates\partial_usermodal.php" />
+    <Compile Include="templates\partial_signupmodal.php" />
+    <Compile Include="templates\partial_loginmodal.php" />
     <Compile Include="templates\survivors.php" />
     <Compile Include="templates\snipers.php" />
     <Compile Include="templates\kd.php" />
@@ -83,6 +93,7 @@
   <ItemGroup>
     <Content Include="css\bootstrap.css" />
     <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\stats.css" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />

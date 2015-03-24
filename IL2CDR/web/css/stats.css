@@ -1,0 +1,32 @@
+﻿/*.modal-dialog {
+  position:absolute;
+  top:50% !important;
+  transform: translate(0, -50%) !important;
+  -ms-transform: translate(0, -50%) !important;
+  -webkit-transform: translate(0, -50%) !important;
+  margin:auto 5%;
+  width:50%;
+  height:50%;
+}
+.modal-content {
+  min-height:100%;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0; 
+}
+.modal-body {
+  position:absolute;
+  top:45px;
+  bottom:45px;
+  left:0;
+  right:0;
+  overflow-y:auto;
+}
+.modal-footer {
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+}*/

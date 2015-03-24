@@ -10,8 +10,8 @@ require_once 'plates/Template/Name.php';
 require_once 'plates/Template/Template.php';
 require_once 'plates/Engine.php';
 
-require 'IndexController.php';
-require 'Slim/Slim.php';
+require_once 'IndexController.php';
+require_once 'Slim/Slim.php';
 
 use Slim\Slim;
 use League\Plates\Engine;
@@ -43,9 +43,19 @@ class Router
     	$this->app->get('/kd/', function() { echo $this->indexController->GetKD(); } );
     	$this->app->get('/snipers/', function() { echo $this->indexController->GetSnipers(); } );
     	$this->app->get('/survivors/', function() { echo $this->indexController->GetSurvivors(); } );
+    	$this->app->get('/confirm/:token', function($token) { echo $this->indexController->GetConfirm($token); } );
+    	$this->app->get('/logout/', function() { $this->indexController->GetLogout(); $this->app->redirect('/'); } );
+        
         $this->app->post('/e/', function() { 
             echo $this->indexController->PostEvent( gzdecode($this->app->request->getBody())); 
         });
+        $this->app->post('/signup/', function() { 
+            echo $this->indexController->PostSignUp( $this->app->request ); 
+        });
+        $this->app->post('/login/', function() { 
+            $this->indexController->PostLogIn( $this->app->request ); $this->app->redirect('/');
+        });
+        
         $this->app->run();
     }
     
