@@ -182,3 +182,5 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 *.phppub
+/IL2CDR/1
+/IL2CDR/localhost49191

@@ -180,6 +180,7 @@ class MissionEvent
                            'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
                            'EndBullets' => $this->db->EaQ( $event->Bullets ),
                            'EndShells' => $this->db->EaQ( $event->Shells ),
+                           'EndBombs' => $this->db->EaQ( $event->Bombs ),
                        );
                     $this->db->setvars($params);
                     $this->db->callproc("AddSortieEnd");
@@ -212,6 +213,7 @@ class MissionEvent
                            'PlaneId' => $this->db->EaQ( $event->Player->Plane->ObjectId ),
                            'Plane' => $this->db->EaQ( $event->Player->Plane->Name ),
                            'Bullets' => $this->db->EaQ( $event->Player->Plane->Bullets ),
+                           'Bombs' => $this->db->EaQ( $event->Player->Plane->Bombs ),
                            'Shells' => $this->db->EaQ( $event->Player->Plane->Shells ),
                            'Fuel' => $this->db->EaQ( $event->Player->Plane->Fuel ),
                            'Payload' => $this->db->EaQ( $event->Player->Plane->Payload ),
@@ -269,6 +271,9 @@ class MissionEvent
                     
                     break;
                 case 9999:
+                    if( substr($event->Server->Name,0,4) == 'PID:' )
+                        continue;                    
+                    
                     $params = array(      
                         'ServerName'=> $this->db->EaQ($event->Server->Name),
                     );                    

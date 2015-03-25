@@ -1,6 +1,8 @@
 <?php
 require_once 'Model/MissionEvent.php';
 require_once 'Model/Auth.php';
+require_once 'Model/TopScore.php';
+require 'phpfastcache.php';
 
 /**
  * IndexController short summary.
@@ -13,6 +15,8 @@ require_once 'Model/Auth.php';
 class IndexController
 {
     private $templates;
+    private $cache;
+    private $top;
     function __construct( League\Plates\Engine $templates)
     {
     	$this->templates = $templates;
@@ -21,7 +25,70 @@ class IndexController
             'isloggedin' => $auth->IsLoggedIn(),
             'currentuser' => $auth->CurrentUser,
             'stattoken' => $auth->StatToken,
-            ]);
+            ]);      
+        $this->top = new TopScore();
+    }
+    public function Get10minutesCache($name)
+    {
+        $token = null;
+        if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
+            $token = $_COOKIE['authtoken'];
+        
+        if( $token == null )
+        {
+            $content = __c()->get($name);
+            if( $content == null )
+            {
+                $content = $this->templates->render($name);
+                __c()->set($name, $content,600);                   
+            }                    
+        }
+        else
+        {
+            $content = __c()->get($token.$name);
+            if( $content == null )
+            {
+                $content = $this->templates->render($name);
+                __c()->set($token.$name, $content ,600);
+            }
+            
+        }
+        if( $content == null )
+            $content = $this->templates->render($name);
+        
+        return $content;
+    }
+    public function Get10minutesTopCache($draw,$start,$length, $search, $fallback)
+    {
+        $name = $draw . '_' . $start . '_' . $length . '_' . $search;
+        $token = null;
+        
+        if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
+            $token = $_COOKIE['authtoken'];
+        
+        if( $token == null )
+        {
+            $content = __c()->get($name);
+            if( $content == null )
+            {
+                $content = $fallback($draw,$start,$length, $search);
+                __c()->set($name, $content,600);                   
+            }                    
+        }
+        else
+        {
+            $content = __c()->get($token.$name);
+            if( $content == null )
+            {
+                $content = $fallback($draw,$start,$length, $search);
+                __c()->set($token.$name, $content ,600);
+            }
+            
+        }
+        if( $content == null )
+            $content = $fallback();
+        
+        return $content;
     }
     public function GetLogout()
     {
@@ -29,21 +96,30 @@ class IndexController
         $auth->Logout();
         
     }
+    public function GetJsonKd($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+        return $this->top->GetTotalKD($draw,$start,$length, $search);
+    }
+    
     public function GetIndex( )
     {
-        return $this->templates->render('kd');
+        return  $this->Get10minutesCache('index');
     }
     public function GetKD( )
     {
-        return $this->templates->render('kd');
+        return $this->Get10minutesCache('kd');
     }
     public function GetSnipers( )
     {
-        return $this->templates->render('snipers');
+        return $this->Get10minutesCache('snipers');
     }
     public function GetSurvivors( )
     {
-        return $this->templates->render('survivors');
+        return $this->Get10minutesCache('survivors');
     }
     
     public function GetConfirm( $token )

@@ -7,33 +7,12 @@
         <tr>
           <th>#</th>
           <th>Nickname</th>
-          <th>Hits per Kill</th>
+          <th>Shots per Kill</th>
+          <th>Shots</th>
           <th>Hits</th>
           <th>Kills</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>lorem</td>
-          <td>0.83</td>
-          <td>10</td>
-          <td>12</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>ipsum</td>
-          <td>0.38</td>
-          <td>5</td>
-          <td>13</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>lorem</td>
-          <td>0.02</td>
-          <td>1</td>
-          <td>50</td>
-        </tr>
     </table>
     </div>
   </div>

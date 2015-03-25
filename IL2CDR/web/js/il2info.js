@@ -4,7 +4,7 @@
 });
 $.extend($.fn.dataTable.defaults, {    
     ordering: false,
-    pageLength: 100,
+    pageLength: 10,
     pagingType: "full_numbers",
     dom: '<"toolbar">frtip',
     language: {
@@ -14,6 +14,11 @@ $.extend($.fn.dataTable.defaults, {
 
 $(document).ready(function () {
     $('#table_kd').DataTable({
+        serverSide: true,
+        ajax: {
+            url: '/json/kd/',
+            type: 'GET'
+        }
     });
 
     $("div.toolbar").html('');

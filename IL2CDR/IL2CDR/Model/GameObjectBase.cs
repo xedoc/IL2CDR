@@ -67,6 +67,8 @@ namespace IL2CDR.Model
             {
                 var existing = HitsSources.FirstOrDefault(o =>
                     o != null &&
+                    o.Hits != null &&
+                    o.Object != null &&
                     o.Object.Id == (source as GameObject).Id &&
                     e.AmmoName == o.Hits.Ammo);
 
@@ -90,6 +92,8 @@ namespace IL2CDR.Model
             {
                 var existing = HitsSources.FirstOrDefault(o =>
                     o != null &&
+                    o.Hits != null &&
+                    o.Player != null &&
                     o.Player.Id == (source as Player).Id &&
                     e.AmmoName == o.Hits.Ammo);
 
@@ -125,6 +129,8 @@ namespace IL2CDR.Model
 
                 var existing = HitsSources.FirstOrDefault(o =>
                     o != null &&
+                    o.Hits != null &&
+                    o.Object != null &&
                     o.Object.Id == (source as GameObject).Id &&
                     o.Hits.Ammo == LastHitAmmoName
                     );
@@ -136,6 +142,8 @@ namespace IL2CDR.Model
             {
                 var existing = HitsSources.FirstOrDefault(o =>
                     o != null &&
+                    o.Hits != null &&
+                    o.Player != null &&
                     o.Player.Id == (source as Player).Id &&
                    o.Hits.Ammo == LastHitAmmoName
                    );

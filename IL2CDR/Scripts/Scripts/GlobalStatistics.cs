@@ -25,6 +25,8 @@ namespace IL2CDR.Scripts
         private string lastPacket = String.Empty;
         private string token = String.Empty;
         private bool dictionarySent = false;
+        private bool firstPacketSent = false;
+
 
         public GlobalStatistics()
         {
@@ -99,7 +101,15 @@ namespace IL2CDR.Scripts
                     if (!String.IsNullOrWhiteSpace(result))
                     {
                         if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if( !firstPacketSent)
+                            {
+                                firstPacketSent = true;
+                                Log.WriteInfo("Successfuly connected to il2.info");
+                            }
                             lastPacket = String.Empty;
+                        }
+                            
                         else
                             Log.WriteInfo("Send result: {0}", result);
 
@@ -160,7 +170,7 @@ namespace IL2CDR.Scripts
 
             }
 
-            if (events.Count >= 10)
+            if (events.Count >= 10 || data is MissionLogEventMissionEnd)
                 SendDataToServer();
 
         }
