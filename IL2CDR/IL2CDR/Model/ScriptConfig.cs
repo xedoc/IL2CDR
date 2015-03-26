@@ -28,6 +28,10 @@ namespace IL2CDR.Model
             return intValue;
         }
 
+        public bool GetBool(string name )
+        {
+            return (bool)(ConfigFields.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).With(x => x.Value));
+        }
         /// <summary>
         /// The <see cref="FileName" /> property's name.
         /// </summary>

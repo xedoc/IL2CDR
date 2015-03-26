@@ -29,6 +29,7 @@ namespace IL2CDR.Scripts
                     {
                         { "fieldName1", "Text field label", "Text watermark", FieldType.Text, "Default value", true},
                         { "fieldName2", "Password field label", "Password watermark", FieldType.Text, String.Empty, true},
+                        { "fieldName3", "Checkbox", "", FieldType.Flag, false, true},
                     },
                 };
             }

@@ -10,7 +10,7 @@
              Style="{DynamicResource SettingsFieldStyle}"
              d:DesignHeight="300" d:DesignWidth="300">
     <d:UserControl.DataContext>
-        <my:ConfigField IsVisible="True" Label="Password" Name="password" Value="test" Type="{x:Static my:FieldType.Password}" Watermark="Enter mysql password" />
+        <my:ConfigField IsVisible="True" Label="Password" Name="password" Value="test" Type="{x:Static my:FieldType.Flag}" Watermark="Enter mysql password" />
     </d:UserControl.DataContext>
     <UserControl.Resources>
         <ResourceDictionary>
@@ -37,6 +37,18 @@
                                     <DockPanel VerticalAlignment="Top">
                                         <Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}" HorizontalAlignment="Left" />
                                         <PasswordBox Interactivity:PasswordBoxAssistant.BoundPassword="{Binding Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Controls:TextBoxHelper.ClearTextButton="True" Controls:PasswordBoxHelper.CapsLockIcon="True" Controls:TextBoxHelper.Watermark="{Binding Watermark}"/>
+                                    </DockPanel>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <!--Flag-->
+                    <DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Flag}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <DockPanel VerticalAlignment="Top">
+                                        <CheckBox IsChecked="{Binding Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Content="{Binding Label, Mode=OneWay}" Margin="150,0,0,0"/>
                                     </DockPanel>
                                 </ControlTemplate>
                             </Setter.Value>
