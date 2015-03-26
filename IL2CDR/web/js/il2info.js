@@ -8,6 +8,7 @@ $.extend($.fn.dataTable.defaults, {
     pagingType: "full_numbers",
     dom: '<"toolbar">frtip',
     language: {
+        processing: "Loading data...",
         searchPlaceholder: "Search player"
     }
 });
@@ -20,14 +21,23 @@ $(document).ready(function () {
             type: 'GET'
         }
     });
-
-    $("div.toolbar").html('');
-}); $(document).ready(function () {
-    $('#table_snipers').DataTable({
+    $('#table_kdpvp').DataTable({
+        serverSide: true,
+        ajax: {
+            url: '/json/kdpvp/',
+            type: 'GET'
+        }
+    });
+    $('#table_kdpve').DataTable({
+        serverSide: true,
+        ajax: {
+            url: '/json/kdpve/',
+            type: 'GET'
+        }
     });
 
-    $("div.toolbar").html('');
-}); $(document).ready(function () {
+    $('#table_snipers').DataTable({
+    });
     $('#table_survivors').DataTable({
     });
 

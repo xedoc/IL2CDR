@@ -47,8 +47,37 @@ class TopScore
                     '2' => format_2dp($total_kills/max(1,$total_deaths)),
                     '3' => $total_kills,
                     '4' => $total_deaths,
-                    "DT_RowId" => "kd" . $i,                
+                    "DT_RowId" => "snip" . $i,                
                 );
+        });
+    }
+    
+    public function GetKDPvP($draw, $start, $length, $search)
+    {
+        return $this->GetDataTable($draw, $start, $length, $search, "TopKDPvP", function($row,$i) {
+        $nickname = $row->nickname;       
+        return (object)array(
+                '0' => intval($row->rank),
+                '1' => $nickname,
+                '2' => format_2dp($row->kd),
+                '3' => intval($row->playerairkills),
+                '4' => intval($row->deaths),
+                "DT_RowId" => "kdpvp" . $i,                
+            );
+        });
+    }
+    public function GetKDPvE($draw, $start, $length, $search)
+    {
+        return $this->GetDataTable($draw, $start, $length, $search, "TopKDPvE", function($row,$i) {
+        $nickname = $row->nickname;       
+        return (object)array(
+                '0' => intval($row->rank),
+                '1' => $nickname,
+                '2' => format_2dp($row->kd),
+                '3' => intval($row->kills),
+                '4' => intval($row->deaths),
+                "DT_RowId" => "kdpve" . $i,                
+            );
         });
     }
     

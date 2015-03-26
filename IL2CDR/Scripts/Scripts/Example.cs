@@ -41,6 +41,18 @@ namespace IL2CDR.Scripts
         }
         public override void OnKill(MissionLogEventKill data)
         {
+            //Don't run script on this server
+            if (!IsMyServer(data))
+                return;
+
+            //If server is known - run some actions here
+        }
+        private bool IsMyServer(MissionLogEventHeader data)
+        {
+            if (data == null)
+                return false;
+
+            return data.Server.Name.Contains("Scripted dogfight server");
         }
     }
     public class Test

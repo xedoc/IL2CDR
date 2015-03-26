@@ -212,7 +212,7 @@
             </TabItem>
             <TabItem Header="Log">
                 <Border Style="{StaticResource TabItemBorder}">
-                    <Control:ScrollingTextBox HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" Text="{Binding LogMessages}"/>
+                    <Control:ScrollingTextBox HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" Text="{Binding LogMessages}" Foreground="White"/>
                 </Border>
             </TabItem>
         </TabControl>

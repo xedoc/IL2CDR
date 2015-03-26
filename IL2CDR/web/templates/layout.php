@@ -33,9 +33,18 @@
         <?php $this->insert('partial_loginarea') ?>
 
       <ul class="nav navbar-nav">
-        <li <?=activeIfMatch("kd")?>><a href="/kd">Kills/Deaths</a></li>
+        <li <?=activeIfStartsWith("kd")?> class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Kills/Deaths<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/kdpvp">Players vs Players</a></li>
+                            <li><a href="/kdpve">Players vs Environment</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/kd">Total</a></li>
+                        </ul>
+                    </li>
         <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
         <li <?=activeIfMatch("survivors")?>><a href="/survivors">Survivors</a></li>
+
       </ul>
 
     </div>
@@ -48,9 +57,7 @@
 
 <div class="navbar-fixed-bottom">
     <footer class="navbar-fixed-bottom text-muted small">
-        &copy; 2015.<br />
-        This site is not affiliated with 1C Game Studios nor with 777 Studios.<br />
-        Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a>
+        &copy; 2015. This site is not affiliated with 1C Game Studios nor with 777 Studios. Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a>
     </footer>
 
 </div>

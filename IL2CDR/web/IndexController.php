@@ -96,6 +96,22 @@ class IndexController
         $auth->Logout();
         
     }
+    public function GetJsonKdPvP($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+        return $this->top->GetKDPvP($draw,$start,$length, $search);
+    }
+    public function GetJsonKdPvE($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+        return $this->top->GetKDPvE($draw,$start,$length, $search);
+    }
     public function GetJsonKd($request)
     {
         $draw = $request->get('draw');
@@ -108,6 +124,14 @@ class IndexController
     public function GetIndex( )
     {
         return  $this->Get10minutesCache('index');
+    }
+    public function GetKDPvP()
+    {
+        return $this->Get10minutesCache('kdpvp');
+    }
+    public function GetKDPvE()
+    {
+        return $this->Get10minutesCache('kdpve');
     }
     public function GetKD( )
     {
@@ -207,6 +231,13 @@ function activeIfMatch($requestUri)
     $current_file_name = basename($_SERVER['REQUEST_URI'], ".php");
 
     if ($current_file_name == $requestUri)
+        echo 'class="active"';
+}
+
+function activeIfStartsWith($requestUri)
+{
+    $current_file_name = basename($_SERVER['REQUEST_URI'], ".php");
+    if( substr( $current_file_name,0,strlen($requestUri))==$requestUri)
         echo 'class="active"';
 }
 

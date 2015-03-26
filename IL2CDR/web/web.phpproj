@@ -359,8 +359,11 @@
     <Compile Include="Slim\Slim.php" />
     <Compile Include="Slim\View.php" />
     <Compile Include="templates\index.php" />
+    <Compile Include="templates\kdpve.php" />
+    <Compile Include="templates\kdpvp.php" />
     <Compile Include="templates\mail_confirmation.php" />
     <Compile Include="templates\message.php" />
+    <Compile Include="templates\partial_kdtabs.php" />
     <Compile Include="templates\partial_loginarea.php" />
     <Compile Include="templates\partial_usermodal.php" />
     <Compile Include="templates\partial_signupmodal.php" />
