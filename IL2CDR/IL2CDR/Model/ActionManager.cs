@@ -27,5 +27,11 @@ namespace IL2CDR.Model
         {
             scriptManager.RunHistoryScripts(data);
         }
+
+        public void ProcessButtonClick( string buttonName )
+        {
+            scriptManager.ProcessButtonClick(buttonName);
+
+        }
     }
 }

@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace IL2CDR.Model
 {
     public class Json
     {
-        public static string Serialize(object obj)
+        public static string Serialize(object obj )
         {
             return JsonConvert.SerializeObject(obj, Formatting.None, new JsonSerializerSettings()
             {

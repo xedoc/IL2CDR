@@ -48,6 +48,7 @@ namespace IL2CDR.Scripts
                     //Settings in GUI
                     ConfigFields = new ConfigFieldList()
                     {
+                        //name, label, watermark, type, value, isVisible
                         { "token", "Token", "Server authentication token", FieldType.Text, String.Empty, true},
                     },
                 };

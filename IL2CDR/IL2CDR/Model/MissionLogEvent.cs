@@ -96,7 +96,7 @@ namespace IL2CDR.Model
             this.EventID = header.EventID;
             this.MissionStartTime = header.MissionStartTime;
             this.RawParameters = new Dictionary<string, string>(header.RawParameters);
-            this.EventTime = DateTime.UtcNow;
+            this.EventTime = header.MissionStartTime.AddMilliseconds( (double)Ticks / 50.0 * 1000.0);
         }
         public MissionLogEventHeader(string logLine, DateTime missionStartTime)
         {
@@ -411,7 +411,7 @@ namespace IL2CDR.Model
     //Landing
     public class MissionLogEventLanding : MissionLogEventHeader
     {
-        public int PlaneId { get; set; }
+        public int PlayerId { get; set; }
         public Vector3D Position { get; set; }
         public Player Player { get; set; }
         public GameObject Bot { get; set; }
@@ -419,11 +419,11 @@ namespace IL2CDR.Model
         public MissionLogEventLanding(MissionLogEventHeader header)
             : base(header)
         {
-            PlaneId = RawParameters.GetInt("PID");
+            PlayerId = RawParameters.GetInt("PID");
             Position = RawParameters.GetVector3D("POS");
-            Player = Server.Players[PlaneId];
+            Player = Server.Players[PlayerId];
             if (Player == null)
-                Bot = Server.GameObjects[PlaneId];
+                Bot = Server.GameObjects[PlayerId];
         }
     }
     //AType:5
@@ -431,7 +431,7 @@ namespace IL2CDR.Model
     //Takeoff 
     public class MissionLogEventTakeOff : MissionLogEventHeader
     {
-        public int PlaneId { get; set; }
+        public int PlayerId { get; set; }
         public Vector3D Position { get; set; }
         public Player Player { get; set; }
         public GameObject Bot { get; set; }
@@ -439,12 +439,12 @@ namespace IL2CDR.Model
         public MissionLogEventTakeOff(MissionLogEventHeader header)
             : base(header)
         {
-            PlaneId = RawParameters.GetInt("PID");
+            PlayerId = RawParameters.GetInt("PID");
             Position = RawParameters.GetVector3D("POS");
 
-            Player = Server.Players[PlaneId];
+            Player = Server.Players[PlayerId];
             if( Player == null )
-                Bot = Server.GameObjects[PlaneId];
+                Bot = Server.GameObjects[PlayerId];
         }
     }
     //AType:4
@@ -475,7 +475,7 @@ namespace IL2CDR.Model
             Bombs = RawParameters.GetInt("BOMB");
             Rockets = RawParameters.GetInt("RCT");
 
-            Player = Server.Players[PlayerId];
+            Player = Server.Players[PlaneId] ?? Server.Players[PlayerId];
             //if (Player == null)
             //    Bot = Server.GameObjects[PlaneId];
         }

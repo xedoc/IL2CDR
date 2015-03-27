@@ -19,6 +19,7 @@ namespace IL2CDR.Model
         Range = 5,
         Flag = 6,
         Password = 7,
+        Button = 8
     }
     [Serializable]
     public class ConfigField : NotifyPropertyChangeBase 
@@ -226,6 +227,13 @@ namespace IL2CDR.Model
         public void Add( string name, string label, string watermark, FieldType dataType, object value, bool isVisible)
         {
             this.Add(new ConfigField(name, label, watermark, dataType, isVisible,  value));
+        }
+
+        public void Set( string name, object value )
+        {
+            var found = this.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            if (found != null)
+                found.Value = value;
         }
     }
 

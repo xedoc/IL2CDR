@@ -27,6 +27,7 @@ namespace IL2CDR.Scripts
                     //field name must be unique
                     ConfigFields = new ConfigFieldList()
                     {
+                        //name, label, watermark, type, value, isVisible
                         { "fieldName1", "Text field label", "Text watermark", FieldType.Text, "Default value", true},
                         { "fieldName2", "Password field label", "Password watermark", FieldType.Text, String.Empty, true},
                         { "fieldName3", "Checkbox", "", FieldType.Flag, false, true},
@@ -39,6 +40,7 @@ namespace IL2CDR.Scripts
         }
         public override void OnApplicationShutdown(object data)
         {
+            
         }
         public override void OnKill(MissionLogEventKill data)
         {

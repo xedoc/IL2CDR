@@ -40,6 +40,14 @@ namespace IL2CDR.Model
                 .Do(x => data.Server.AddDamage( x as MissionLogEventDamage))},
         };
 
+      
+        public List<object> MissionHistory
+        {
+            get { return missionHistory; }
+            set { missionHistory = value; }
+        }
+        
+
         public DateTime MissionStartDateTime { get; set; }
         public string MissionLogFolder { get; set; }
 
@@ -48,6 +56,12 @@ namespace IL2CDR.Model
             this.server = server;
             MissionLogFolder = server.Rcon.Config.MissionTextLogFolder;
             Initialize();
+        }
+        public MissionLogDataService(string missionLogFolder)
+        {
+            MissionLogFolder = missionLogFolder;
+            server = new Server("LogParser", true, true);
+            missionHistory = new List<object>();
         }
         public void Initialize()
         {
@@ -86,11 +100,21 @@ namespace IL2CDR.Model
 
             
         }
-        public void ReadMissionHistory()
+        public void ReadMissionHistory(string firstMissionLogFile = null)
         {
             //missionReport(2015-02-25_11-43-53)[0].txt
 
-            var firstMissionLogFile = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt");
+            if( firstMissionLogFile == null )
+            {
+                firstMissionLogFile = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt");
+            }
+            else
+            {
+                firstMissionLogFile = this.With( x => Re.GetSubString(firstMissionLogFile, @"(missionReport\([\d+|\-|_]+\))\[\d+\].txt"))
+                    .With(x => String.Concat(x,"[0].txt"));
+            }
+
+
             if( String.IsNullOrWhiteSpace( firstMissionLogFile ))
                 return;
             
@@ -143,7 +167,8 @@ namespace IL2CDR.Model
                     action(header);
                 }
             }
-            actionManager.ProcessHistory(data);
+            if( actionManager != null )
+                actionManager.ProcessHistory(data);
         }
         private void ClearHistory()
         {
@@ -158,11 +183,25 @@ namespace IL2CDR.Model
             if (!Directory.Exists(MissionLogFolder))
                 return;
 
-            actionManager = (Application.Current as App).ActionManager;
-            actionManager.ProcessServerLogStart(server);
             ClearHistory();
+
+            if (Application.Current != null)
+            {
+                actionManager = (Application.Current as App).ActionManager;
+                actionManager.ProcessServerLogStart(server);
+            }
+            else
+            {
+                var scriptManager = new ScriptManager();
+                scriptManager.LoadScripts();
+                scriptManager.Start();
+                actionManager = new ActionManager(new ScriptManager());
+            }
+            
             ReadMissionHistory();
-            tracker.Start();
+            
+            if( tracker != null )
+                tracker.Start();
         }
 
         public void Stop()

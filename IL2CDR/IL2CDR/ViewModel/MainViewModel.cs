@@ -8,6 +8,7 @@ using IL2CDR.Model;
 using IL2CDR.Properties;
 using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IL2CDR.ViewModel
 {
@@ -20,6 +21,7 @@ namespace IL2CDR.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private DServerManager dserverManager;
+        private ActionManager actionManager;
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -39,6 +41,8 @@ namespace IL2CDR.ViewModel
                 ServerList = x;
                 UpdateServerList();
             });
+
+            actionManager = (Application.Current as App).ActionManager;
 
             CurrentScriptSettings = Config.ScriptConfigs.FirstOrDefault();
 
@@ -342,6 +346,23 @@ namespace IL2CDR.ViewModel
             }
         }
 
+        private RelayCommand<string> _scriptButtonClick;
+
+        /// <summary>
+        /// Gets the ScriptButtonClick.
+        /// </summary>
+        public RelayCommand<string> ScriptButtonClick
+        {
+            get
+            {
+                return _scriptButtonClick
+                    ?? (_scriptButtonClick = new RelayCommand<string>(
+                    (buttonName) =>
+                    {
+                        Task.Factory.StartNew(() => actionManager.ProcessButtonClick(buttonName));                        
+                    }));
+            }
+        }
         /// <summary>
         /// The <see cref="ServerList" /> property's name.
         /// </summary>

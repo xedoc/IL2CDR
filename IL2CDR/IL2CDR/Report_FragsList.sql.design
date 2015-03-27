@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Devart (www.devart.com), SQL document design file -->
+<!-- Modifying this generated file will probably render it invalid -->
+<Document>
+  <Properties>
+    <Type>SQL Document Design</Type>
+    <DatabaseProvider>59f90733-4d68-4fdf-82a7-f0fcbf5460aa</DatabaseProvider>
+    <ProviderVersion>6.0.1154.0</ProviderVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </Properties>
+  <Connection Name="xedocpro_il2stats">
+    <Category>00000000-0000-0000-0000-000000000000</Category>
+    <ConnectionString>User Id=xedocpro_stats;Host=173.254.28.24;Database=xedocpro_il2stats;Character Set=utf8</ConnectionString>
+    <Database>xedocpro_il2stats</Database>
+  </Connection>
+  <Views ShowAdditionalViews="False" IsLayoutActiveAttribute="True" MainViewAttribute="Design" MainViewScale="51">
+    <View Name="Design" Active="True" Visible="True">
+      <Data>
+        <StatementType>Select</StatementType>
+        <ActiveQuery>0</ActiveQuery>
+        <SubQuery Id="0" Open="0" LocationX="-654" LocationY="-299" Scale="1">
+          <PageOptions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <HorizontalOverlap>0</HorizontalOverlap>
+            <VerticalOverlap>0</VerticalOverlap>
+            <TopLeftMargins>
+              <Width>10 mm</Width>
+              <Height>10 mm</Height>
+            </TopLeftMargins>
+            <BottomRightMargins>
+              <Width>10 mm</Width>
+              <Height>10 mm</Height>
+            </BottomRightMargins>
+            <PaperSize>
+              <Width>210 mm</Width>
+              <Height>297 mm</Height>
+            </PaperSize>
+          </PageOptions>
+          <Tables>
+            <Table Name="players" Left="-456" Top="-328" Width="228.6176" Height="228" Collapsed="False" />
+            <Table Name="frags" Left="-120" Top="-352" Width="221.02" Height="228" Collapsed="False" />
+            <Table Name="missions" Left="120" Top="-336" Width="217.5825" Height="228" Collapsed="False" />
+            <Table Name="servers" Left="384" Top="-304" Width="211.1567" Height="120" Collapsed="False" />
+            <Table Name="players_1" Left="-621" Top="-247" Width="228.6176" Height="228" Collapsed="False" />
+            <Table Name="objectsinfo" Left="-264" Top="-72" Width="211.1567" Height="138" Collapsed="False" />
+          </Tables>
+        </SubQuery>
+      </Data>
+    </View>
+    <View Name="Code" Visible="True" />
+    <View Name="Data" Visible="True" />
+    <View Name="Profiler" Visible="False" />
+    <View Name="PivotGrid" Visible="False" />
+  </Views>
+</Document>

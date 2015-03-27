@@ -118,7 +118,16 @@ class IndexController
         $start =  $request->get('start');
         $length = $request->get('length');
         $search = $request->get('search')['value'];
-        return $this->top->GetTotalKD($draw,$start,$length, $search);
+        return $this->top->GetTotalKD($draw,$start,$length, $search);    
+    }
+    
+    public function GetJsonSnipers($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+        return $this->top->GetTotalSnipers($draw,$start,$length, $search);
     }
     
     public function GetIndex( )

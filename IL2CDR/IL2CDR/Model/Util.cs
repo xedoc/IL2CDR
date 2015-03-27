@@ -7,11 +7,24 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
+using System.Windows.Forms;
 
 namespace IL2CDR.Model
 {
     public class Util
     {
+        public static DialogResult Message(string text)
+        {
+            return MessageBox.Show(text);
+        }
+        public static DialogResult Message(string text, string caption)
+        {
+            return MessageBox.Show(text, caption);
+        }
+        public static DialogResult Message(string text, string caption, MessageBoxButtons buttons)
+        {
+            return MessageBox.Show(text, caption, buttons);
+        }
         public static Exception Try(Action action, bool logException = true)
         {
             if (action == null)

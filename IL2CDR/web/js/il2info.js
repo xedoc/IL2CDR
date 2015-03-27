@@ -37,6 +37,11 @@ $(document).ready(function () {
     });
 
     $('#table_snipers').DataTable({
+        serverSide: true,
+        ajax: {
+            url: '/json/snipers/',
+            type: 'GET'
+        }
     });
     $('#table_survivors').DataTable({
     });

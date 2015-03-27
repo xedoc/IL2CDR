@@ -49,13 +49,23 @@ namespace IL2CDR.Model
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
                 script.OnServerLogStart(server);
+            }
         }
         public void RunStartupMethod()
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
                 script.OnApplicationStartup(null);
+            }
         }
         public void RunShutdownMethod()
         {
@@ -101,6 +111,18 @@ namespace IL2CDR.Model
             }
         }
 
+        public void ProcessButtonClick( string name )
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
+                script.OnButtonClick(name);
+            }
+        }
+
         public void LoadScripts()
         {
             string folder = AppDomain.CurrentDomain.GetData("DataDirectory") + scriptsSubFolder;
@@ -132,12 +154,12 @@ namespace IL2CDR.Model
                         (scriptObject as IScriptConfig).Config = savedScriptConfig;
                         var oldFields = savedScriptConfig.ConfigFields.Select(f => f.Name).Except(defaultConfig.ConfigFields.Select(f => f.Name));
                         var newFields = defaultConfig.ConfigFields.Select(f => f.Name).Except(savedScriptConfig.ConfigFields.Select(f => f.Name));
-                        foreach (var oldField in oldFields)
+                        foreach (var oldField in oldFields.ToList())
                         {
                             savedScriptConfig.ConfigFields.RemoveAll(f => f.Name.Equals(oldField));
                         }
                         
-                        foreach (var newField in newFields)
+                        foreach (var newField in newFields.ToList())
                         {
                             defaultConfig.ConfigFields.FirstOrDefault(f => f.Name.Equals(newField)).Do(
                                 x => savedScriptConfig.ConfigFields.Add(x));                            

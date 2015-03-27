@@ -32,6 +32,7 @@ namespace IL2CDR.Model
         void OnAny(object data);
         void OnHistory(object data);
         void OnServerLogStart(Server server);
+        void OnButtonClick(string buttonName);
 
     }
 }

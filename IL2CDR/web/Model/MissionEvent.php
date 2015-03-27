@@ -139,12 +139,14 @@ class MissionEvent
                     {
                         $params += array(
                             'TargetPlayerID' => $this->db->EaQ( $event->TargetPlayer->NickId ),                            
+                            'TargetSortieID' => $this->db->EaQ( $event->TargetPlayer->SortieId )
                             );
                     }
                     else
                     {
                         $params += array(     
                            'TargetPlayerID' => 'null',
+                           'TargetSortieID' => 'null'
                            );
                     }
                     if( isset( $event->TargetObject ) )

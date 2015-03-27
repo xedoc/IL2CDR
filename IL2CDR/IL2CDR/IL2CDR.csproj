@@ -112,6 +112,10 @@
       <Link>Scripts\GlobalStatistics.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Scripts\Scripts\LogParser.cs">
+      <Link>Scripts\LogParser.cs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Control\ScrollingTextBox.cs" />
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Interactiviy\PasswordBoxAssistant.cs" />
@@ -165,6 +169,7 @@
     <Compile Include="Model\WebClientBase.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Model\WindowWrapper.cs" />
     <Compile Include="Properties\PortableSettingsProvider.cs" />
     <Compile Include="ScriptConfigField.xaml.cs">
       <DependentUpon>ScriptConfigField.xaml</DependentUpon>

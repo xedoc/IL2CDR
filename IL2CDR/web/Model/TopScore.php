@@ -40,14 +40,15 @@ class TopScore
         return $this->GetDataTable($draw, $start, $length, $search, "TopTotalSnipers", function($row,$i) {
             $nickname = $row->nickname;
             $total_kills = intval($row->total_kills);
-            $total_deaths = intval($row->total_deaths);
+            $totalshots = intval($row->totalshots);
             return (object)array(
                     '0' => intval($row->rank),
                     '1' => $nickname,
-                    '2' => format_2dp($total_kills/max(1,$total_deaths)),
-                    '3' => $total_kills,
-                    '4' => $total_deaths,
-                    "DT_RowId" => "snip" . $i,                
+                    '2' => format_2dp( 100 * $row->totalhits / max(1,$totalshots)) . '%',
+                    '3' => $totalshots,
+                    '4' => intval($row->totalhits),
+                    '5' => $total_kills,
+                    "DT_RowId" => "sn" . $i,                
                 );
         });
     }
@@ -80,7 +81,7 @@ class TopScore
             );
         });
     }
-    
+
     public function GetTotalKD($draw, $start, $length, $search)
     {        
         return $this->GetDataTable($draw, $start, $length, $search, "TopTotalKD", function($row,$i) {

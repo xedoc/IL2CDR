@@ -52,6 +52,7 @@ class Router
         $this->app->get('/json/kd/', function() { echo $this->indexController->GetJsonKd($this->app->request); } );
         $this->app->get('/json/kdpvp/', function() { echo $this->indexController->GetJsonKdPvP($this->app->request); } );
         $this->app->get('/json/kdpve/', function() { echo $this->indexController->GetJsonKdPvE($this->app->request); } );
+        $this->app->get('/json/snipers/', function() { echo $this->indexController->GetJsonSnipers($this->app->request); } );
         
         $this->app->post('/e/', function() { 
             echo $this->indexController->PostEvent( gzdecode($this->app->request->getBody())); 

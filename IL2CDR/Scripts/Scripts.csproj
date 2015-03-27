@@ -44,6 +44,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scripts\LogParser.cs" />
     <Compile Include="Scripts\GlobalStatistics.cs" />
     <Compile Include="Scripts\LocalStatistics.cs" />
     <Compile Include="Scripts\Example.cs" />
@@ -51,6 +52,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

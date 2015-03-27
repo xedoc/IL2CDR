@@ -43,6 +43,14 @@ namespace IL2CDR.Model
                 lock (lockList)
                 {
                     var existing = this[value.Id];
+                    if( existing == null )
+                    {
+                        existing = this.Values.FirstOrDefault(player =>
+                            player != null &&
+                            (player.Plane != null && player.Plane.Id == value.Id) ||
+                            (player.BotPilot != null && player.BotPilot.Id == value.Id));
+                    }
+
                     if (existing == null)
                         this.Add(value.Id, value);
                     else
@@ -53,7 +61,7 @@ namespace IL2CDR.Model
 
         public void PlayerLeave(Guid nickId)
         {
-            if (nickId != null || nickId != default(Guid))
+            if (nickId != null && nickId != default(Guid))
             {
                 if (this.Any((pair) => pair.Value.NickId.Equals(nickId)))
                 {
