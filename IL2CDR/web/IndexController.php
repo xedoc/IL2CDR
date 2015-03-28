@@ -179,6 +179,7 @@ class IndexController
             {
                 if( $event->SaveToDB() )
                 {
+                    $event = null;
                     return "OK";
                 }
                 else 

@@ -17,8 +17,8 @@ class MissionEvent
     function __construct($text)
     {
         $this->db = new MySQL();
-        $this->text = $text;
         $this->events = json_decode( $text );
+        $text = null;
     }
     private function GetTimeStamp($jsdate)
     {
@@ -45,10 +45,8 @@ class MissionEvent
     
     public function SaveToDB( )
     {        
-        if( !$this->db->IsConnected )
-            return false;
-        
-        if( !isset( $this->events) || 
+        if( !$this->db->IsConnected  ||
+            !isset( $this->events) || 
             empty($this->events) ||
             !is_array($this->events))
         {
@@ -286,7 +284,7 @@ class MissionEvent
        }
         
 
-        
+        $this->events = null;
        return true;
     }
     
