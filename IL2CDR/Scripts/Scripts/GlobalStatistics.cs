@@ -13,10 +13,12 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        private const string DOMAIN = "il2.info";
-        //private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
+        private const string DOMAIN = "localhost";
+        private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
         //private const string URL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
-        private const string URL = "http://" + DOMAIN + "/e";
+        
+        //private const string DOMAIN = "il2.info";
+        //private const string URL = "http://" + DOMAIN + "/e";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
@@ -140,6 +142,7 @@ namespace IL2CDR.Scripts
                     jsonPackets.Add(obj);
                 }
             }
+
             return Json.Serialize(jsonPackets.ToList());
         }
 
@@ -167,11 +170,15 @@ namespace IL2CDR.Scripts
                     if (kill.TargetPlayer == null && kill.AttackerPlayer == null)
                         return;
                 }
+                var length = Json.Serialize(data).Length;
+
+                Log.WriteInfo("{0} JSON length: {1}", data.GetType(), length);
                 events.Enqueue(data);
+
 
             }
 
-            if (events.Count >= 10 || data is MissionLogEventMissionEnd)
+            if (events.Count >= 5 || data is MissionLogEventMissionEnd)
                 SendDataToServer();
 
         }

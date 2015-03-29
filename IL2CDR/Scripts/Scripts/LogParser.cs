@@ -13,6 +13,7 @@ namespace IL2CDR.Scripts
     public class LogParser : ActionScriptBase
     {
         private string defaultIL2Dir = null;
+        public List<object> History { get; set; }
         public LogParser()
         {
             defaultIL2Dir = GetIL2Directory();
@@ -56,7 +57,7 @@ namespace IL2CDR.Scripts
             var dataService = new MissionLogDataService(Path.GetDirectoryName(missionFileName));
 
             dataService.Start();
-
+            History = dataService.MissionHistory;
             var sorties = from SortieStart in dataService.MissionHistory.Where(o => o is MissionLogEventPlaneSpawn)
                               .Select(o => o as MissionLogEventPlaneSpawn)
                               .Select(o => new { o.Player.SortieId, o.EventTime, o.Player.NickName, o.Player.Plane.Bullets })

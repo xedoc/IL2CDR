@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace IL2CDR.Model
 {
     public class GameObjectBase
-    {
-        public string LastHitAmmoName { get; set; }
+    { 
         public List<HitsSource> HitsSources { get; set; }
         
         public GameObjectBase()
@@ -59,9 +59,8 @@ namespace IL2CDR.Model
         }
         public void AddHit(object source, MissionLogEventHit e)
         {
-            if (source == null)
+            if (source == null || e == null || String.IsNullOrWhiteSpace(e.AmmoName) )
                 return;
-            LastHitAmmoName = e.AmmoName;
 
             if (source is GameObject)
             {
@@ -69,24 +68,22 @@ namespace IL2CDR.Model
                     o != null &&
                     o.Hits != null &&
                     o.Object != null &&
-                    o.Object.Id == (source as GameObject).Id &&
-                    e.AmmoName == o.Hits.Ammo);
+                    o.Object.Id == (source as GameObject).Id );
 
-                if (existing != null)
+                if (existing == null)
                 {
-                    existing.Hits.HitCount++;
-                }
-                else
-                {
-                    HitsSources.Add(new HitsSource()
+                    existing = new HitsSource()
                     {
                         Object = source as GameObject,
-                        Hits = new Hits(e.AmmoName)
-                        {
-                            HitCount = 1,
-                        }
-                    });
+                    };
+
+                    HitsSources.Add(existing);
                 }
+                var hits = existing.Hits[e.AmmoName];
+                if (hits == null)
+                    existing.Hits[e.AmmoName] = new Hit(e.AmmoName) { HitCount = 1 };
+                else
+                    existing.Hits[e.AmmoName].HitCount++;
             }
             else if (source is Player)
             {
@@ -94,45 +91,38 @@ namespace IL2CDR.Model
                     o != null &&
                     o.Hits != null &&
                     o.Player != null &&
-                    o.Player.Id == (source as Player).Id &&
-                    e.AmmoName == o.Hits.Ammo);
+                    o.Player.Id == (source as Player).Id 
+                    );
 
-                if (existing != null)
+                if (existing == null)
                 {
-                    existing.Hits.HitCount++;
-                }
-                else
-                {
-                    HitsSources.Add(new HitsSource()
+                    existing = new HitsSource()
                     {
                         Player = source as Player,
-                        Hits = new Hits(e.AmmoName)
-                        {
-                            HitCount = 1,
-                        }
-                    });
+                    };
+
+                    HitsSources.Add(existing);
                 }
+                var hits = existing.Hits[e.AmmoName];
+                if (hits == null)
+                    existing.Hits[e.AmmoName] = new Hit(e.AmmoName) { HitCount = 1 };
+                else
+                    existing.Hits[e.AmmoName].HitCount++;
             }
         }
         public void AddDamage(object source, MissionLogEventDamage e)
         {
-            if (source == null)
+            if (source == null || e.Damage <= 0)
                 return;
 
             if (source is GameObject)
             {
-                if (String.IsNullOrWhiteSpace(LastHitAmmoName))
-                    LastHitAmmoName = HitsSources.FirstOrDefault().With(o => o.Hits.Ammo);
-
-                if (String.IsNullOrWhiteSpace(LastHitAmmoName))
-                    LastHitAmmoName = "Unknown";
 
                 var existing = HitsSources.FirstOrDefault(o =>
                     o != null &&
                     o.Hits != null &&
                     o.Object != null &&
-                    o.Object.Id == (source as GameObject).Id &&
-                    o.Hits.Ammo == LastHitAmmoName
+                    o.Object.Id == (source as GameObject).Id
                     );
 
                 if (existing != null)
@@ -144,8 +134,7 @@ namespace IL2CDR.Model
                     o != null &&
                     o.Hits != null &&
                     o.Player != null &&
-                    o.Player.Id == (source as Player).Id &&
-                   o.Hits.Ammo == LastHitAmmoName
+                    o.Player.Id == (source as Player).Id 
                    );
 
                 if (existing != null)

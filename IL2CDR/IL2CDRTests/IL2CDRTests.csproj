@@ -36,6 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
@@ -52,6 +56,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Model\HitsSourceConverterTests.cs" />
     <Compile Include="Model\WebClientBaseTests.cs" />
     <Compile Include="Scripts\Data.cs" />
     <Compile Include="Model\MissionLogEventTests.cs" />
@@ -68,6 +73,9 @@
       <Project>{3DF1DBE1-792A-46ED-AEEF-4B73F4029473}</Project>
       <Name>Scripts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
