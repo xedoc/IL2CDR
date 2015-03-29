@@ -94,7 +94,7 @@ namespace IL2CDR.Model
                     return;
 
                 srv.ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, srv.Name);
-                
+                Log.WriteInfo("Start server monitor for server {0}", srv.Name);
                 srv.MissionLogService.Start();
                 srv.IsRconConnected = true;
 

@@ -55,7 +55,10 @@ class Router
         $this->app->get('/json/snipers/', function() { echo $this->indexController->GetJsonSnipers($this->app->request); } );
         
         $this->app->post('/e/', function() { 
-            echo $this->indexController->PostEvent( gzdecode($this->app->request->getBody())); 
+            $unzipped = gzdecode($this->app->request->getBody());
+            echo $this->indexController->PostEvent( $unzipped ); 
+            unset($unzipped);
+            $unzipped = null;
         });
         $this->app->post('/signup/', function() { 
             echo $this->indexController->PostSignUp( $this->app->request ); 

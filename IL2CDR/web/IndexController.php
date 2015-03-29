@@ -179,7 +179,6 @@ class IndexController
             {
                 if( $event->SaveToDB() )
                 {
-                    $event = null;
                     return "OK";
                 }
                 else 
@@ -187,6 +186,8 @@ class IndexController
                     return "FAIL";
                 }
             }        
+            unset($event);
+            $event = null;
         }
         return "UNKNOWN EVENT";          
         

@@ -74,7 +74,7 @@ class TopScore
         return (object)array(
                 '0' => intval($row->rank),
                 '1' => $nickname,
-                '2' => format_2dp($row->kd),
+                '2' => format_2dp($row->kills/max(1,$row->deaths)),
                 '3' => intval($row->kills),
                 '4' => intval($row->deaths),
                 "DT_RowId" => "kdpve" . $i,                

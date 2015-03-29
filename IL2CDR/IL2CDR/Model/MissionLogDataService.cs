@@ -59,6 +59,7 @@ namespace IL2CDR.Model
         }
         public MissionLogDataService(string missionLogFolder)
         {
+            Log.WriteInfo("Start monitoring of {0} folder", missionLogFolder);
             MissionLogFolder = missionLogFolder;
             server = new Server("LogParser", true, true);
             missionHistory = new List<object>();
@@ -88,6 +89,7 @@ namespace IL2CDR.Model
         }
         private void StartNewMission(string logFilePath)
         {
+            Log.WriteInfo("New mission started {0}", logFilePath);
             missionDateTimePrefix = Re.GetSubString(logFilePath, @"missionReport\((.*)?\)\[0\]\.txt");
 
             if (String.IsNullOrWhiteSpace(missionDateTimePrefix))
@@ -102,6 +104,7 @@ namespace IL2CDR.Model
         }
         public void ReadMissionHistory(string firstMissionLogFile = null)
         {
+            Log.WriteInfo("Reading events history from {0}", firstMissionLogFile);
             //missionReport(2015-02-25_11-43-53)[0].txt
 
             if( firstMissionLogFile == null )
@@ -178,15 +181,22 @@ namespace IL2CDR.Model
         public void Start()
         {
             if (String.IsNullOrWhiteSpace(MissionLogFolder))
+            {
+                Log.WriteInfo("No mission folder specified!");
                 return;
+            }
 
             if (!Directory.Exists(MissionLogFolder))
+            {
+                Log.WriteInfo("Specified mission folder doesn't exist {0}", MissionLogFolder);
                 return;
+            }
 
             ClearHistory();
 
             if (Application.Current != null)
             {
+                Log.WriteInfo("Initialize action manager for {0}", server.Name);
                 actionManager = (Application.Current as App).ActionManager;
                 actionManager.ProcessServerLogStart(server);
             }

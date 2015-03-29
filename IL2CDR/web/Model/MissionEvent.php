@@ -18,6 +18,7 @@ class MissionEvent
     {
         $this->db = new MySQL();
         $this->events = json_decode( $text );
+        unset($text);
         $text = null;
     }
     private function GetTimeStamp($jsdate)
@@ -40,6 +41,8 @@ class MissionEvent
                     return sprintf( "FROM_UNIXTIME(%s)", $seconds);
             }
         }
+        unset($matches);
+        
         return 0;       
     }
     
@@ -50,6 +53,7 @@ class MissionEvent
             empty($this->events) ||
             !is_array($this->events))
         {
+            unset($this->events);
             return false;
         }       
         foreach ($this->events as $event)
@@ -283,8 +287,11 @@ class MissionEvent
             }
        }
         
+       unset($this->events);
+       unset($this->db);
+       
+       gc_collect_cycles();
 
-        $this->events = null;
        return true;
     }
     
