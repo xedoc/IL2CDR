@@ -14,21 +14,28 @@ $.extend($.fn.dataTable.defaults, {
 });
 
 $(document).ready(function () {
-    $('#table_kd').DataTable({
+    $('#table_kd').on( 'processing.dt', function ( e, settings, processing ) {
+        $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
+    } )
+    .DataTable({
         serverSide: true,
         ajax: {
             url: '/json/kd/',
             type: 'GET'
         }
     });
-    $('#table_kdpvp').DataTable({
+    $('#table_kdpvp').on('processing.dt', function (e, settings, processing) {
+        $('#processingIndicator').css('display', processing ? 'block' : 'none');
+    }).DataTable({
         serverSide: true,
         ajax: {
             url: '/json/kdpvp/',
             type: 'GET'
         }
     });
-    $('#table_kdpve').DataTable({
+    $('#table_kdpve').on('processing.dt', function (e, settings, processing) {
+        $('#processingIndicator').css('display', processing ? 'block' : 'none');
+    }).DataTable({
         serverSide: true,
         ajax: {
             url: '/json/kdpve/',
@@ -36,14 +43,18 @@ $(document).ready(function () {
         }
     });
 
-    $('#table_snipers').DataTable({
+    $('#table_snipers').on('processing.dt', function (e, settings, processing) {
+        $('#processingIndicator').css('display', processing ? 'block' : 'none');
+    }).DataTable({
         serverSide: true,
         ajax: {
             url: '/json/snipers/',
             type: 'GET'
         }
     });
-    $('#table_survivors').DataTable({
+    $('#table_survivors').on('processing.dt', function (e, settings, processing) {
+        $('#processingIndicator').css('display', processing ? 'block' : 'none');
+    }).DataTable({
     });
 
     $("div.toolbar").html('');

@@ -363,6 +363,7 @@
     <Compile Include="templates\kdpvp.php" />
     <Compile Include="templates\mail_confirmation.php" />
     <Compile Include="templates\message.php" />
+    <Compile Include="templates\partial_ajaxloader.php" />
     <Compile Include="templates\partial_kdtabs.php" />
     <Compile Include="templates\partial_loginarea.php" />
     <Compile Include="templates\partial_usermodal.php" />
@@ -379,6 +380,7 @@
     <Folder Include="js\" />
     <Folder Include="fonts\" />
     <Folder Include="Model\" />
+    <Folder Include="images\" />
     <Folder Include="phpfastcache\" />
     <Folder Include="phpfastcache\3.0.0\" />
     <Folder Include="phpfastcache\3.0.0\drivers\" />
@@ -427,6 +429,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="images\ajax_loader.gif" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
     <Content Include="js\il2info.js" />

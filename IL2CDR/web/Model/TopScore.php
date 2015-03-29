@@ -59,10 +59,11 @@ class TopScore
         $nickname = $row->nickname;       
         return (object)array(
                 '0' => intval($row->rank),
-                '1' => $nickname,
-                '2' => format_2dp($row->kd),
-                '3' => intval($row->playerairkills),
-                '4' => intval($row->deaths),
+                '1' => isset($row->division) ? $row->division : "E",
+                '2' => $nickname,
+                '3' => format_2dp($row->kd),
+                '4' => intval($row->playerairkills),
+                '5' => intval($row->deaths),
                 "DT_RowId" => "kdpvp" . $i,                
             );
         });
@@ -72,11 +73,12 @@ class TopScore
         return $this->GetDataTable($draw, $start, $length, $search, "TopKDPvE", function($row,$i) {
         $nickname = $row->nickname;       
         return (object)array(
-                '0' => intval($row->rank),
-                '1' => $nickname,
-                '2' => format_2dp($row->kills/max(1,$row->deaths)),
-                '3' => intval($row->kills),
-                '4' => intval($row->deaths),
+                '0' => intval($row->rank),                
+                '1' => isset($row->division) ? $row->division : "E",
+                '2' => $nickname,
+                '3' => format_2dp($row->kills/max(1,$row->deaths)),
+                '4' => intval($row->kills),
+                '5' => intval($row->deaths),
                 "DT_RowId" => "kdpve" . $i,                
             );
         });
@@ -90,10 +92,11 @@ class TopScore
             $total_deaths = intval($row->total_deaths);
             return (object)array(
                     '0' => intval($row->rank),
-                    '1' => $nickname,
-                    '2' => format_2dp($total_kills/max(1,$total_deaths)),
-                    '3' => $total_kills,
-                    '4' => $total_deaths,
+                    '1' => isset($row->division) ? $row->division : "E",                    
+                    '2' => $nickname,
+                    '3' => format_2dp($total_kills/max(1,$total_deaths)),
+                    '4' => $total_kills,
+                    '5' => $total_deaths,
                     "DT_RowId" => "kd" . $i,                
                 );
         });

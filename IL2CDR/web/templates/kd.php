@@ -15,13 +15,16 @@
               <thead>
                 <tr>
                   <th>#</th>
+                   <th>Division</th>
                   <th>Nickname</th>
                   <th>K/D rate</th>
                   <th>Kills</th>
                   <th>Deaths</th>
                 </tr>
+               
               </thead>
             </table>
+                <?php $this->insert('partial_ajaxloader') ?>
             </div>
           </div>    
         </div>
