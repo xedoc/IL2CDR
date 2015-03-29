@@ -2,13 +2,13 @@
   players.nickname AS attacker_nickname,
   players_1.nickname AS target_nickname,
   objectsinfo.name AS target_objectname,
-  CONVERT_TZ(frags.dt, @@time_zone, '+01:00') AS frag_dt,
+  CONVERT_TZ(frags.dt, @@time_zone, 'Europe/Kiev') AS frag_dt,
   frags.hits,
   frags.damage,
   frags.attacker_coalition,
   frags.target_coalition,
-  CONVERT_TZ(missions.MissionStartTime, @@time_zone, '+01:00') AS mission_start,
-  CONVERT_TZ(missions.MissionEndTime, @@time_zone, '+01:00') AS mission_end,
+  CONVERT_TZ(missions.MissionStartTime, @@time_zone, 'Europe/Kiev') AS mission_start,
+  CONVERT_TZ(missions.MissionEndTime, @@time_zone, 'Europe/Kiev') AS mission_end,
   servers.ServerName
 FROM frags
   LEFT OUTER JOIN players
@@ -21,3 +21,4 @@ FROM frags
     ON frags.targetplayer_id = players_1.nickname_id
   INNER JOIN objectsinfo
     ON frags.targetobject_id = objectsinfo.object_id
+ORDER BY frag_dt DESC

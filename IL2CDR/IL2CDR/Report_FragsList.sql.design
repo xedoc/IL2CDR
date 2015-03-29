@@ -8,17 +8,17 @@
     <ProviderVersion>6.0.1154.0</ProviderVersion>
     <SchemaVersion>2.0</SchemaVersion>
   </Properties>
-  <Connection Name="xedocpro_il2stats">
+  <Connection Name="173.254.28.24">
     <Category>00000000-0000-0000-0000-000000000000</Category>
-    <ConnectionString>User Id=xedocpro_stats;Host=173.254.28.24;Database=xedocpro_il2stats;Character Set=utf8</ConnectionString>
+    <ConnectionString>User Id=xedocpro_admin;Host=173.254.28.24;Character Set=utf8</ConnectionString>
     <Database>xedocpro_il2stats</Database>
   </Connection>
-  <Views ShowAdditionalViews="False" IsLayoutActiveAttribute="True" MainViewAttribute="Design" MainViewScale="51">
-    <View Name="Design" Active="True" Visible="True">
+  <Views ShowAdditionalViews="False" IsLayoutActiveAttribute="True" MainViewAttribute="Design" MainViewScale="50">
+    <View Name="Design" Visible="True">
       <Data>
         <StatementType>Select</StatementType>
         <ActiveQuery>0</ActiveQuery>
-        <SubQuery Id="0" Open="0" LocationX="-654" LocationY="-299" Scale="1">
+        <SubQuery Id="0" Open="0" LocationX="-1121.45688172997" LocationY="-361.047222107546" Scale="0.6785816">
           <PageOptions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <HorizontalOverlap>0</HorizontalOverlap>
             <VerticalOverlap>0</VerticalOverlap>
@@ -46,7 +46,9 @@
         </SubQuery>
       </Data>
     </View>
-    <View Name="Code" Visible="True" />
+    <View Name="Code" Active="True" Visible="True">
+      <Data />
+    </View>
     <View Name="Data" Visible="True" />
     <View Name="Profiler" Visible="False" />
     <View Name="PivotGrid" Visible="False" />
