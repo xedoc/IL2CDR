@@ -328,7 +328,6 @@ namespace IL2CDR.Model
             Player = new Player()
             {
                 Id = RawParameters.GetInt("PID"),
-                SortieId = EventID,
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
                 IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
                 IsOnline = true,
@@ -348,6 +347,7 @@ namespace IL2CDR.Model
                     WeaponMods = RawParameters.GetString("WM"),                    
                 },
                 BotPilot = new GameObject(RawParameters.GetInt("PID"), "BotPilot"),
+                SortieId = EventID,
             };
             Player.CoalitionIndex = Server.GetCoalitionIndex(Player.Country);
         }

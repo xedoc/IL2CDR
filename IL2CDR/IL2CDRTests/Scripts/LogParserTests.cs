@@ -15,6 +15,14 @@ namespace IL2CDR.Scripts.Tests
         {
             var parser = new LogParser();
             parser.OpenMissionReport();
+            var globalstat = new GlobalStatistics();
+            globalstat.Config = globalstat.DefaultConfig;
+
+            globalstat.Config.ConfigFields.Set("token", "0695da663534558c209f052ac2af4112");
+            foreach( var item in parser.History)
+            {
+                globalstat.AddToQueue(item);
+            }
 
             Assert.IsTrue(true);
         }
