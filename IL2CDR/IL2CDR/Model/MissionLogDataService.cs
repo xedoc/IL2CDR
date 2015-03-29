@@ -20,6 +20,8 @@ namespace IL2CDR.Model
         private TextFileTracker tracker;
         private ActionManager actionManager;
         private Server server;
+        private DateTime lastEventTime;
+        private long lastTick;
         private Dictionary<EventType, Action<MissionLogEventHeader>> historyHandlers = new Dictionary<EventType, Action<MissionLogEventHeader>>()
         {
             { EventType.AirfieldInfo, (data) => data.With( x => x as MissionLogEventAirfieldInfo)
@@ -89,6 +91,17 @@ namespace IL2CDR.Model
         }
         private void StartNewMission(string logFilePath)
         {
+            //Check if MissionEnd is sent
+            if( missionHistory != null && missionHistory.Count > 0 )
+            {
+                var existing = missionHistory.FirstOrDefault(data => data is MissionLogEventMissionEnd);
+                if( existing == null )
+                {
+                    var endMission = new MissionLogEventMissionEnd(new MissionLogEventHeader(String.Format("T:{0} AType:7", lastTick), lastEventTime));
+                    AddHistory(endMission);
+                    actionManager.ProcessAction(endMission);
+                }
+            }
             Log.WriteInfo("New mission started {0}", logFilePath);
             missionDateTimePrefix = Re.GetSubString(logFilePath, @"missionReport\((.*)?\)\[0\]\.txt");
 
@@ -104,12 +117,18 @@ namespace IL2CDR.Model
         }
         public void ReadMissionHistory(string firstMissionLogFile = null)
         {
-            Log.WriteInfo("Reading events history from {0}", firstMissionLogFile);
             //missionReport(2015-02-25_11-43-53)[0].txt
 
             if( firstMissionLogFile == null )
             {
                 firstMissionLogFile = Util.GetNewestFilePath(MissionLogFolder, "missionReport(*)[0].txt");
+                if (String.IsNullOrWhiteSpace(firstMissionLogFile))
+                {
+                    Log.WriteError("Mission log not found in {0}", MissionLogFolder);
+                    return;
+                }
+
+
             }
             else
             {
@@ -118,9 +137,15 @@ namespace IL2CDR.Model
             }
 
 
-            if( String.IsNullOrWhiteSpace( firstMissionLogFile ))
+            if (String.IsNullOrWhiteSpace(firstMissionLogFile))
+            {
+                Log.WriteError("Malformed log filename {0}", firstMissionLogFile);
                 return;
-            
+            }
+
+            Log.WriteInfo("Reading events history from {0}", firstMissionLogFile);
+
+
             StartNewMission(firstMissionLogFile);
 
             if (MissionStartDateTime.Equals(default(DateTime)))
@@ -164,6 +189,9 @@ namespace IL2CDR.Model
             var header = (data as MissionLogEventHeader);
             if( header != null )
             {
+                lastEventTime = header.EventTime;
+                lastTick = header.Ticks;
+
                 Action<MissionLogEventHeader> action;
                 if( historyHandlers.TryGetValue( header.Type, out action ) )
                 {

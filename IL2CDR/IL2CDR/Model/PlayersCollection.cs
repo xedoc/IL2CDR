@@ -51,10 +51,11 @@ namespace IL2CDR.Model
                             (player.BotPilot != null && player.BotPilot.Id == value.Id));
                     }
 
-                    if (existing == null)
-                        this.Add(value.Id, value);
-                    else
-                        existing = value;
+                    if (existing != null)
+                        this.Remove(value.Id);
+
+                    this.Add(value.Id, value);
+                        
                 }
             }
         }
@@ -80,7 +81,7 @@ namespace IL2CDR.Model
             var player = this[id];
             if (player == null)
                 return;
-
+            Log.WriteInfo(id.ToString());
             player.IsInAir = false;
             player.IsKilled = true;
         }

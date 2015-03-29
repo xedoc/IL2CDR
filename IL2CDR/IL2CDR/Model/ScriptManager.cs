@@ -126,7 +126,12 @@ namespace IL2CDR.Model
         public void LoadScripts()
         {
             string folder = AppDomain.CurrentDomain.GetData("DataDirectory") + scriptsSubFolder;
+            if( !Directory.Exists( folder ))
+            {
+                folder = @".\Scripts\";
 
+                //return;
+            }
             var scriptFiles = Directory.GetFiles(folder, "*.cs", SearchOption.AllDirectories);
             foreach (var scriptPath in scriptFiles)
             {

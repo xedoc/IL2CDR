@@ -25,10 +25,10 @@ namespace IL2CDR.Model
                 lock (lockList)
                 {
                     var existing = this[value.Id];
-                    if (existing == null)
-                        this.Add(value.Id, value);
-                    else
-                        existing = value;
+                    if (existing != null)
+                        this.Remove(value.Id);
+                        
+                    this.Add(value.Id, value);
                 }
             }
         }
