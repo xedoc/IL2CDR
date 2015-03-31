@@ -24,14 +24,15 @@ class IndexController
         $onpage = 10;
         $this->top = new TopScore();
         
+        $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
         $this->templates->addData([
             'isloggedin' => $auth->IsLoggedIn(),
             'currentuser' => $auth->CurrentUser,
             'stattoken' => $auth->StatToken,
             'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
             'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
-            'table_wltotal' => json_decode( $this->top->GetTotalWL(1,0,$onpage,null) ),
-
+            'table_wltotal' => $totalWL,
+            'playersCount' => $totalWL->recordsTotal,
             ]);      
     }
     public function Get10minutesCache($name)
