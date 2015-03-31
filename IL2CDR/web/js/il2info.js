@@ -5,6 +5,7 @@
 $.extend($.fn.dataTable.defaults, {    
     ordering: false,
     pageLength: 10,
+    deferLoading: 100,
     pagingType: "full_numbers",
     dom: '<"toolbar">frtip',
     language: {

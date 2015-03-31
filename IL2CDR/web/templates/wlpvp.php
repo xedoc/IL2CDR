@@ -1,8 +1,7 @@
 <?php $this->layout('layout', ['title' => 'Top - PvP W/L'])?>
-
     <div class="row">
         <div class="col-md-offset-3 col-md-6 text-center">
-        <?php $this->insert('partial_wltabs') ?>
+        <?php $this->insert('partial_wltabs'); ?>
         <h3>Player wins per loss</h3>
         <small class="text-muted"><i>Planes lost in combat with players and crashes</i></small>
         </div>
@@ -22,6 +21,7 @@
                         <th>Losses</th>
                     </tr>
                 </thead>
+                <?php $this->insert('partial_toptable', ['table' => $table_wlpvp]) ?>
             </table>
             <?php $this->insert('partial_ajaxloader') ?>
             </div>

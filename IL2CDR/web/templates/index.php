@@ -1,4 +1,5 @@
 <?php $this->layout('layout', ['title' => 'Top Wins/Losses'])?>
+<?=$this->e($table_wpvp);?>
 <div class="row">
 <div class="col-md-6 col-md-offset-3">
     <table id="table_wl" class="nowrap table table-striped table-bordered">
@@ -13,6 +14,7 @@
             </tr>
         </thead>
     </table>
+
     <?php $this->insert('partial_ajaxloader') ?>
 </div>
 </div>

@@ -22,6 +22,7 @@
                         <th>Losses</th>
                     </tr>
                 </thead>
+                <?php $this->insert('partial_toptable', ['table' => $table_wlpve]) ?>
             </table>
             <?php $this->insert('partial_ajaxloader') ?>
         </div>
