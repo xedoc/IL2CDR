@@ -14,31 +14,31 @@ $.extend($.fn.dataTable.defaults, {
 });
 
 $(document).ready(function () {
-    $('#table_kd').on( 'processing.dt', function ( e, settings, processing ) {
+    $('#table_wl').on( 'processing.dt', function ( e, settings, processing ) {
         $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
     } )
     .DataTable({
         serverSide: true,
         ajax: {
-            url: '/json/kd/',
+            url: '/json/wl/',
             type: 'GET'
         }
     });
-    $('#table_kdpvp').on('processing.dt', function (e, settings, processing) {
+    $('#table_wlpvp').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
         serverSide: true,
         ajax: {
-            url: '/json/kdpvp/',
+            url: '/json/wlpvp/',
             type: 'GET'
         }
     });
-    $('#table_kdpve').on('processing.dt', function (e, settings, processing) {
+    $('#table_wlpve').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
         serverSide: true,
         ajax: {
-            url: '/json/kdpve/',
+            url: '/json/wlpve/',
             type: 'GET'
         }
     });

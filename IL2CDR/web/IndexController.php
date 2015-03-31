@@ -96,29 +96,54 @@ class IndexController
         $auth->Logout();
         
     }
-    public function GetJsonKdPvP($request)
+    public function GetPlayersJsonFromCache( $type, $draw, $start, $length, $search )
     {
-        $draw = $request->get('draw');
-        $start =  $request->get('start');
-        $length = $request->get('length');
-        $search = $request->get('search')['value'];
-        return $this->top->GetKDPvP($draw,$start,$length, $search);
+        $playerCacheStatus = __c()->get('table_players');
+        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus ));            
     }
-    public function GetJsonKdPvE($request)
+    public function AddPlayersJsonToCache( $type, $draw, $start, $length, $search, $content )
     {
-        $draw = $request->get('draw');
-        $start =  $request->get('start');
-        $length = $request->get('length');
-        $search = $request->get('search')['value'];
-        return $this->top->GetKDPvE($draw,$start,$length, $search);
+        $playerCacheStatus = __c()->get('table_players');
+        __c()->set( sprintf("%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus ), $content, 60000);
+        return $content;
     }
-    public function GetJsonKd($request)
+    public function GetJsonWlPvP($request)
     {
         $draw = $request->get('draw');
         $start =  $request->get('start');
         $length = $request->get('length');
         $search = $request->get('search')['value'];
-        return $this->top->GetTotalKD($draw,$start,$length, $search);    
+        $from_cache = $this->GetPlayersJsonFromCache( 'wlpvp', $draw, $start, $length, $search );
+        if( $from_cache != null )
+            return $from_cache;
+        
+        $result = $this->top->GetWLPvP($draw,$start,$length, $search);
+        return $this->AddPlayersJsonToCache( 'wlpvp', $draw,$start,$length, $search, $result);
+    }
+    public function GetJsonWlPvE($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+
+        $from_cache = $this->GetPlayersJsonFromCache( 'wlpve', $draw, $start, $length, $search );
+        if( $from_cache != null )
+            return $from_cache;
+        $result = $this->top->GetWLPvE($draw,$start,$length, $search);
+        return $this->AddPlayersJsonToCache( 'wlpve', $draw,$start,$length, $search, $result);
+    }
+    public function GetJsonWl($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+        $from_cache = $this->GetPlayersJsonFromCache( 'wl', $draw, $start, $length, $search );
+        if( $from_cache != null )
+            return $from_cache;
+        $result =  $this->top->GetTotalWL($draw,$start,$length, $search);   
+        return $this->AddPlayersJsonToCache( 'wl', $draw,$start,$length, $search, $result);
     }
     
     public function GetJsonSnipers($request)
@@ -127,24 +152,28 @@ class IndexController
         $start =  $request->get('start');
         $length = $request->get('length');
         $search = $request->get('search')['value'];
-        return $this->top->GetTotalSnipers($draw,$start,$length, $search);
+        $from_cache = $this->GetPlayersJsonFromCache( 'snipers', $draw, $start, $length, $search );
+        if( $from_cache != null )
+            return $from_cache;
+        $result =  $this->top->GetTotalSnipers($draw,$start,$length, $search);
+        return $this->AddPlayersJsonToCache( 'snipers', $draw,$start,$length, $search, $result);
     }
     
     public function GetIndex( )
     {
         return  $this->Get10minutesCache('index');
     }
-    public function GetKDPvP()
+    public function GetWLPvP()
     {
-        return $this->Get10minutesCache('kdpvp');
+        return $this->Get10minutesCache('wlpvp');
     }
-    public function GetKDPvE()
+    public function GetWLPvE()
     {
-        return $this->Get10minutesCache('kdpve');
+        return $this->Get10minutesCache('wlpve');
     }
-    public function GetKD( )
+    public function GetWL( )
     {
-        return $this->Get10minutesCache('kd');
+        return $this->Get10minutesCache('wl');
     }
     public function GetSnipers( )
     {

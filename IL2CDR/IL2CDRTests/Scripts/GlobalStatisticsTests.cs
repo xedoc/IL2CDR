@@ -16,7 +16,7 @@ namespace IL2CDR.Scripts.Tests
         [TestMethod()]
         public void GlobalStatisticsTest()
         {
-
+            Log.WriteInfo( Util.SourceLineNumber );    
         }
 
         [TestMethod()]

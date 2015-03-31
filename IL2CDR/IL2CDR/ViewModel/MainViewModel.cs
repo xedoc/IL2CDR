@@ -22,6 +22,7 @@ namespace IL2CDR.ViewModel
     {
         private DServerManager dserverManager;
         private ActionManager actionManager;
+        private ScriptManager scriptManager;
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -42,6 +43,7 @@ namespace IL2CDR.ViewModel
                 UpdateServerList();
             });
 
+            scriptManager = (Application.Current as App).ScriptManager;
             actionManager = (Application.Current as App).ActionManager;
 
             CurrentScriptSettings = Config.ScriptConfigs.FirstOrDefault();
@@ -342,6 +344,27 @@ namespace IL2CDR.ViewModel
                             missionLogService.Stop();
                         else
                             missionLogService.Start();
+                    }));
+            }
+        }
+
+        private RelayCommand<string> _scriptCheck;
+
+        /// <summary>
+        /// Gets the ScriptCheck.
+        /// </summary>
+        public RelayCommand<string> ScriptCheck
+        {
+            get
+            {
+                return _scriptCheck
+                    ?? (_scriptCheck = new RelayCommand<string>(
+                    (scriptFile) =>
+                    {
+                        if( scriptManager != null )
+                        {
+                            scriptManager.SwitchScript(scriptFile);
+                        }
                     }));
             }
         }

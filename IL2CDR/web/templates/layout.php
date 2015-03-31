@@ -10,7 +10,7 @@
     <meta http-equiv="pragma" content="no-cache" />
 
     <title><?=$this->e($title)?></title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css">
     <link rel="stylesheet" href="/css/stats.css" type="text/css" />
 
@@ -33,13 +33,13 @@
         <?php $this->insert('partial_loginarea') ?>
 
       <ul class="nav navbar-nav">
-        <li <?=activeIfStartsWith("kd")?> class="dropdown">
-                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Kills/Deaths<b class="caret"></b></a>
+        <li <?=activeIfStartsWith("wl")?> class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Wins/Losses<b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="/kdpvp">Players vs Players</a></li>
-                            <li><a href="/kdpve">Players vs Environment</a></li>
+                            <li><a href="/wlpvp">Players vs Players</a></li>
+                            <li><a href="/wlpve">Players vs Environment</a></li>
                             <li class="divider"></li>
-                            <li><a href="/kd">Total</a></li>
+                            <li><a href="/wl">Total</a></li>
                         </ul>
                     </li>
         <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
@@ -55,11 +55,10 @@
 
 
 
-<div class="navbar-fixed-bottom">
+<div class="row">
     <footer class="navbar-fixed-bottom text-muted small">
         &copy; 2015. This site is not affiliated with 1C Game Studios nor with 777 Studios. Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a>
     </footer>
-
 </div>
 
 <?php $this->insert('partial_usermodal') ?>

@@ -44,6 +44,18 @@ namespace IL2CDR.Model
 
             return null;
         }
+        public static string SourceFileName 
+        {
+            get {
+                return new System.Diagnostics.StackTrace(true).GetFrame(4).GetFileName();
+            }
+        }
+        public static string SourceLineNumber
+        {
+            get {
+                return new System.Diagnostics.StackTrace(true).GetFrame(4).GetFileLineNumber().ToString(); 
+            }            
+        }
         public static Vector3DCollection BoundaryPointsToVectorCollection(string bp)
         {
             Vector3DCollection vectors = new Vector3DCollection();

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
+    [Serializable]
     public class ActionScriptBase : IActionScript, IScriptConfig
     {
         /// <summary>

@@ -352,6 +352,7 @@
     <Compile Include="Slim\Middleware\ContentTypes.php" />
     <Compile Include="Slim\Middleware\Flash.php" />
     <Compile Include="Slim\Middleware\MethodOverride.php" />
+    <Compile Include="Slim\Middleware\Minify.php" />
     <Compile Include="Slim\Middleware\PrettyExceptions.php" />
     <Compile Include="Slim\Middleware\SessionCookie.php" />
     <Compile Include="Slim\Route.php" />
@@ -359,19 +360,19 @@
     <Compile Include="Slim\Slim.php" />
     <Compile Include="Slim\View.php" />
     <Compile Include="templates\index.php" />
-    <Compile Include="templates\kdpve.php" />
-    <Compile Include="templates\kdpvp.php" />
+    <Compile Include="templates\wlpve.php" />
+    <Compile Include="templates\wlpvp.php" />
     <Compile Include="templates\mail_confirmation.php" />
     <Compile Include="templates\message.php" />
     <Compile Include="templates\partial_ajaxloader.php" />
-    <Compile Include="templates\partial_kdtabs.php" />
+    <Compile Include="templates\partial_wltabs.php" />
     <Compile Include="templates\partial_loginarea.php" />
     <Compile Include="templates\partial_usermodal.php" />
     <Compile Include="templates\partial_signupmodal.php" />
     <Compile Include="templates\partial_loginmodal.php" />
     <Compile Include="templates\survivors.php" />
     <Compile Include="templates\snipers.php" />
-    <Compile Include="templates\kd.php" />
+    <Compile Include="templates\wl.php" />
     <Compile Include="templates\layout.php" />
     <Compile Include="test.php" />
   </ItemGroup>

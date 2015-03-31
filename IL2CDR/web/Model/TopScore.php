@@ -53,53 +53,35 @@ class TopScore
         });
     }
     
-    public function GetKDPvP($draw, $start, $length, $search)
+    public function GetWLPvP($draw, $start, $length, $search)
     {
-        return $this->GetDataTable($draw, $start, $length, $search, "TopKDPvP", function($row,$i) {
-        $nickname = $row->nickname;       
-        return (object)array(
-                '0' => intval($row->rank),
-                '1' => isset($row->division) ? $row->division : "E",
-                '2' => $nickname,
-                '3' => format_2dp($row->kd),
-                '4' => intval($row->playerairkills),
-                '5' => intval($row->deaths),
-                "DT_RowId" => "kdpvp" . $i,                
-            );
-        });
+        return $this->GetWL($draw, $start, $length, $search, "TopWLPvP" );
     }
-    public function GetKDPvE($draw, $start, $length, $search)
+    public function GetWLPvE($draw, $start, $length, $search)
     {
-        return $this->GetDataTable($draw, $start, $length, $search, "TopKDPvE", function($row,$i) {
-        $nickname = $row->nickname;       
-        return (object)array(
-                '0' => intval($row->rank),                
-                '1' => isset($row->division) ? $row->division : "E",
-                '2' => $nickname,
-                '3' => format_2dp($row->kills/max(1,$row->deaths)),
-                '4' => intval($row->kills),
-                '5' => intval($row->deaths),
-                "DT_RowId" => "kdpve" . $i,                
-            );
-        });
+        return $this->GetWL($draw, $start, $length, $search, "TopWLPvE" );
     }
-
-    public function GetTotalKD($draw, $start, $length, $search)
+    public function GetTotalWL($draw, $start, $length, $search)
     {        
-        return $this->GetDataTable($draw, $start, $length, $search, "TopTotalKD", function($row,$i) {
-            $nickname = $row->nickname;
-            $total_kills = intval($row->total_kills);
-            $total_deaths = intval($row->total_deaths);
-            return (object)array(
-                    '0' => intval($row->rank),
-                    '1' => isset($row->division) ? $row->division : "E",                    
-                    '2' => $nickname,
-                    '3' => format_2dp($total_kills/max(1,$total_deaths)),
-                    '4' => $total_kills,
-                    '5' => $total_deaths,
-                    "DT_RowId" => "kd" . $i,                
-                );
-        });
+        return $this->GetWL($draw, $start, $length, $search, "TopTotalWL" );
+    }
+    
+    public function GetWL($draw, $start, $length, $search, $procname )
+    {
+        return $this->GetDataTable($draw, $start, $length, $search, $procname, function($row,$i) {
+                $nickname = $row->nickname;
+                $wins = intval($row->wins);
+                $losses = intval($row->losses);
+                return (object)array(
+                        '0' => intval($row->rank),
+                        '1' => isset($row->division) ? $row->division : "E",                    
+                        '2' => $nickname,
+                        '3' => format_2dp($wins/max(1,$losses)),
+                        '4' => $wins,
+                        '5' => $losses,
+                        "DT_RowId" => "wl" . $i,                
+                    );
+            });
     }
     
     private function GetDataTable($draw, $start, $length, $search, $procname, $func)
@@ -118,8 +100,8 @@ class TopScore
             $i = intval($start);
             while( $row = $result->fetch_object())
             {
-                $table->recordsTotal = $row->playercount;
-                $table->recordsFiltered = $row->playercount;
+                $table->recordsTotal = $row->recordscount;
+                $table->recordsFiltered = $row->recordscount;
                 $obj = $func($row, $i);
                 
                 $i++;

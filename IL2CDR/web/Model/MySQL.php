@@ -30,6 +30,7 @@ class MySQL implements iDatabase
         if( !$this->IsConnected )
             return null;
         
+        $this->TouchCache( $proc );
         return $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
         
     }
@@ -87,4 +88,20 @@ class MySQL implements iDatabase
 
         return sprintf("'%s'", $this->my->real_escape_string( $text ));
     }
+    
+    public function GetCacheStatus($name)
+    {
+        return __c()->get($name);
+    }
+    
+    public function TouchCache($name)
+    {        
+        $players = array( "AddKill", "AddPlayer", "AddSortieEnd");
+        
+        if( in_array($name, $players ))
+        {
+            __c()->set('table_players', time(), 24 * 3600 * 30);                    
+        }
+    }
+    
 }

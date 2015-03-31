@@ -18,6 +18,7 @@ namespace IL2CDR.Model
         public Func<string,bool> Preprocess { get; set; }
         public Action<string> OnNewLine { get; set; }
         public Action<string> OnFileCreation { get; set; }
+        public Action<string> OnChanged { get; set; }
 
         public TextFileTracker(string folder, string mask)
         {
@@ -56,11 +57,15 @@ namespace IL2CDR.Model
 
             if( e.ChangeType == WatcherChangeTypes.Changed )
             {
-                ReadNewLines(e.FullPath);
-                string line = null;
-                while( logLinesQueue.TryDequeue( out line ))
+                if (OnChanged != null)
                 {
-                    if (OnNewLine != null)
+                    OnChanged(e.FullPath);
+                }
+                if (OnNewLine != null)
+                {
+                    ReadNewLines(e.FullPath);
+                    string line = null;
+                    while( logLinesQueue.TryDequeue( out line ))
                         OnNewLine(line);
                 }
                     

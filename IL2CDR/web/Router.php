@@ -32,6 +32,8 @@ class Router
     {
         Slim::registerAutoloader();
         $this->app = new Slim();
+        //Content is gzipped anyway
+        //$this->app->add( new \Slim\Middleware\Minify());
         $this->SetupRoutes();
      
     }
@@ -39,19 +41,19 @@ class Router
     function SetupRoutes( )
     {
         $this->indexController = new IndexController( new Engine('templates') );
-    	$this->app->get('/', function() { echo $this->indexController->GetKD(); } );
-    	$this->app->get('/kd/', function() { echo $this->indexController->GetKD(); } );
-    	$this->app->get('/kdpvp/', function() { echo $this->indexController->GetKDPvP(); } );
-    	$this->app->get('/kdpve/', function() { echo $this->indexController->GetKDPvE(); } );
+    	$this->app->get('/', function() { echo $this->indexController->GetWL(); } );
+    	$this->app->get('/wl/', function() { echo $this->indexController->GetWL(); } );
+    	$this->app->get('/wlpvp/', function() { echo $this->indexController->GetWLPvP(); } );
+    	$this->app->get('/wlpve/', function() { echo $this->indexController->GetWLPvE(); } );
     	$this->app->get('/snipers/', function() { echo $this->indexController->GetSnipers(); } );
     	$this->app->get('/survivors/', function() { echo $this->indexController->GetSurvivors(); } );
     	$this->app->get('/confirm/:token', function($token) { echo $this->indexController->GetConfirm($token); } );
     	$this->app->get('/logout/', function() { $this->indexController->GetLogout(); $this->app->redirect('/'); } );
 
         //top score json
-        $this->app->get('/json/kd/', function() { echo $this->indexController->GetJsonKd($this->app->request); } );
-        $this->app->get('/json/kdpvp/', function() { echo $this->indexController->GetJsonKdPvP($this->app->request); } );
-        $this->app->get('/json/kdpve/', function() { echo $this->indexController->GetJsonKdPvE($this->app->request); } );
+        $this->app->get('/json/wl/', function() { echo $this->indexController->GetJsonWl($this->app->request); } );
+        $this->app->get('/json/wlpvp/', function() { echo $this->indexController->GetJsonWlPvP($this->app->request); } );
+        $this->app->get('/json/wlpve/', function() { echo $this->indexController->GetJsonWlPvE($this->app->request); } );
         $this->app->get('/json/snipers/', function() { echo $this->indexController->GetJsonSnipers($this->app->request); } );
         
         $this->app->post('/e/', function() { 

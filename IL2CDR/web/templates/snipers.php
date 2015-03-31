@@ -1,4 +1,4 @@
-<?php $this->layout('layout', ['title' => 'Leaderboard - Snipers'])?>
+<?php $this->layout('layout', ['title' => 'Top - Snipers'])?>
 <div class="container">
         <div class="row">
         <div class="col-md-offset-3 col-md-6 text-center">            

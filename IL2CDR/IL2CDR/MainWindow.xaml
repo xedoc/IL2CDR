@@ -115,7 +115,7 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <CheckBox Focusable="False" IsChecked="{Binding IsEnabled}" Margin="5"/>
+                                        <CheckBox Command="{Binding Path=Main.ScriptCheck, Source={StaticResource Locator}}" CommandParameter="{Binding FileName}" Focusable="False" IsChecked="{Binding IsEnabled}" Margin="5"/>
                                         <Label Content="{Binding Title}"/>
                                     </StackPanel>
                                 </DataTemplate>
