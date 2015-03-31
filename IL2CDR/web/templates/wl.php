@@ -1,5 +1,4 @@
 <?php $this->layout('layout', ['title' => 'Top - Total Wins/Losses'])?>
-<div class="container">
     <div class="row">
         <div class="col-md-offset-3 col-md-6 text-center">
              <?php $this->insert('partial_wltabs') ?>
@@ -28,4 +27,3 @@
           </div>    
         </div>
     </div>
-</div>

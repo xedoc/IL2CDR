@@ -51,15 +51,18 @@
   </div>
 </nav>
 
-<?=$this->section('content')?>
 
-
-
-<div class="row">
-    <footer class="navbar-fixed-bottom text-muted small">
-        &copy; 2015. This site is not affiliated with 1C Game Studios nor with 777 Studios. Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a>
-    </footer>
+<div class="container">
+    <?=$this->section('content')?>
 </div>
+
+
+
+<footer class="top-buffer text-muted small">
+    <div class="container text-center">
+        <p class="navbar-text col-md-12 col-sm-12 col-xs-12">    &copy; 2015. This site is not affiliated with 1C Game Studios nor with 777 Studios. Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a></p>
+    </div>
+</footer>
 
 <?php $this->insert('partial_usermodal') ?>
 <?php $this->insert('partial_loginmodal') ?>
