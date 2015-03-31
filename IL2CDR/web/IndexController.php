@@ -168,7 +168,7 @@ class IndexController
     
     public function GetIndex( )
     {
-        return  $this->Get10minutesCache('index');
+        return  $this->Get10minutesCache('wlpvp');
     }
     public function GetWLPvP()
     {

@@ -359,7 +359,6 @@
     <Compile Include="Slim\Router.php" />
     <Compile Include="Slim\Slim.php" />
     <Compile Include="Slim\View.php" />
-    <Compile Include="templates\index.php" />
     <Compile Include="templates\partial_jsconfig.php" />
     <Compile Include="templates\partial_toptable.php" />
     <Compile Include="templates\wlpve.php" />
