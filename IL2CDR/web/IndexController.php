@@ -21,12 +21,19 @@ class IndexController
     {
     	$this->templates = $templates;
         $auth = new Auth();
+        $onpage = 10;
+        $this->top = new TopScore();
+        
+        $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
         $this->templates->addData([
             'isloggedin' => $auth->IsLoggedIn(),
             'currentuser' => $auth->CurrentUser,
             'stattoken' => $auth->StatToken,
+            'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
+            'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
+            'table_wltotal' => $totalWL,
+            'playersCount' => $totalWL->recordsTotal,
             ]);      
-        $this->top = new TopScore();
     }
     public function Get10minutesCache($name)
     {
@@ -161,7 +168,7 @@ class IndexController
     
     public function GetIndex( )
     {
-        return  $this->Get10minutesCache('index');
+        return  $this->Get10minutesCache('wlpvp');
     }
     public function GetWLPvP()
     {

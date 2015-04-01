@@ -13,17 +13,31 @@ class MySQL implements iDatabase
     private $config;    
     private $my;
     public $IsConnected = false;
+    private $connection;
     function __construct()
     {
         $this->config = include(__DIR__ . '/../config.php');
         $this->connect();
     }
+    public function nextresult()
+    {
+        $this->my->next_result();
+    }
     public function query($query)
     {
+        $result = false;
         if( $this->IsConnected )
-            return $this->my->query($query);
-        else
-            return null;
+        {
+            $result = $this->my->query($query);
+        }
+        
+        if( !$result )
+        {
+            echo $this->my->error;
+        }
+        
+        return $result;
+
     }
     public function callproc($proc, $params = array())
     {
@@ -31,7 +45,14 @@ class MySQL implements iDatabase
             return null;
         
         $this->TouchCache( $proc );
-        return $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
+        $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
+        $result = $this->my->store_result();
+        if( !$result )
+        {
+            echo $this->my->error;
+        }
+        
+        return $result;
         
     }
     

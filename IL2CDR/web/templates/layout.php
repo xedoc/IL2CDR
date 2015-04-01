@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css">
     <link rel="stylesheet" href="/css/stats.css" type="text/css" />
+    <?php $this->insert('partial_jsconfig') ?>
 
 
 </head>

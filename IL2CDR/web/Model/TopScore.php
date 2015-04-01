@@ -107,7 +107,8 @@ class TopScore
                 $i++;
                 $table->data[] = $obj;
             }            
-            $result->close();   
+            $result->close();
+            $this->db->nextresult();
             $json = $table->GetJSON();
             return $json;
         }
