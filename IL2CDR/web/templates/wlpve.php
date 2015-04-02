@@ -24,7 +24,6 @@
                 </thead>
                 <?php $this->insert('partial_toptable', ['table' => $table_wlpve]) ?>
             </table>
-            <?php $this->insert('partial_ajaxloader') ?>
         </div>
         </div>    
     </div>

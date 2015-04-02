@@ -1,9 +1,9 @@
-<?php $this->layout('layout', ['title' => 'Top - Total Wins/Losses'])?>
+<?php $this->layout('layout', ['title' => 'Missions'])?>
     <div class="row">
         <div class="col-md-offset-3 col-md-6 text-center">
-             <?php $this->insert('partial_wltabs') ?>
-            <h3>Total wins per loss</h3>
-            <small class="text-muted"><i>Players,bots and ground units</i></small>
+             <?php $this->insert('partial_missions') ?>
+            <h3>Mission results</h3>
+            <small class="text-muted"><i>Current, finished and interrupted</i></small>
         </div>
     </div>
     <div class="row">

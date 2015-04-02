@@ -23,7 +23,6 @@
                 </thead>
                 <?php $this->insert('partial_toptable', ['table' => $table_wlpvp]) ?>
             </table>
-            <?php $this->insert('partial_ajaxloader') ?>
             </div>
           </div>    
         </div>

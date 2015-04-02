@@ -151,8 +151,7 @@ class IndexController
             return $from_cache;
         $result =  $this->top->GetTotalWL($draw,$start,$length, $search);   
         return $this->AddPlayersJsonToCache( 'wl', $draw,$start,$length, $search, $result);
-    }
-    
+    }    
     public function GetJsonSnipers($request)
     {
         $draw = $request->get('draw');
@@ -165,7 +164,10 @@ class IndexController
         $result =  $this->top->GetTotalSnipers($draw,$start,$length, $search);
         return $this->AddPlayersJsonToCache( 'snipers', $draw,$start,$length, $search, $result);
     }
-    
+    public function GetMissions()
+    {
+        return  $this->Get10minutesCache('missions');
+    }
     public function GetIndex( )
     {
         return  $this->Get10minutesCache('wlpvp');
@@ -189,8 +191,7 @@ class IndexController
     public function GetSurvivors( )
     {
         return $this->Get10minutesCache('survivors');
-    }
-    
+    } 
     public function GetConfirm( $token )
     {
         $auth = new Auth();
@@ -202,8 +203,7 @@ class IndexController
         {
             return $this->templates->render('message', ['message' => 'Unknown email']);       
         }
-    }
-    
+    }   
     public function PostEvent($json)               
     {
         if( !isset($_COOKIE['srvtoken']) && empty($_COOKIE['srvtoken'])  )
@@ -227,8 +227,7 @@ class IndexController
         }
         return "UNKNOWN EVENT";          
         
-    }
-    
+    } 
     public function PostSignUp($request)
     {        
         if( $request->isPost() )

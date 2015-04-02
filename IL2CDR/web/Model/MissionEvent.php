@@ -201,6 +201,15 @@ class MissionEvent
                     $this->db->callproc("AddMissionEndEvent");
                     break;
                 case 8:
+                    $params = array(
+                            'Text' => $this->db->EaQ(sprintf('%s %s %s %s', 
+                                    $event->ObjectiveId, 
+                                    $event->IsPrimary,
+                                    $event->CoalitionIndex,
+                                    $event->IsCompleted
+                                    )));
+                    $this->db->setvars($params);
+                    $this->db->callproc("AddTxtLog");
                     break;
                 case 9:
                     break;                    

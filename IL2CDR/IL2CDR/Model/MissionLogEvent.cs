@@ -263,10 +263,9 @@ namespace IL2CDR.Model
             if (purpose == null)
                 purpose = new GameObjectItem(GameObjectClass.Other, "Unknown");
 
-            Object = new GameObject(RawParameters.GetInt("ID"), RawParameters.GetString("NAME")) { 
+            Object = new GameObject(RawParameters.GetInt("ID"), RawParameters.GetString("TYPE")) { 
                 Classification = purpose.Classification.ToString("g"),
                 Purpose = purpose.Purpose,
-                Name = RawParameters.GetString("TYPE"),
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
             };
 
@@ -504,10 +503,8 @@ namespace IL2CDR.Model
         {
             get
             {
-                if (TargetPlayer != null)
-                    return TargetPlayer.GetHitsCountBy(AttackerObject) + TargetPlayer.GetHitsCountBy(AttackerPlayer);
-                else if (TargetObject != null)
-                    return TargetObject.GetHitsCountBy(AttackerObject) + TargetObject.GetHitsCountBy(AttackerPlayer);
+                if (TargetObject != null && AttackerObject != null )
+                    return TargetObject.GetHitsCountBy(AttackerObject);
                 else
                     return 0;
             }
@@ -517,10 +514,8 @@ namespace IL2CDR.Model
         {
             get
             {
-                if (TargetPlayer != null)
-                    return TargetPlayer.GetDamageBy(AttackerObject) + TargetPlayer.GetDamageBy(AttackerPlayer);
-                else if (TargetObject != null)
-                    return TargetObject.GetDamageBy(AttackerObject) + TargetObject.GetDamageBy(AttackerPlayer);
+                if (TargetObject != null && AttackerObject != null )
+                    return TargetObject.GetDamageBy(AttackerObject);
                 else
                     return 0;
             }
@@ -551,10 +546,6 @@ namespace IL2CDR.Model
                     return 0;
             }
         }
-
-
-        
-        
 
         public MissionLogEventKill(MissionLogEventHeader header)
             : base(header)
@@ -620,13 +611,10 @@ namespace IL2CDR.Model
             TargetId = RawParameters.GetInt("TID");
             AmmoName = RawParameters.GetString("AMMO");
 
-            AttackerPlayer = Server.Players[AttackerId];
-            if (AttackerPlayer == null)
-                AttackerObject = Server.GameObjects[AttackerId];
-
-            TargetPlayer = Server.Players[TargetId];
-            if (TargetPlayer == null)
-                TargetObject = Server.GameObjects[TargetId];
+            //AttackerPlayer = Server.Players[AttackerId];
+            AttackerObject = Server.GameObjects[AttackerId];
+            //TargetPlayer = Server.Players[TargetId];
+            TargetObject = Server.GameObjects[TargetId];
 
         }
     }

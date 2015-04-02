@@ -49,6 +49,7 @@ class Router
     	$this->app->get('/survivors/', function() { echo $this->indexController->GetSurvivors(); } );
     	$this->app->get('/confirm/:token', function($token) { echo $this->indexController->GetConfirm($token); } );
     	$this->app->get('/logout/', function() { $this->indexController->GetLogout(); $this->app->redirect('/'); } );
+    	$this->app->get('/missions/', function() { echo $this->indexController->GetMissions(); } );
 
         //top score json
         $this->app->get('/json/wl/', function() { echo $this->indexController->GetJsonWl($this->app->request); } );
