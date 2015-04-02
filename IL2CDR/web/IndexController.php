@@ -32,6 +32,7 @@ class IndexController
             'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
             'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
             'table_wltotal' => $totalWL,
+            'table_missions' => json_decode( $this->top->GetMissions(1,0,$onpage,null)),
             'playersCount' => $totalWL->recordsTotal,
             ]);      
     }

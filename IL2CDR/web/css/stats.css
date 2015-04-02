@@ -1,1 +1,8 @@
 ﻿.top-buffer { margin-top:40px; }
+
+.table thead>tr>th.tdcenter{
+    vertical-align: middle !important;
+    text-align : center !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}

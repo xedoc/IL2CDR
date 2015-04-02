@@ -52,7 +52,21 @@ class TopScore
                 );
         });
     }
-    
+    public function GetMissions($draw, $start, $length, $search)
+    {
+        return $this->GetDataTable($draw, $start, $length, $search, "ReportMissionResults", function($row,$i) {
+                return (object)array(
+                        '0' => $row->ServerName,
+                        '1' => $row->MissionStartTime,                    
+                        '2' => $row->MissionEndTime,
+                        '3' => $row->C2PlanesScore,
+                        '4' => $row->C1PlanesScore,
+                        '5' => $row->C2GroundScore,
+                        '6' => $row->C1GroundScore,
+                        "DT_RowId" => "mis" . $i,                
+                    );
+            });
+    }
     public function GetWLPvP($draw, $start, $length, $search)
     {
         return $this->GetWL($draw, $start, $length, $search, "TopWLPvP" );

@@ -45,6 +45,9 @@
                     </li>
         <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
         <li <?=activeIfMatch("survivors")?>><a href="/survivors">Survivors</a></li>
+        <li class="nav-divider"></li>
+        <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
+
 
       </ul>
 
