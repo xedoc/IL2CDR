@@ -56,6 +56,7 @@ class Router
         $this->app->get('/json/wlpvp/', function() { echo $this->indexController->GetJsonWlPvP($this->app->request); } );
         $this->app->get('/json/wlpve/', function() { echo $this->indexController->GetJsonWlPvE($this->app->request); } );
         $this->app->get('/json/snipers/', function() { echo $this->indexController->GetJsonSnipers($this->app->request); } );
+        $this->app->get('/json/missions/', function() { echo $this->indexController->GetJsonMissions($this->app->request); } );
         
         $this->app->post('/e/', function() { 
             $unzipped = gzdecode($this->app->request->getBody());

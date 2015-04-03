@@ -2,6 +2,7 @@
 require_once 'Model/MissionEvent.php';
 require_once 'Model/Auth.php';
 require_once 'Model/TopScore.php';
+require_once 'Model/TZ.php';
 require 'phpfastcache.php';
 
 /**
@@ -23,7 +24,8 @@ class IndexController
         $auth = new Auth();
         $onpage = 10;
         $this->top = new TopScore();
-        
+        $missions = json_decode( $this->top->GetMissions(1,0,$onpage,null));
+        $tz = new TZ();
         $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
         $this->templates->addData([
             'isloggedin' => $auth->IsLoggedIn(),
@@ -32,8 +34,10 @@ class IndexController
             'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
             'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
             'table_wltotal' => $totalWL,
-            'table_missions' => json_decode( $this->top->GetMissions(1,0,$onpage,null)),
+            'table_missions' => $missions,
             'playersCount' => $totalWL->recordsTotal,
+            'missionCount' => $missions->recordsTotal,
+            'tz' => $tz->GetTimeZone(),
             ]);      
     }
     public function Get10minutesCache($name)
@@ -104,12 +108,12 @@ class IndexController
         $auth->Logout();
         
     }
-    public function GetPlayersJsonFromCache( $type, $draw, $start, $length, $search )
+    public function GetJsonFromCache( $type, $draw, $start, $length, $search )
     {
         $playerCacheStatus = __c()->get('table_players');
         return __c()->get(sprintf("%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus ));            
     }
-    public function AddPlayersJsonToCache( $type, $draw, $start, $length, $search, $content )
+    public function AddJsonToCache( $type, $draw, $start, $length, $search, $content )
     {
         $playerCacheStatus = __c()->get('table_players');
         __c()->set( sprintf("%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus ), $content, 60000);
@@ -121,12 +125,12 @@ class IndexController
         $start =  $request->get('start');
         $length = $request->get('length');
         $search = $request->get('search')['value'];
-        $from_cache = $this->GetPlayersJsonFromCache( 'wlpvp', $draw, $start, $length, $search );
+        $from_cache = $this->GetJsonFromCache( 'wlpvp', $draw, $start, $length, $search );
         if( $from_cache != null )
             return $from_cache;
         
         $result = $this->top->GetWLPvP($draw,$start,$length, $search);
-        return $this->AddPlayersJsonToCache( 'wlpvp', $draw,$start,$length, $search, $result);
+        return $this->AddJsonToCache( 'wlpvp', $draw,$start,$length, $search, $result);
     }
     public function GetJsonWlPvE($request)
     {
@@ -135,11 +139,11 @@ class IndexController
         $length = $request->get('length');
         $search = $request->get('search')['value'];
 
-        $from_cache = $this->GetPlayersJsonFromCache( 'wlpve', $draw, $start, $length, $search );
+        $from_cache = $this->GetJsonFromCache( 'wlpve', $draw, $start, $length, $search );
         if( $from_cache != null )
             return $from_cache;
         $result = $this->top->GetWLPvE($draw,$start,$length, $search);
-        return $this->AddPlayersJsonToCache( 'wlpve', $draw,$start,$length, $search, $result);
+        return $this->AddJsonToCache( 'wlpve', $draw,$start,$length, $search, $result);
     }
     public function GetJsonWl($request)
     {
@@ -147,11 +151,11 @@ class IndexController
         $start =  $request->get('start');
         $length = $request->get('length');
         $search = $request->get('search')['value'];
-        $from_cache = $this->GetPlayersJsonFromCache( 'wl', $draw, $start, $length, $search );
+        $from_cache = $this->GetJsonFromCache( 'wl', $draw, $start, $length, $search );
         if( $from_cache != null )
             return $from_cache;
         $result =  $this->top->GetTotalWL($draw,$start,$length, $search);   
-        return $this->AddPlayersJsonToCache( 'wl', $draw,$start,$length, $search, $result);
+        return $this->AddJsonToCache( 'wl', $draw,$start,$length, $search, $result);
     }    
     public function GetJsonSnipers($request)
     {
@@ -159,11 +163,23 @@ class IndexController
         $start =  $request->get('start');
         $length = $request->get('length');
         $search = $request->get('search')['value'];
-        $from_cache = $this->GetPlayersJsonFromCache( 'snipers', $draw, $start, $length, $search );
+        $from_cache = $this->GetJsonFromCache( 'snipers', $draw, $start, $length, $search );
         if( $from_cache != null )
             return $from_cache;
         $result =  $this->top->GetTotalSnipers($draw,$start,$length, $search);
-        return $this->AddPlayersJsonToCache( 'snipers', $draw,$start,$length, $search, $result);
+        return $this->AddJsonToCache( 'snipers', $draw,$start,$length, $search, $result);
+    }
+    public function GetJsonMissions($request)
+    {
+        $draw = $request->get('draw');
+        $start =  $request->get('start');
+        $length = $request->get('length');
+        $search = $request->get('search')['value'];
+        $from_cache = $this->GetJsonFromCache( 'missions', $draw, $start, $length, $search );
+        if( $from_cache != null )
+            return $from_cache;
+        $result =  $this->top->GetMissions($draw,$start,$length, $search);
+        return $this->AddJsonToCache( 'missions', $draw,$start,$length, $search, $result);
     }
     public function GetMissions()
     {
@@ -231,7 +247,7 @@ class IndexController
     } 
     public function PostSignUp($request)
     {        
-        if( $request->isPost() )
+         if( $request->isPost() )
         {
             $email = $request->post('email');
             $password = $request->post('password');

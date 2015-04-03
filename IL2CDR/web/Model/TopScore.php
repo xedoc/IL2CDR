@@ -54,15 +54,35 @@ class TopScore
     }
     public function GetMissions($draw, $start, $length, $search)
     {
-        return $this->GetDataTable($draw, $start, $length, $search, "ReportMissionResults", function($row,$i) {
+        return $this->GetDataTable($draw, $start, $length, $search, "ReportMissionResults", function($row,$i) 
+        {
+            $c1total = $row->C1PlanesScore + $row->C1GroundScore;
+            $c2total = $row->C2PlanesScore + $row->C2GroundScore;
+            if( $c1total == $c2total )
+            {
+                $c1class = 'missiondraw';
+                $c2class = $c1class;
+            }
+            else if( $c1total > $c2total)
+            {
+                $c1class = 'missionwon';
+                $c2class = 'missionlost';
+            }
+            else
+            {
+                $c1class = 'missionlost';
+                $c2class = 'missionwon';
+            }            
                 return (object)array(
                         '0' => $row->ServerName,
                         '1' => $row->MissionStartTime,                    
-                        '2' => $row->MissionEndTime,
-                        '3' => $row->C2PlanesScore,
-                        '4' => $row->C1PlanesScore,
-                        '5' => $row->C2GroundScore,
-                        '6' => $row->C1GroundScore,
+                        '2' => empty($row->MissionEndTime) ? 'Not finished' : $row->MissionEndTime,
+                        '3' => $row->C1PlanesScore,
+                        '4' => $row->C1GroundScore,
+                        '5' => sprintf('<span class="%s">%s</span>', $c1class, $c1total),
+                        '6' => $row->C2PlanesScore,
+                        '7' => $row->C2GroundScore,
+                        '8' => sprintf('<span class="%s">%s</span>', $c2class, $c2total),
                         "DT_RowId" => "mis" . $i,                
                     );
             });
@@ -100,7 +120,7 @@ class TopScore
     
     private function GetDataTable($draw, $start, $length, $search, $procname, $func)
     {    
-        $default = json_encode( new TopDataTable( $draw, 0,0,array()) );
+        $default = json_encode( new TopDataTable( $draw, 0,0,array()), JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES );
         if( !$this->db->IsConnected )
             return $default;
         
@@ -108,6 +128,8 @@ class TopScore
         if( $result )
         {
             $count = $result->num_rows;
+            if( $count <= 0 )
+                return $default;
             
             $table = new TopDataTable($draw, 0, $count, array());
             

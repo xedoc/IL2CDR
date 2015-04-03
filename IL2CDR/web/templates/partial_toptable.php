@@ -2,7 +2,7 @@
     <tr>
         <?php $ar = (array)$row; ?>
         <?php for ($i = 0; $i < count( $ar ) - 1; $i++): ?>
-        <td><?=$this->e( $row->{strval($i)} ) ?></td>
+        <td><?=$row->{strval($i)}?></td>
         <?php endfor ?>
     </tr>
     <?php endforeach ?>

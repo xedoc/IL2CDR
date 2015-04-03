@@ -1,8 +1,79 @@
-﻿.top-buffer { margin-top:40px; }
+﻿input[type="search"] {
+    width:200px !important;
+
+}
+body {
+    color : #c0c0c0 !important;
+}
+div.DTS_Loading {
+    vertical-align : middle !important;
+    height: auto !important;
+    background-color : rgba(60, 60, 60, 0.7) !important;
+    z-index : 10 !important;
+}
+div.DTS div.dataTables_scroll {
+    background : none !important;
+
+}
+.dataTables_scrollHead{
+    border-bottom : 1px solid #3d3d3d;
+}
+.dataTables_scroll {
+    border-bottom : 1px solid #3d3d3d;
+}
+.top-buffer { margin-top:40px; }
 
 .table thead>tr>th.tdcenter{
     vertical-align: middle !important;
     text-align : center !important;
     padding-left: 0px !important;
     padding-right: 0px !important;
+}
+
+
+div.DTS div.dataTables_scrollHead, div.DTS div.dataTables_scrollFoot {
+    background-color : #222222 !important;
+}
+
+div.DTS tbody tr.even {
+  background-color: #222222 !important;
+}
+::-webkit-scrollbar-button{
+    width:0px;
+    height:0px;
+
+}
+::-webkit-scrollbar-track
+{
+    border: 1px solid #3d3d3d;
+	background-color: #222222;
+}
+
+::-webkit-scrollbar
+{
+	width: 24px;
+    border-width: 1px !important;
+	background-color: #222222 !important;
+}
+
+::-webkit-scrollbar-thumb
+{
+    border: 1px solid #222222;
+    background-color: rgb(60,60,60);
+    min-height:45px;
+}
+
+span.missionlost {
+    color : red;
+}
+span.missionwon {
+    color : green;
+}
+span.missiondraw {
+    color : yellow;
+}
+
+.dataTables_scrollHeadInner{
+    padding-left : 0px !important;
+
 }

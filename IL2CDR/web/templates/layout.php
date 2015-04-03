@@ -11,8 +11,9 @@
 
     <title><?=$this->e($title)?></title>
     <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css"/>
     <link rel="stylesheet" href="/css/stats.css" type="text/css" />
+    <link rel="stylesheet" href="//cdn.datatables.net/scroller/1.2.2/css/dataTables.scroller.css" type="text/css" />
     <?php $this->insert('partial_jsconfig') ?>
 
 
@@ -34,6 +35,7 @@
         <?php $this->insert('partial_loginarea') ?>
 
       <ul class="nav navbar-nav">
+
         <li <?=activeIfStartsWith("wl")?> class="dropdown">
                         <a href="#" data-toggle="dropdown" class="dropdown-toggle">Wins/Losses<b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -43,10 +45,10 @@
                             <li><a href="/wl">Total</a></li>
                         </ul>
                     </li>
-        <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
-        <li <?=activeIfMatch("survivors")?>><a href="/survivors">Survivors</a></li>
-        <li class="nav-divider"></li>
-        <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
+<!--        <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
+        <li <?=activeIfMatch("survivors")?>><a href="/survivors">Survivors</a></li>-->
+        
+          <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
 
 
       </ul>
@@ -66,6 +68,10 @@
     <div class="container text-center">
         <p class="navbar-text col-md-12 col-sm-12 col-xs-12">    &copy; 2015. This site is not affiliated with 1C Game Studios nor with 777 Studios. Official site of the game is: <a href="http://www.il2sturmovik.com">www.il2sturmovik.com</a></p>
     </div>
+    <div class="container text-center text-muted small">
+        Time zone:&nbsp<?=$this->e($tz)?>
+    </div>
+
 </footer>
 
 <?php $this->insert('partial_usermodal') ?>
@@ -74,10 +80,16 @@
 
 </body>
 
-<script src="/js/jquery.min.js"></script>    
+<script src="/js/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script src="//cdn.datatables.net/scroller/1.2.2/js/dataTables.scroller.min.js"></script>
+
+<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'></script>
+
+
 <script src="/js/il2info.js"></script>
 
 </html>

@@ -24,7 +24,7 @@ class TopDataTable
     
     public function GetJSON()
     {
-        return json_encode($this);
+        return json_encode($this, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES);
     }
     
 }

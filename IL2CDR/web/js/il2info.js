@@ -5,7 +5,6 @@
 $.extend($.fn.dataTable.defaults, {    
     ordering: false,
     pageLength: 10,
-    deferLoading: playersCount,
     pagingType: "full_numbers",
     dom: '<"toolbar">frtip',
     language: {
@@ -23,7 +22,9 @@ $(document).ready(function () {
         ajax: {
             url: '/json/wl/',
             type: 'GET'
-        }
+        },
+        deferLoading: playersCount,
+
     });
     $('#table_wlpvp').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
@@ -32,7 +33,8 @@ $(document).ready(function () {
         ajax: {
             url: '/json/wlpvp/',
             type: 'GET'
-        }
+        },
+        deferLoading: playersCount,
     });
     $('#table_wlpve').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
@@ -41,7 +43,8 @@ $(document).ready(function () {
         ajax: {
             url: '/json/wlpve/',
             type: 'GET'
-        }
+        },
+        deferLoading: playersCount,
     });
 
     $('#table_snipers').on('processing.dt', function (e, settings, processing) {
@@ -51,12 +54,46 @@ $(document).ready(function () {
         ajax: {
             url: '/json/snipers/',
             type: 'GET'
-        }
+        },
+        deferLoading: playersCount,
     });
     $('#table_survivors').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
     });
 
+    var missionTable = $('#table_missions').DataTable({
+        serverSide: true,
+        ajax: {
+            url: '/json/missions/',
+            type: 'GET'
+        },
+        language: {
+            processing: "Loading data...",
+            searchPlaceholder: "Server name, start/end time"
+        },
+        dom: "rftS",
+        paging: true,
+        scrollY: 400,
+        scroller: {
+        loadingIndicator: true,
+        deferLoading: missionCount,
+    }
+    });
+
+    var tz = jstz.determine();        
+        
+    if (typeof (tz) === 'undefined') {
+        timeZone = '';
+    }
+    else {
+        timeZone = tz.name(); 
+    }
+
+    $.cookie("tz", timeZone);
+
     $("div.toolbar").html('');
 });
+
+
+

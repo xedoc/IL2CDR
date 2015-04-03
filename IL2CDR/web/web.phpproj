@@ -28,6 +28,7 @@
     <Compile Include="Model\Mailer.php" />
     <Compile Include="Model\MissionEvent.php" />
     <Compile Include="Model\MySQL.php" />
+    <Compile Include="Model\TZ.php" />
     <Compile Include="Model\TopDataTable.php" />
     <Compile Include="Model\TopScore.php" />
     <Compile Include="Model\Utils.php" />
@@ -362,6 +363,8 @@
     <Compile Include="templates\missions.php" />
     <Compile Include="templates\partial_jsconfig.php" />
     <Compile Include="templates\partial_toptable.php" />
+    <Compile Include="templates\svg\luft.php" />
+    <Compile Include="templates\svg\star.php" />
     <Compile Include="templates\wlpve.php" />
     <Compile Include="templates\wlpvp.php" />
     <Compile Include="templates\mail_confirmation.php" />
@@ -422,6 +425,7 @@
     <Folder Include="Slim\Http\" />
     <Folder Include="Slim\Middleware\" />
     <Folder Include="templates\" />
+    <Folder Include="templates\svg\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="css\bootstrap.css" />
@@ -433,6 +437,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="images\ajax_loader.gif" />
+    <Content Include="js\addclear.js" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
     <Content Include="js\il2info.js" />

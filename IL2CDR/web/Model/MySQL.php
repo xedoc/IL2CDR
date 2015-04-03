@@ -1,5 +1,6 @@
 <?php
 require_once 'iDatabase.php';
+require_once 'TZ.php';
 /**
  * MySQL short summary.
  *
@@ -14,14 +15,25 @@ class MySQL implements iDatabase
     private $my;
     public $IsConnected = false;
     private $connection;
+    
     function __construct()
     {
         $this->config = include(__DIR__ . '/../config.php');
+        $this->timeZone = new TZ();
         $this->connect();
     }
     public function nextresult()
     {
         $this->my->next_result();
+    }
+    public function execute($query)
+    {
+        if( $this->IsConnected )
+        {
+            $this->my->real_query( $query );
+            $this->my->store_result();
+        }
+        
     }
     public function query($query)
     {
@@ -45,8 +57,8 @@ class MySQL implements iDatabase
             return null;
         
         $this->TouchCache( $proc );
-        $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
-        $result = $this->my->store_result();
+        $result = $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
+        $res = $this->my->store_result();
         if( !$result )
         {
             echo $this->my->error;
@@ -61,9 +73,15 @@ class MySQL implements iDatabase
         if( !$this->IsConnected )
             return;
         
-        $this->query( sprintf("SET %s", $this->GetSetParams( $params ) ));
+        $this->execute( sprintf("SET %s", $this->GetSetParams( $params ) ));
     }
     
+    public function SetTimeZone()
+    {
+        $timezone = new TZ();
+        $this->execute(sprintf('SET @UserTZ="%s"',$timezone->GetTimeZone()));
+        
+    }
     public function connect()
     {
         try
@@ -73,8 +91,10 @@ class MySQL implements iDatabase
                 $this->config["mysql_pass"],
                 $this->config["mysql_db"]);        
         
+
             if (!mysqli_connect_errno()) { 
                 $this->IsConnected = true;
+                
             }
         	    
         }
