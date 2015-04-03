@@ -146,6 +146,7 @@ class TopScore
             $result->close();
             $this->db->nextresult();
             $json = $table->GetJSON();
+
             return $json;
         }
         return $default;        

@@ -40,6 +40,7 @@ class MySQL implements iDatabase
         $result = false;
         if( $this->IsConnected )
         {
+            $this->SetTimeZone();       
             $result = $this->my->query($query);
         }
         
@@ -56,6 +57,7 @@ class MySQL implements iDatabase
         if( !$this->IsConnected )
             return null;
         
+ 
         $this->TouchCache( $proc );
         $result = $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
         $res = $this->my->store_result();
@@ -79,7 +81,7 @@ class MySQL implements iDatabase
     public function SetTimeZone()
     {
         $timezone = new TZ();
-        $this->execute(sprintf('SET @UserTZ="%s"',$timezone->GetTimeZone()));
+        $this->execute(sprintf("SET @UserTZ='%s'", $timezone->GetTimeZone()));
         
     }
     public function connect()
