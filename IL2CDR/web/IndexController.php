@@ -18,6 +18,7 @@ class IndexController
     private $templates;
     private $cache;
     private $top;
+    private $tz;
     function __construct( League\Plates\Engine $templates)
     {
     	$this->templates = $templates;
@@ -25,7 +26,7 @@ class IndexController
         $onpage = 10;
         $this->top = new TopScore();
         $missions = json_decode( $this->top->GetMissions(1,0,$onpage,null));
-        $tz = new TZ();
+        $this->tz = new TZ();
         $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
         $this->templates->addData([
             'isloggedin' => $auth->IsLoggedIn(),
@@ -37,7 +38,7 @@ class IndexController
             'table_missions' => $missions,
             'playersCount' => $totalWL->recordsTotal,
             'missionCount' => $missions->recordsTotal,
-            'tz' => $tz->GetTimeZone(),
+            'tz' => $this->tz->GetTimeZone(),
             ]);      
     }
     public function Get10minutesCache($name)
@@ -111,12 +112,12 @@ class IndexController
     public function GetJsonFromCache( $type, $draw, $start, $length, $search )
     {
         $playerCacheStatus = __c()->get('table_players');
-        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus ));            
+        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ));            
     }
     public function AddJsonToCache( $type, $draw, $start, $length, $search, $content )
     {
         $playerCacheStatus = __c()->get('table_players');
-        __c()->set( sprintf("%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus ), $content, 60000);
+        __c()->set( sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ), $content, 60000);
         return $content;
     }
     public function GetJsonWlPvP($request)
