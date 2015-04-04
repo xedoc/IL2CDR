@@ -44,25 +44,26 @@ class IndexController
     public function Get10minutesCache($name)
     {
         $token = null;
+
         if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
             $token = $_COOKIE['authtoken'];
         
         if( $token == null )
         {
-            $content = __c()->get($name);
+            $content = __c()->get($name . '_' . $this->tz->GetTimeZone());
             if( $content == null )
             {
                 $content = $this->templates->render($name);
-                __c()->set($name, $content,600);                   
+                __c()->set($name . '_' . $this->tz->GetTimeZone(), $content,600);                   
             }                    
         }
         else
         {
-            $content = __c()->get($token.$name);
+            $content = __c()->get($token.$name . '_' . $this->tz->GetTimeZone());
             if( $content == null )
             {
                 $content = $this->templates->render($name);
-                __c()->set($token.$name, $content ,600);
+                __c()->set($token.$name . '_' . $this->tz->GetTimeZone() , $content ,600);
             }
             
         }
@@ -73,7 +74,7 @@ class IndexController
     }
     public function Get10minutesTopCache($draw,$start,$length, $search, $fallback)
     {
-        $name = $draw . '_' . $start . '_' . $length . '_' . $search;
+        $name = $draw . '_' . $start . '_' . $length . '_' . $search . '_' . $this->tz->GetTimeZone();
         $token = null;
         
         if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
