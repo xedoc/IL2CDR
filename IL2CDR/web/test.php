@@ -1,11 +1,11 @@
 <?php
-require_once('phpfastcache.php');
+require 'Model/FifoPipe.php';
 
-//$cache = new phpFastCache("files");
+$pipe = new FifoPipe("test");
 
-echo 'before: ' .  __c()->get("prodcut"); 
-__c()->set("prodcut", "test", 600); 
-echo ' after:' .  __c()->get("prodcut"); 
-
+if( $_GET['w'] == 'w' )
+    $pipe->Write('test');
+else
+    $pipe->Read();
 
 ?>

@@ -48,6 +48,7 @@
     <Compile Include="Scripts\GlobalStatistics.cs" />
     <Compile Include="Scripts\LocalStatistics.cs" />
     <Compile Include="Scripts\Example.cs" />
+    <Compile Include="Scripts\WebRcon.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

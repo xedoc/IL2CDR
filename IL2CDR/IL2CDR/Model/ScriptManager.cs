@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using CSScriptLibrary;
 using IL2CDR.Properties;
 
@@ -73,14 +74,14 @@ namespace IL2CDR.Model
                 if (!(script as IScriptConfig).Config.IsEnabled)
                     continue;
 
-                script.OnApplicationStartup(null);
+                script.OnApplicationStartup( Application.Current as App );
             }
         }
         public void RunShutdownMethod()
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach (IActionScript script in actScripts)
-                script.OnApplicationShutdown(null);
+                script.OnApplicationShutdown( Application.Current as App );
         }
 
         public void RunActionScripts( object data )

@@ -24,6 +24,7 @@
     <Compile Include="Model\Auth.php" />
     <Compile Include="Model\class.phpmailer.php" />
     <Compile Include="Model\class.smtp.php" />
+    <Compile Include="Model\FifoPipe.php" />
     <Compile Include="Model\iDatabase.php" />
     <Compile Include="Model\Mailer.php" />
     <Compile Include="Model\MissionEvent.php" />
@@ -384,6 +385,7 @@
     <Compile Include="templates\wl.php" />
     <Compile Include="templates\layout.php" />
     <Compile Include="test.php" />
+    <Compile Include="test2.php" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="css\" />
