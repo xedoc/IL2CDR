@@ -83,6 +83,7 @@ namespace IL2CDR.Model
         public Guid EventID { get; set; }
         public DateTime EventTime { get; set; }
         public DateTime MissionStartTime { get; set; }
+        public string MissionFile { get; set; }
         
         [JsonIgnore]
         public Dictionary<string, string> RawParameters { get; set; }
