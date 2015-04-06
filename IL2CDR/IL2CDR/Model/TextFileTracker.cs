@@ -11,7 +11,7 @@ namespace IL2CDR.Model
     public class TextFileTracker : IStopStart
     {
         private FileSystemWatcher watcher;
-        private Dictionary<string, int> filePositions;
+        private Dictionary<string, long> filePositions;
         private ConcurrentQueue<string> logLinesQueue;
         private string folder, mask;
 
@@ -19,12 +19,12 @@ namespace IL2CDR.Model
         public Action<string> OnNewLine { get; set; }
         public Action<string> OnFileCreation { get; set; }
         public Action<string> OnChanged { get; set; }
-
+        public string CurrentFileName { get; set; }
         public TextFileTracker(string folder, string mask)
         {
             this.folder = folder;
             this.mask = mask;
-            filePositions = new Dictionary<string, int>();
+            filePositions = new Dictionary<string, long>();
         }
         public void SetupFolderWatcher()
         {
@@ -32,13 +32,15 @@ namespace IL2CDR.Model
                 return;
 
             watcher = new FileSystemWatcher(folder,mask);
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite;
+            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
             watcher.Changed += watcher_Changed;
+            watcher.Created += watcher_Changed;
             watcher.EnableRaisingEvents = true;
         }
         void watcher_Changed(object sender, FileSystemEventArgs e)
         {
             var path = e.FullPath;
+            CurrentFileName = path;
             if( e.ChangeType == WatcherChangeTypes.Created)
             {
                 if (OnFileCreation != null)
@@ -73,8 +75,8 @@ namespace IL2CDR.Model
             
         }
         private void ReadNewLines( string path )
-        {            
-            if( !filePositions.ContainsKey(path))
+        {
+            if (!filePositions.ContainsKey(path))
                 filePositions.Add(path, 0);
 
             var openException = Util.Try(() => {
@@ -89,6 +91,8 @@ namespace IL2CDR.Model
                             if (e != null)
                                 Log.WriteError("Error reading line from {0} {1}", path, e.Message);
                         }
+                        if( reader.BaseStream != null && reader.BaseStream.Position >= 0 )
+                            AddFileOffset( path, reader.BaseStream.Position );
                     }
                 }            
             });
@@ -96,6 +100,20 @@ namespace IL2CDR.Model
             if (openException != null)
                 Log.WriteError("Can't open a file {0} {1}", path, openException.Message);
 
+        }
+        public void AddFileOffset( string path, long offset )
+        {
+
+            if( filePositions != null && 
+                !String.IsNullOrWhiteSpace(path) && 
+                offset >= 0 )
+            {
+                if (!filePositions.ContainsKey(path))
+                    filePositions.Add(path, offset);
+                else
+                    filePositions[path] = offset;
+
+            }
         }
         public void Start()
         {

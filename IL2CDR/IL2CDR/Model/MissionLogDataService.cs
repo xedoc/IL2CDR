@@ -72,8 +72,12 @@ namespace IL2CDR.Model
             tracker = new TextFileTracker(MissionLogFolder, mask);
             tracker.OnNewLine = (line) => {
                 var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
+                
                 if( data != null && actionManager != null)
                 {
+                    var header = data as MissionLogEventHeader;
+                    header.MissionFile = Path.GetFileName(tracker.CurrentFileName);
+
                     AddHistory(data);
                     actionManager.ProcessAction(data);
                 }
@@ -153,17 +157,27 @@ namespace IL2CDR.Model
 
 
             var missionFiles = Util.GetFilesSortedByTime(MissionLogFolder, String.Format("missionReport({0})[*].txt", missionDateTimePrefix), true);
-
+            
             var readException = Util.Try(() => {
                 foreach (var file in missionFiles)
                 {
-                    var lines = File.ReadAllLines(file);
-                    if (lines != null)
+                    var fileInfo = new FileInfo(file);
+                    if( fileInfo.Length > 0 && !String.IsNullOrWhiteSpace(file))
                     {
-                        foreach (var line in lines)
+                        tracker.AddFileOffset(file, fileInfo.Length);
+                        var lines = File.ReadAllLines(file);
+                        if (lines != null)
                         {
-                            var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
-                            AddHistory(data);
+                            foreach (var line in lines)
+                            {
+                                var data = MissionLogDataBuilder.GetData(line, MissionStartDateTime, GetCurrentEventNumber(), server);
+                                if( data is MissionLogEventHeader )
+                                {
+                                    var header = data as MissionLogEventHeader;
+                                    header.MissionFile = Path.GetFileName(file);
+                                    AddHistory(data);
+                                }
+                            }
                         }
                     }
                 }                

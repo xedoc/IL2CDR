@@ -162,7 +162,11 @@ namespace IL2CDR.Scripts
                 data is MissionLogEventObjectiveCompleted ||
                 !(data is MissionLogEventHeader))
             {
-
+                //if( data is MissionLogEventHeader )
+                //{
+                //    var header = data as MissionLogEventHeader;
+                //    Log.WriteInfo("{0} {1} {2}",header.MissionFile, header.EventTime, header.Type);
+                //}
                 if (data is MissionLogEventKill)
                 {
                     var kill = data as MissionLogEventKill;
