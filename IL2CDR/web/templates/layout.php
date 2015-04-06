@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -14,7 +15,7 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css"/>
     <link rel="stylesheet" href="/css/stats.css" type="text/css" />
     <link rel="stylesheet" href="//cdn.datatables.net/scroller/1.2.2/css/dataTables.scroller.css" type="text/css" />
-    <?php $this->insert('partial_jsconfig') ?>
+<?php $this->insert('partial_jsconfig') ?>
 
 
 </head>
@@ -80,13 +81,13 @@
 
 </body>
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="//cdn.datatables.net/scroller/1.2.2/js/dataTables.scroller.min.js"></script>
-
 <script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'></script>
 
 

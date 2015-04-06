@@ -60,29 +60,23 @@ class TopScore
             $c2total = $row->C2PlanesScore + $row->C2GroundScore;
             if( $c1total == $c2total )
             {
-                $c1class = 'missiondraw';
+                $c1class = '';
                 $c2class = $c1class;
             }
             else if( $c1total > $c2total)
             {
                 $c1class = 'missionwon';
-                $c2class = 'missionlost';
+                $c2class = '';
             }
             else
             {
-                $c1class = 'missionlost';
+                $c1class = '';
                 $c2class = 'missionwon';
             }            
                 return (object)array(
-                        '0' => $row->ServerName,
-                        '1' => $row->MissionStartTime,                    
-                        '2' => empty($row->MissionEndTime) ? 'Not finished' : $row->MissionEndTime,
-                        '3' => $row->C1PlanesScore,
-                        '4' => $row->C1GroundScore,
-                        '5' => sprintf('<span class="%s">%s</span>', $c1class, $c1total),
-                        '6' => $row->C2PlanesScore,
-                        '7' => $row->C2GroundScore,
-                        '8' => sprintf('<span class="%s">%s</span>', $c2class, $c2total),
+                        '0' => sprintf("<p>%s</p> <p class=\"text-muted xsmall\">%s - %s</p>", $row->ServerName,$row->MissionStartTime,empty($row->MissionEndTime) ? 'Not finished' : $row->MissionEndTime),
+                        '1' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C1PlanesScore,$row->C1GroundScore, $c1class, $c1total),
+                        '2' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C2PlanesScore,$row->C2GroundScore, $c2class, $c2total),
                         "DT_RowId" => "mis" . $i,                
                     );
             });

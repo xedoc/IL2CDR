@@ -4,9 +4,7 @@
 });
 $.extend($.fn.dataTable.defaults, {    
     ordering: false,
-    pageLength: 10,
     pagingType: "full_numbers",
-    dom: '<"toolbar">frtip',
     language: {
         processing: "Loading data...",
         searchPlaceholder: "Search player"
@@ -18,6 +16,8 @@ $(document).ready(function () {
         $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
     } )
     .DataTable({
+        dom: '<"toolbar">frtip',
+        pageLength: 10,
         serverSide: true,
         ajax: {
             url: '/json/wl/',
@@ -29,6 +29,8 @@ $(document).ready(function () {
     $('#table_wlpvp').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
+        dom: '<"toolbar">frtip',
+        pageLength: 10,
         serverSide: true,
         ajax: {
             url: '/json/wlpvp/',
@@ -39,6 +41,8 @@ $(document).ready(function () {
     $('#table_wlpve').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
+        dom: '<"toolbar">frtip',
+        pageLength: 10,
         serverSide: true,
         ajax: {
             url: '/json/wlpve/',
@@ -50,6 +54,8 @@ $(document).ready(function () {
     $('#table_snipers').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
+        dom: '<"toolbar">frtip',
+        pageLength: 10,
         serverSide: true,
         ajax: {
             url: '/json/snipers/',
@@ -63,6 +69,9 @@ $(document).ready(function () {
     });
 
     var missionTable = $('#table_missions').DataTable({
+        "columnDefs": [
+            { className: "tdcenter", "targets": [ 1, 2 ] }
+        ],
         serverSide: true,
         ajax: {
             url: '/json/missions/',
@@ -72,13 +81,14 @@ $(document).ready(function () {
             processing: "Loading data...",
             searchPlaceholder: "Server name, start/end time"
         },
+        deferLoading: missionCount,
         dom: "rftS",
+        deferRender: true,
         paging: true,
         scrollY: 400,
         scroller: {
-        loadingIndicator: true,
-        deferLoading: missionCount,
-    }
+            loadingIndicator: true,
+        }
     });
 
     var tz = jstz.determine();        

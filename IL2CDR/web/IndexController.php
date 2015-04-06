@@ -25,7 +25,7 @@ class IndexController
         $auth = new Auth();
         $onpage = 10;
         $this->top = new TopScore();
-        $missions = json_decode( $this->top->GetMissions(1,0,$onpage,null));
+        $missions = json_decode( $this->top->GetMissions(1,0,80,null));
         $this->tz = new TZ();
         $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
         $this->templates->addData([

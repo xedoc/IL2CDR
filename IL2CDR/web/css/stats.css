@@ -1,4 +1,46 @@
-﻿input[type="search"] {
+﻿.mutedicon path {
+    fill : #828282;
+}
+.icon-plane {
+    background-image : url("/svg/plane.svg");
+    background-repeat : no-repeat !important;    
+    padding-left:20px !important;
+    padding-bottom:5px;
+    display:inline-block;
+}
+.no-svg .icon-plane {
+    background-image : url("/images/plane.png");
+    background-repeat : no-repeat !important;    
+    padding-left:20px !important;
+    padding-bottom:5px;
+    display:inline-block;
+}
+
+.icon-ground {
+    background-image : url("/svg/truck.svg") ;
+    background-repeat : no-repeat !important;    
+    padding-left:36px !important;
+    padding-bottom:5px;
+    margin-left : 5px;
+    display:inline-block;
+}
+
+.no-svg .icon-ground {
+    background-image : url("/images/truck.png");
+    background-repeat : no-repeat !important;    
+    padding-left:36px !important;
+    padding-bottom:5px;
+    margin-left : 5px;
+    display:inline-block;
+}
+
+.icon-total {
+    display:block;
+}
+.xsmall {
+    font-size : 70%;
+}
+input[type="search"] {
     width:200px !important;
 
 }
@@ -23,7 +65,7 @@ div.DTS div.dataTables_scroll {
 }
 .top-buffer { margin-top:40px; }
 
-.table thead>tr>th.tdcenter{
+.table .tdcenter{
     vertical-align: middle !important;
     text-align : center !important;
     padding-left: 0px !important;
@@ -51,7 +93,7 @@ div.DTS tbody tr.even {
 
 ::-webkit-scrollbar
 {
-	width: 24px;
+	width: 16px;
     border-width: 1px !important;
 	background-color: #222222 !important;
 }
@@ -63,13 +105,14 @@ div.DTS tbody tr.even {
     min-height:45px;
 }
 
-span.missionlost {
-    color : red;
+.missionlost {
+    color : #AB0000;    
 }
-span.missionwon {
+.missionwon {
     color : green;
+    font-weight : bold;
 }
-span.missiondraw {
+.missiondraw {
     color : yellow;
 }
 
