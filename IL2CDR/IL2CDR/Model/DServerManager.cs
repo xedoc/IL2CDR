@@ -16,7 +16,7 @@ namespace IL2CDR.Model
         public DServerManager()
         {
             dserverProcMonitor = new ProcessMonitor("DServer.exe");
-            DServers = new ObservableCollection<Server>();
+            Servers = new ObservableCollection<Server>();
             dserverProcMonitor.AddProcess = (process) => {
                 AddServer(GetServer(process));
             };
@@ -26,7 +26,7 @@ namespace IL2CDR.Model
             };
             dserverProcMonitor.Start();
         }
-        public ObservableCollection<Server> DServers { get; set; }
+        public ObservableCollection<Server> Servers { get; set; }
 
         public void Start()
         {
@@ -49,13 +49,13 @@ namespace IL2CDR.Model
         {
             lock( lockDservers )
             {
-                var server = DServers.FirstOrDefault(ds => ds != null && ds.Process != null && ds.Process.ProcessId == processId);
+                var server = Servers.FirstOrDefault(ds => ds != null && ds.Process != null && ds.Process.ProcessId == processId);
                 if( server != null )
                 {
                     server.MissionLogService.Stop();
                     Util.Try(() => server.Rcon.Stop());
                     UI.Dispatch(() => {
-                        DServers.Remove(server);
+                        Servers.Remove(server);
                         dserverProcMonitor.Remove(processId);
                     });
                 }
@@ -63,7 +63,7 @@ namespace IL2CDR.Model
         }
         private void AddServer(Server server)
         {
-            var existingDServer = DServers.FirstOrDefault(s => s.Rcon.Config.GameRootFolder.Equals(server.Rcon.Config.GameRootFolder));
+            var existingDServer = Servers.FirstOrDefault(s => s.Rcon.Config.GameRootFolder.Equals(server.Rcon.Config.GameRootFolder));
             if( existingDServer != null )
             {
                 var process = Process.GetProcessById((int)existingDServer.Process.ProcessId);
@@ -77,7 +77,7 @@ namespace IL2CDR.Model
             UI.Dispatch(() =>
             {
                 lock (lockDservers)
-                    DServers.Add(server);
+                    Servers.Add(server);
             });
             Task.Factory.StartNew((obj) => {
                 var srv = (obj as Server);
@@ -100,10 +100,22 @@ namespace IL2CDR.Model
 
             }, server);
         }
+        public Server this[string key]
+        {
+            get {
+                    return GetServerById(key);
+                }   
+        }
+        public Server GetServerById( string id )
+        {
+            return Servers.FirstOrDefault(s => s != null &&
+                s.ServerId != null &&
+                s.ServerId.ToString().Equals(id, StringComparison.InvariantCultureIgnoreCase));
+        }
         public void Stop()
         {
             dserverProcMonitor.Stop();
-            foreach( var server in DServers )
+            foreach( var server in Servers )
             {
                 Util.Try(() => server.Rcon.Stop());
                 server.MissionLogService.Stop();

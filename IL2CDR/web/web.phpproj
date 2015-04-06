@@ -33,6 +33,7 @@
     <Compile Include="Model\TopDataTable.php" />
     <Compile Include="Model\TopScore.php" />
     <Compile Include="Model\Utils.php" />
+    <Compile Include="Model\WebRcon.php" />
     <Compile Include="phpfastcache.php">
       <Publishable>False</Publishable>
     </Compile>

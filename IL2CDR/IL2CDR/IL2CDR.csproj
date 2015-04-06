@@ -117,6 +117,10 @@
       <Link>Scripts\LogParser.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Scripts\Scripts\WebRcon.cs">
+      <Link>Scripts\WebRcon.cs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Control\ScrollingTextBox.cs" />
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Interactiviy\PasswordBoxAssistant.cs" />

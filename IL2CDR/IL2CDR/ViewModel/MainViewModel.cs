@@ -37,8 +37,8 @@ namespace IL2CDR.ViewModel
             Config = Properties.Settings.Default.Config;
             
             dserverManager = (Application.Current as App).DServerManager;
-            dserverManager.DServers.CollectionChanged += DServers_CollectionChanged;
-            dserverManager.With(x => x.DServers).Do( x => {
+            dserverManager.Servers.CollectionChanged += DServers_CollectionChanged;
+            dserverManager.With(x => x.Servers).Do( x => {
                 ServerList = x;
                 UpdateServerList();
             });
