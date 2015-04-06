@@ -54,7 +54,32 @@ class Auth
 
         return false;
     }
-    
+    public function GetServers()
+    {
+        if( !$this->db->IsConnected )
+            return array();
+               
+        $params = array(
+                'AuthToken' => $_COOKIE['authtoken']
+            );
+        $this->db->setvars($params);
+        $result = $this->db->callproc( 'GetServers ');
+        $servers = array();
+        if( $result )
+        {
+            while( $obj = $result->fetch_object())
+            {
+                if( $obj )
+                {
+                    $server = new Server( $obj->ServerId, $obj->ServerName );
+                    $server->IsHidden = $obj->IsHidden;
+                    $servers[] = $server;
+                }
+            }
+        }
+        return $servers;
+        
+    }
     public function AddServerOwner()
     {
         if( !$this->db->IsConnected )

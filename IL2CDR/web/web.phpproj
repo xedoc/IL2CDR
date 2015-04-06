@@ -29,6 +29,7 @@
     <Compile Include="Model\Mailer.php" />
     <Compile Include="Model\MissionEvent.php" />
     <Compile Include="Model\MySQL.php" />
+    <Compile Include="Model\Server.php" />
     <Compile Include="Model\TZ.php" />
     <Compile Include="Model\TopDataTable.php" />
     <Compile Include="Model\TopScore.php" />
