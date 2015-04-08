@@ -31,7 +31,7 @@ class MySQL implements iDatabase
         if( $this->IsConnected )
         {
             $this->my->real_query( $query );
-            $this->my->store_result();
+            //$this->my->store_result();
         }
         
     }
@@ -42,6 +42,14 @@ class MySQL implements iDatabase
         {
             $this->SetTimeZone();       
             $result = $this->my->query($query);
+            if( $result && isset($result->num_rows) && $result->num_rows <= 0 )
+            {
+                $this->nextresult();
+                return false;
+                //$this->my->store_result();
+            }
+            else if( !$result )
+                return false;
         }
         
         if( !$result )
@@ -60,7 +68,19 @@ class MySQL implements iDatabase
  
         $this->TouchCache( $proc );
         $result = $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
-        $res = $this->my->store_result();
+
+        if( $result && isset($result->num_rows) && $result->num_rows <= 0 )
+        {
+            $this->nextresult();
+            return false;
+        }
+        else if( !$result )
+            return false;
+        
+        //$this->my->store_result();
+        //if( $result )
+        //    $this->my->store_result();
+        //$this->nextresult();
         if( !$result )
         {
             echo $this->my->error;
@@ -69,7 +89,10 @@ class MySQL implements iDatabase
         return $result;
         
     }
-    
+    public function getlasterror()
+    {
+        return $this->my->error;
+    }
     public function setvars($params)
     {
         if( !$this->IsConnected )

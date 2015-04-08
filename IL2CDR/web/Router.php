@@ -50,6 +50,7 @@ class Router
     	$this->app->get('/confirm/:token', function($token) { echo $this->indexController->GetConfirm($token); } );
     	$this->app->get('/logout/', function() { $this->indexController->GetLogout(); $this->app->redirect('/'); } );
     	$this->app->get('/missions/', function() { echo $this->indexController->GetMissions(); } );
+    	$this->app->get('/servers/', function() { echo $this->indexController->GetServers(); } );
 
         //top score json
         $this->app->get('/json/wl/', function() { echo $this->indexController->GetJsonWl($this->app->request); } );
@@ -63,6 +64,10 @@ class Router
             echo $this->indexController->PostEvent( $unzipped ); 
             unset($unzipped);
             $unzipped = null;
+        });
+        $this->app->post('/update/servers', function() { 
+            $this->indexController->PostServers( $this->app->request );
+            $this->app->redirect('/servers');
         });
         $this->app->post('/signup/', function() { 
             echo $this->indexController->PostSignUp( $this->app->request ); 

@@ -123,7 +123,10 @@ class TopScore
         {
             $count = $result->num_rows;
             if( $count <= 0 )
-                return $default;
+            {
+                return $default;                
+            }
+             
             
             $table = new TopDataTable($draw, 0, $count, array());
             

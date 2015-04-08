@@ -50,35 +50,10 @@ class Auth
             {
                 return $obj->result;
             }
+            $this->db->nextresult();
         }
 
         return false;
-    }
-    public function GetServers()
-    {
-        if( !$this->db->IsConnected )
-            return array();
-               
-        $params = array(
-                'AuthToken' => $_COOKIE['authtoken']
-            );
-        $this->db->setvars($params);
-        $result = $this->db->callproc( 'GetServers ');
-        $servers = array();
-        if( $result )
-        {
-            while( $obj = $result->fetch_object())
-            {
-                if( $obj )
-                {
-                    $server = new Server( $obj->ServerId, $obj->ServerName );
-                    $server->IsHidden = $obj->IsHidden;
-                    $servers[] = $server;
-                }
-            }
-        }
-        return $servers;
-        
     }
     public function AddServerOwner()
     {
@@ -111,7 +86,7 @@ class Auth
                     return 'OK';
                 }
             }
-                
+            $this->db->nextresult();
         }
 
         return "Unknown error";
@@ -123,7 +98,7 @@ class Auth
         {
             $token =  $_COOKIE['authtoken'];
             $result = $this->db->query( sprintf('CALL Login(%s,%s,%s)', $this->db->EaQ($this->email), $this->db->EaQ($this->password), $this->db->EaQ($token) ));            
-            if( isset( $result ))
+            if( $result )
             {
                 if( $obj = $result->fetch_object() )
                 {
@@ -134,6 +109,7 @@ class Auth
                         return true;
                     }
                 }
+                $this->db->nextresult();
             }             
         }
         return false;
@@ -159,6 +135,7 @@ class Auth
                  }
                  
              }
+             $this->db->nextresult();
          }
         
         return false;        

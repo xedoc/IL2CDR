@@ -2,6 +2,7 @@
 require_once 'Model/MissionEvent.php';
 require_once 'Model/Auth.php';
 require_once 'Model/TopScore.php';
+require_once 'Model/Servers.php';
 require_once 'Model/TZ.php';
 require 'phpfastcache.php';
 
@@ -19,19 +20,20 @@ class IndexController
     private $cache;
     private $top;
     private $tz;
+    private $auth;
     function __construct( League\Plates\Engine $templates)
     {
     	$this->templates = $templates;
-        $auth = new Auth();
+        $this->auth = new Auth();
         $onpage = 10;
         $this->top = new TopScore();
         $missions = json_decode( $this->top->GetMissions(1,0,80,null));
         $this->tz = new TZ();
         $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
         $this->templates->addData([
-            'isloggedin' => $auth->IsLoggedIn(),
-            'currentuser' => $auth->CurrentUser,
-            'stattoken' => $auth->StatToken,
+            'isloggedin' => $this->auth->IsLoggedIn(),
+            'currentuser' => $this->auth->CurrentUser,
+            'stattoken' => $this->auth->StatToken,
             'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
             'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
             'table_wltotal' => $totalWL,
@@ -183,6 +185,47 @@ class IndexController
         $result =  $this->top->GetMissions($draw,$start,$length, $search);
         return $this->AddJsonToCache( 'missions', $draw,$start,$length, $search, $result);
     }
+    public function GetServers()
+    {    
+        $auth = new Auth();
+           try{
+        $servers = new Servers();
+        }
+        catch(Exception $e)
+        {
+            echo $e->getMessage();
+        }
+        if( $auth->IsLoggedIn() )
+        {
+            return $this->templates->render('servers', ['servers' => $servers->GetServers()]);  
+        }
+        else
+        {
+            return $this->templates->render('message', ['message' => 'Authorization required!']);  
+        }    
+    }
+    public function PostServers($request)
+    {
+        $auth = new Auth();
+        
+        if( !$auth->IsLoggedIn() )
+        {
+            echo $this->templates->render('message', ['message' => 'Authorization required!']);  
+            die();
+        }
+
+        if( $request->isPost() )
+        {
+            $servers = new Servers();
+            $servers->UpdateServers( 
+                $request->post('servers'), 
+                $request->post('ishidden') );
+        }
+       
+    }
+    
+    
+    
     public function GetMissions()
     {
         return  $this->Get10minutesCache('missions');

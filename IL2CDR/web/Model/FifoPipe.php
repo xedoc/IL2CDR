@@ -24,25 +24,45 @@ class FifoPipe
             }
             else
             {
-                $this->filename = sprintf("\\\\%s\\pipe\\cdr%id", php_uname('n'), $id);
+                $this->filename = sprintf("testpipe", php_uname('n'));
+                touch($this->filename);
             }
         }
         
     }
     
     public function Write($text)
-    {
-        $pipe_write = fopen($this->filename, 'w+');
-        fwrite($pipe_write, "Hello world\n");
+    {        
+        $pipe_write = fopen($this->filename, 'w');
+        fwrite($pipe_write, "Hello world\n");        
         fclose($pipe_write);
     }
     
     public function Read()
     {       
-    	$pipe_read = fopen($this->filename, 'r+');
-        $output = fgets($pipe_read);
-        echo 'Received from the pipe: '. $output . "\n";
-        fclose($pipe_read);
+        touch($this->filename);
+    	$pipe_read = fopen($this->filename, 'r');
+        $output = fgets($pipe_read);                       
+        if (!function_exists('posix_mkfifo'))
+        {
+            $i = 10;
+           while(!$output)
+           {
+               usleep(500000);
+               $output = fgets($pipe_read);
+               $i--;
+               if( $i <= 0 )
+                   break;
+           }
+           fclose($pipe_read);
+           unlink($this->filename);
+        }
+        else
+        {
+            fclose($pipe_read);
+        }
+        echo 'Received from the pipe: '. $output . "\n";        
+
     }
     
 }

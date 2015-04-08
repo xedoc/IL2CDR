@@ -30,6 +30,7 @@
     <Compile Include="Model\MissionEvent.php" />
     <Compile Include="Model\MySQL.php" />
     <Compile Include="Model\Server.php" />
+    <Compile Include="Model\Servers.php" />
     <Compile Include="Model\TZ.php" />
     <Compile Include="Model\TopDataTable.php" />
     <Compile Include="Model\TopScore.php" />
@@ -368,7 +369,9 @@
     <Compile Include="templates\missions.php" />
     <Compile Include="templates\partial_jsconfig.php" />
     <Compile Include="templates\partial_svgicons.php" />
+    <Compile Include="templates\partial_tablecontent.php" />
     <Compile Include="templates\partial_toptable.php" />
+    <Compile Include="templates\servers.php" />
     <Compile Include="templates\svg\luft.php" />
     <Compile Include="templates\svg\plane.php" />
     <Compile Include="templates\svg\star.php" />
@@ -386,6 +389,7 @@
     <Compile Include="templates\snipers.php" />
     <Compile Include="templates\wl.php" />
     <Compile Include="templates\layout.php" />
+    <Compile Include="testw.php" />
     <Compile Include="test.php" />
     <Compile Include="test2.php" />
   </ItemGroup>
