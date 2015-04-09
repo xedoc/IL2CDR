@@ -128,6 +128,7 @@
     <Compile Include="Model\ActionScriptBase.cs" />
     <Compile Include="Model\AirField.cs" />
     <Compile Include="Model\AirFieldCollection.cs" />
+    <Compile Include="Model\Area.cs" />
     <Compile Include="Model\Bot.cs" />
     <Compile Include="Model\Collections.cs" />
     <Compile Include="Model\Config.cs" />

@@ -31,7 +31,7 @@ namespace IL2CDR.Model
             { EventType.GameObjectSpawn, (data) => data.With(x => x as MissionLogEventGameObjectSpawn)
                     .With(x => x.Object).Do(x => data.Server.GameObjects[x.Id] = x)},
             { EventType.Leave, (data) =>data.With(x => x as MissionLogEventPlayerLeave)
-                    .Do(x => data.Server.Players.PlayerLeave(x.NickId))},
+                    .Do(x => data.Server.Players.PlayerLeave(x.NickGuid))},
             { EventType.Kill, (data) => data.With(x => x as MissionLogEventKill)
                 .Do(x => data.Server.DestroyObject(x.TargetId))},
             { EventType.MissionStart, (data) => data.With(x => x as MissionLogEventStart)

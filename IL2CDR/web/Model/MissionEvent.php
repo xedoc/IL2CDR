@@ -141,7 +141,8 @@ class MissionEvent
                     {
                         $params += array(
                             'TargetPlayerID' => $this->db->EaQ( $event->TargetPlayer->NickId ),                            
-                            'TargetSortieID' => $this->db->EaQ( $event->TargetPlayer->SortieId )
+                            'TargetSortieID' => $this->db->EaQ( $event->TargetPlayer->SortieId ),
+                            'IsInAir' => $this->db->EaQ( $event->TargetPlayer->IsInAir ),
                             );
                     }
                     else

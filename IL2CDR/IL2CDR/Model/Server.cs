@@ -12,6 +12,7 @@ namespace IL2CDR.Model
 {
     public class Server : NotifyPropertyChangeBase
     {
+        private object lockOnlinePlayers = new object();
         [JsonIgnore]
         public RconConnection Rcon { get; set; }
         [JsonIgnore]
@@ -46,6 +47,28 @@ namespace IL2CDR.Model
         private void Initialize()
         {
             Players = new PlayersCollection();
+            Players.OnPlayerJoin = (player) => {
+                if( player == null )
+                    return;
+                if( !OnlinePlayers.Any( p => p.NickId.Equals( player.NickId )) )
+                {
+                    lock( lockOnlinePlayers )
+                    {
+                        OnlinePlayers.Add(player);
+                    }
+                }
+                    
+            };
+            Players.OnPlayerLeave = (player) => {
+                if (player == null)
+                {
+                    lock(lockOnlinePlayers )
+                    {
+                        OnlinePlayers.RemoveAll(p => p.NickId.Equals(player.NickId));
+                    }
+                }
+            };
+
             GameObjects = new GameObjectsCollection();
             AirFields = new AirFieldCollection();
             CoalitionIndexes = new List<CoalitionIndex>();
@@ -81,7 +104,36 @@ namespace IL2CDR.Model
             else
                 return -1;
         }
+        /// <summary>
+        /// The <see cref="OnlinePlayers" /> property's name.
+        /// </summary>
+        public const string OnlinePlayersPropertyName = "OnlinePlayers";
 
+        private ObservableCollection<Player> _onlinePlayers = new ObservableCollection<Player>();
+
+        /// <summary>
+        /// Sets and gets the OnlinePlayers property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        [JsonIgnore]
+        public ObservableCollection<Player> OnlinePlayers
+        {
+            get
+            {
+                return _onlinePlayers;
+            }
+
+            set
+            {
+                if (_onlinePlayers == value)
+                {
+                    return;
+                }
+
+                _onlinePlayers = value;
+                RaisePropertyChanged(OnlinePlayersPropertyName);
+            }
+        }
         /// <summary>
         /// The <see cref="CoalitionIndexes" /> property's name.
         /// </summary>

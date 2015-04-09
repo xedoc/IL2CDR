@@ -8,6 +8,9 @@ namespace IL2CDR.Model
 {
     public class PlayersCollection : Dictionary<int, Player>
     {
+        public Action<Player> OnPlayerLeave { get; set; }
+        public Action<Player> OnPlayerJoin { get; set; }
+
         private object lockList = new object();
 
         /// <summary>
@@ -59,7 +62,20 @@ namespace IL2CDR.Model
                 }
             }
         }
+        public void PlayerSpawn(Player player)
+        {
+            if (player == null)
+                return;
 
+            var existing = this.FirstOrDefault((pair) => pair.Value.NickId.Equals(player.NickId)).Value;
+            if( OnPlayerJoin != null )
+            {
+                if (existing == null)
+                    OnPlayerJoin(player);
+                else if (!player.IsOnline)
+                    OnPlayerJoin(existing);
+            }
+        }
         public void PlayerLeave(Guid nickId)
         {
             if (nickId != null && nickId != default(Guid))
@@ -70,7 +86,8 @@ namespace IL2CDR.Model
                     if (player != null)
                     {
                         player.IsOnline = false;
-                        player.IsInAir = false;
+                        if (OnPlayerLeave != null)
+                            OnPlayerLeave(player);
                     }
 
                 }
@@ -81,8 +98,6 @@ namespace IL2CDR.Model
             var player = this[id];
             if (player == null)
                 return;
-            Log.WriteInfo(id.ToString());
-            player.IsInAir = false;
             player.IsKilled = true;
         }
     }

@@ -140,23 +140,22 @@ namespace IL2CDR.Model
 
     }
 
-    //AType:21
+    //AType:21 Player leave
     //T:28250 AType:21 USERID:00000000-0000-0000-0000-000000000000 USERNICKID:00000000-0000-0000-0000-000000000000
     public class MissionLogEventPlayerLeave : MissionLogEventHeader
     {
-        public Guid NickId { get; set; }
-        public Guid LoginId { get; set; }
+        public Guid NickGuid { get; set; }
+        public Guid LoginGuid { get; set; }
 
         public MissionLogEventPlayerLeave(MissionLogEventHeader header) 
             : base(header)
         {
-            Guid nickId, loginId;
-            Guid.TryParse(RawParameters["USERNICKID"], out nickId);
-            Guid.TryParse(RawParameters["USERID"], out loginId);
+            NickGuid = RawParameters.GetGuid("USERNICKID");
+            LoginGuid = RawParameters.GetGuid("USERID");
         }
     }
 
-    //AType:20
+    //AType:20 Player join
     //USERID:xxxxxx-... USERNICKID:xxxxxx-...
     //Identify AType:20
     public class MissionLogEventPlayerJoin : MissionLogEventHeader
@@ -312,7 +311,7 @@ namespace IL2CDR.Model
     //PAYLOAD:0 FUEL:1.000 SKIN: WM:1
     //Another example with InAir=2
     //T:8120 AType:10 PLID:675841 PID:676865 BUL:1620 SH:0 BOMB:0 RCT:0 (133952.922,83.792,185683.047) IDS:00000000-0000-0000-0000-000000000000 LOGIN:00000000-0000-0000-0000-000000000000 NAME:NIK TYPE:Yak-1 ser.69 COUNTRY:101 FORM:0 FIELD:861184 INAIR:2 PARENT:-1 PAYLOAD:0 FUEL:0.380 SKIN: WM:1
-
+    //inair: 0 - in air, 1 - air strip, 2 - parking
     public class MissionLogEventPlaneSpawn : MissionLogEventHeader
     {        
         public Player Player { get; set; }
@@ -329,7 +328,7 @@ namespace IL2CDR.Model
             {
                 Id = RawParameters.GetInt("PID"),
                 Country = new Country(RawParameters.GetInt("COUNTRY")),
-                IsInAir = RawParameters.GetInt("INAIR") == 1 ? true : false,
+                IsInAir = RawParameters.GetInt("INAIR") == 0 ? true : false,
                 IsOnline = true,
                 LoginId = RawParameters.GetGuid("LOGIN"),
                 NickId = RawParameters.GetGuid("IDS"),
@@ -344,12 +343,13 @@ namespace IL2CDR.Model
                     Purpose = purpose == null ? null : purpose.Purpose,
                     Shells = RawParameters.GetInt("SH"),
                     Skin = RawParameters.GetString("SKIN"),
-                    WeaponMods = RawParameters.GetString("WM"),                    
+                    WeaponMods = RawParameters.GetString("WM"),
                 },
                 BotPilot = new GameObject(RawParameters.GetInt("PID"), "BotPilot"),
                 SortieId = EventID,
             };
             Player.CoalitionIndex = Server.GetCoalitionIndex(Player.Country);
+            Server.Players.PlayerSpawn(Player);
         }
     }
     //AType:9
@@ -424,6 +424,8 @@ namespace IL2CDR.Model
             Player = Server.Players[PlayerId];
             if (Player == null)
                 Bot = Server.GameObjects[PlayerId];
+            else
+                Player.IsInAir = false;
         }
     }
     //AType:5
@@ -443,8 +445,12 @@ namespace IL2CDR.Model
             Position = RawParameters.GetVector3D("POS");
 
             Player = Server.Players[PlayerId];
-            if( Player == null )
+            if (Player == null)
                 Bot = Server.GameObjects[PlayerId];
+            else
+                Player.IsInAir = true;
+
+
         }
     }
     //AType:4
