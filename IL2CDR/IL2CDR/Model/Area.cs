@@ -11,6 +11,7 @@ namespace IL2CDR.Model
     {
         private Vector3D[] vectors;
         private double minX, minY, maxX, maxY;
+
         public Area(Vector3D[] vectors )
         {
             minX = vectors.Min(v => v.X);
@@ -21,6 +22,9 @@ namespace IL2CDR.Model
             vectors.CopyTo(this.vectors, 0 );
         }
 
+        public int Coalition { get;set; }
+        public int AreaId { get; set; }
+
         public bool InBounds( Vector3D point )
         {
             if( point.X < minX || 
@@ -30,15 +34,15 @@ namespace IL2CDR.Model
                 return false;
             
             int length = vectors.Length;
-            bool result = true;
+            bool result = false;
             for (int i = 0, j = length - 1; i < length; j = i++)
             {
-                if (((vectors[i].Y > point.Z) != (vectors[j].Y > point.Z)) &&
+                if (((vectors[i].Z > point.Z) != (vectors[j].Z > point.Z)) &&
                  (point.X < (vectors[j].X - vectors[i].X) * (point.Z - vectors[i].Z) / (vectors[j].Z - vectors[i].Z) + vectors[i].X))
                     result = !result;
             }
             return result;
-
         }
+
     }
 }

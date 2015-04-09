@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using System.Windows.Media.Media3D;
 using Newtonsoft.Json;
 
 namespace IL2CDR.Model
@@ -254,6 +255,36 @@ namespace IL2CDR.Model
 
                 _airFields = value;
                 RaisePropertyChanged(AirFieldsPropertyName);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="Areas" /> property's name.
+        /// </summary>
+        public const string AreasPropertyName = "Areas";
+
+        private List<Area> _areas = new List<Area>();
+
+        /// <summary>
+        /// Sets and gets the Areas property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public List<Area> Areas
+        {
+            get
+            {
+                return _areas;
+            }
+
+            set
+            {
+                if (_areas == value)
+                {
+                    return;
+                }
+
+                _areas = value;
+                RaisePropertyChanged(AreasPropertyName);
             }
         }
 
