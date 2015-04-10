@@ -4,6 +4,8 @@ require_once 'Model/Auth.php';
 require_once 'Model/TopScore.php';
 require_once 'Model/Servers.php';
 require_once 'Model/TZ.php';
+require_once 'Model/Cache.php';
+require_once 'Model/Filter.php';
 require 'phpfastcache.php';
 
 /**
@@ -21,28 +23,47 @@ class IndexController
     private $top;
     private $tz;
     private $auth;
+    private $datacache;
     function __construct( League\Plates\Engine $templates)
     {
-    	$this->templates = $templates;
+    	$this->templates = $templates;               
         $this->auth = new Auth();
-        $onpage = 10;
+        $this->datacache = new Cache();
         $this->top = new TopScore();
-        $missions = json_decode( $this->top->GetMissions(1,0,80,null));
-        $this->tz = new TZ();
-        $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
-        $this->templates->addData([
-            'isloggedin' => $this->auth->IsLoggedIn(),
-            'currentuser' => $this->auth->CurrentUser,
-            'stattoken' => $this->auth->StatToken,
-            'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
-            'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
-            'table_wltotal' => $totalWL,
-            'table_missions' => $missions,
-            'playersCount' => $totalWL->recordsTotal,
-            'missionCount' => $missions->recordsTotal,
-            'tz' => $this->tz->GetTimeZone(),
-            ]);      
+        $this->tz = new TZ();        
+        
+        $data = $this->datacache->GetCache( 'start_page');
+        if( isset($data) && !empty($data) )
+        {
+            $this->templates->addData($data);
+        }
+        else
+        {
+            $servers = new Servers();
+            
+            $onpage = 10;
+            $missions = json_decode( $this->top->GetMissions(1,0,80,null));
+            $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
+            
+            $data = [ 'isloggedin' => $this->auth->IsLoggedIn(),                
+                'allservers' => $servers->GetVisibleServers(),
+                'currentuser' => $this->auth->CurrentUser,
+                'difficulties' => $servers->GetDifficulties(),
+                'stattoken' => $this->auth->StatToken,
+                'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
+                'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
+                'table_wltotal' => $totalWL,
+                'table_missions' => $missions,
+                'playersCount' => $totalWL->recordsTotal,
+                'missionCount' => $missions->recordsTotal,
+                'tz' => $this->tz->GetTimeZone(),
+                ];
+            $this->datacache->AddCache('start_page', 600, $data );
+            $this->templates->addData($data); 
+        }
+        
     }
+
     public function Get10minutesCache($name)
     {
         $token = null;
@@ -188,13 +209,8 @@ class IndexController
     public function GetServers()
     {    
         $auth = new Auth();
-           try{
         $servers = new Servers();
-        }
-        catch(Exception $e)
-        {
-            echo $e->getMessage();
-        }
+        
         if( $auth->IsLoggedIn() )
         {
             return $this->templates->render('servers', ['servers' => $servers->GetServers()]);  
@@ -204,6 +220,21 @@ class IndexController
             return $this->templates->render('message', ['message' => 'Authorization required!']);  
         }    
     }
+    public function PostFilter($request)
+    {
+        if( $request->isPost() )
+        {
+            $filter = new Filter();
+            $id = $filter->GetFilterId( 
+                $request->post('servers'), 
+                $request->post('difficulties') 
+            );
+            
+            setcookie('filter', $id, 0, '/');
+        }
+        
+    }
+
     public function PostServers($request)
     {
         $auth = new Auth();

@@ -62,13 +62,18 @@ namespace IL2CDR.Model
                 }
             }
         }
+        public Player FindPlayerByGuid (Guid guid )
+        {
+            return this.FirstOrDefault((pair) => pair.Value.NickId.Equals(guid)).Value;
+
+        }
         public void PlayerSpawn(Player player)
         {
             if (player == null)
                 return;
 
             var existing = this.FirstOrDefault((pair) => pair.Value.NickId.Equals(player.NickId)).Value;
-            if( OnPlayerJoin != null )
+            if (OnPlayerJoin != null)
             {
                 if (existing == null)
                     OnPlayerJoin(player);

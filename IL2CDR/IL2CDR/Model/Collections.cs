@@ -38,6 +38,10 @@ namespace IL2CDR
             return Util.POSToVector3D( dict.GetString( posName ));
         }
 
+        public static Vector3D[] GetVectorArray( this Dictionary<string,string> dict, string name)
+        {
+            return Util.BoundaryPointsToVectorCollection(dict.GetString(name));
+        }
         public static int GetInt(this Dictionary<string, string> dict, string name)
         {
             int i = -1;

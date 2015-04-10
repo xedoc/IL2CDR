@@ -22,9 +22,11 @@
     <Compile Include="index.php" />
     <Compile Include="IndexController.php" />
     <Compile Include="Model\Auth.php" />
+    <Compile Include="Model\Cache.php" />
     <Compile Include="Model\class.phpmailer.php" />
     <Compile Include="Model\class.smtp.php" />
     <Compile Include="Model\FifoPipe.php" />
+    <Compile Include="Model\Filter.php" />
     <Compile Include="Model\iDatabase.php" />
     <Compile Include="Model\Mailer.php" />
     <Compile Include="Model\MissionEvent.php" />
@@ -367,7 +369,10 @@
     <Compile Include="svg\plane.svg" />
     <Compile Include="svg\truck.svg" />
     <Compile Include="templates\missions.php" />
+    <Compile Include="templates\partial_filtermodal.php" />
     <Compile Include="templates\partial_jsconfig.php" />
+    <Compile Include="templates\partial_serverdifficulty.php" />
+    <Compile Include="templates\partial_serverlist.php" />
     <Compile Include="templates\partial_svgicons.php" />
     <Compile Include="templates\partial_tablecontent.php" />
     <Compile Include="templates\partial_toptable.php" />

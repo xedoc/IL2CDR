@@ -12,10 +12,16 @@ $.extend($.fn.dataTable.defaults, {
 });
 
 $(document).ready(function () {
-    $('#table_wl').on( 'processing.dt', function ( e, settings, processing ) {
+    $('#filter').on('submit', function (e) {
+        e.preventDefault();  
+        var data = $("#filter").find(":selected").text();
+        console.log(data); 
+    });
+
+
+    $('#table_wl').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
-    } )
-    .DataTable({
+    }).DataTable({
         dom: '<"toolbar">frtip',
         pageLength: 10,
         serverSide: true,
@@ -87,6 +93,7 @@ $(document).ready(function () {
         paging: true,
         scrollY: 400,
         scroller: {
+            rowHeight : 74,
             loadingIndicator: true,
         }
     });

@@ -38,6 +38,48 @@ class Servers
         $this->db->callproc( 'UpdateServers');
 
     }
+    public function GetDifficulties()
+    {
+        if( !$this->db->IsConnected )
+            return array();        
+        
+        $result = $this->db->callproc( 'GetDifficulties');
+        $difficulties = array();
+        if( $result && $result->num_rows > 0)
+        {
+            while( $obj = $result->fetch_object())
+            {
+                if( $obj )
+                {                    
+                    $difficulties[] = $obj->Difficulty;
+                }
+            }
+            $this->db->nextresult();
+        }
+        return $difficulties;
+    }
+    public function GetVisibleServers()
+    {
+        if( !$this->db->IsConnected )
+            return array();        
+        
+        $result = $this->db->callproc( 'GetVisibleServers');
+        $servers = array();
+        if( $result && $result->num_rows > 0)
+        {
+            while( $obj = $result->fetch_object())
+            {
+                if( $obj )
+                {
+                    $server = new Server($obj->ServerName,  $obj->ServerId );
+                    $server->IsHidden = $obj->IsHidden;
+                    $servers[] = $server;
+                }
+            }
+            $this->db->nextresult();
+        }
+        return $servers;
+    }
     public function GetServers()
     {
         if( !$this->db->IsConnected )

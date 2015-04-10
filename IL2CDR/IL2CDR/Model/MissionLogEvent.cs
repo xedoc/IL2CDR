@@ -54,7 +54,7 @@ namespace IL2CDR.Model
             { EventType.InfluenceAreaInfo, (header) => {return new MissionLogEventInfluenceAreaInfo(header);}},
             { EventType.InfluenceAreaBoundary, (header) => {return new MissionLogEventInfluenceAreaBoundary(header);}},
             { EventType.Version, (header) => {return new MissionLogEventVersion(header);}},
-            { EventType.BotPilotSpawn, (header) => {return new MissionLogBotSpawn(header);}},
+            { EventType.BotPilotSpawn, (header) => {return new MissionLogEject(header);}},
             { EventType.Join, (header) => {return new MissionLogEventPlayerJoin(header);}},
             { EventType.Leave, (header) => {return new MissionLogEventPlayerLeave(header);}},
         };
@@ -144,6 +144,7 @@ namespace IL2CDR.Model
     //T:28250 AType:21 USERID:00000000-0000-0000-0000-000000000000 USERNICKID:00000000-0000-0000-0000-000000000000
     public class MissionLogEventPlayerLeave : MissionLogEventHeader
     {
+        public Player Player { get; set; }
         public Guid NickGuid { get; set; }
         public Guid LoginGuid { get; set; }
 
@@ -152,6 +153,7 @@ namespace IL2CDR.Model
         {
             NickGuid = RawParameters.GetGuid("USERNICKID");
             LoginGuid = RawParameters.GetGuid("USERID");
+            Player = Server.Players.FindPlayerByGuid(NickGuid);
         }
     }
 
@@ -174,23 +176,36 @@ namespace IL2CDR.Model
 
     //TODO: Handle Atype:19
     //T:180021 AType:19 
-
-    //TODO: Handle AType:18
+ 
+    //TODO: Handle AType:18 Eject maybe??
     //T:1982216 AType:18 BOTID:725017 PARENTID:723993 POS(112101.023,1238.855,99265.477)
 
-    //AType:16
+    //AType:16 
     //T:28250 AType:16 BOTID:182273 POS(113655.180,129.202,243216.594)
-    public class MissionLogBotSpawn : MissionLogEventHeader
+    public class MissionLogEject : MissionLogEventHeader
     {
-        
+        public Player Player { get; set; }
+        public GameObject Bot { get; set; }
         public int BotId { get; set; }
+        public bool IsFriendlyArea { get; set; }
         public Vector3D Position {get;set;}
 
-        public MissionLogBotSpawn(MissionLogEventHeader header) 
+        public MissionLogEject(MissionLogEventHeader header) 
             : base(header)
         {
-            BotId = RawParameters.GetInt("BOTID");
-            Position = Util.POSToVector3D("POS");
+            Position = RawParameters.GetVector3D("POS");
+            var area = Server.Areas.FindAreaByPos(RawParameters.GetVector3D("POS"));
+
+            Player = Server.Players[RawParameters.GetInt("BOTID")];
+            if( Player == null )
+            {
+                Bot = Server.GameObjects[RawParameters.GetInt("BOTID")];
+                IsFriendlyArea = area.Coalition == Bot.CoalitionIndex;
+            }
+            else
+            {
+                IsFriendlyArea = area.Coalition == Player.CoalitionIndex;
+            }
         }
     }
 
@@ -212,13 +227,24 @@ namespace IL2CDR.Model
     //T:1 AType:14 AID:18432 BP((150876.0,0.9,262474.0),(159244.0,0.9,222558.0),(185432.0,0.9,188837.0),(183398.0,0.9,164959.0),(165913.0,0.9,150673.0),(192221.0,0.9,75572.0),(230054.0,0.9,77365.0),(230179.0,0.9,358210.0),(161.0,0.9,358111.0),(755.0,0.9,233576.0),(30336.0,0.9,229602.0),(55631.0,0.9,217230.0),(84031.0,0.9,214012.0),(110293.0,0.9,200406.0),(121516.0,0.9,210199.0),(115778.0,0.9,226024.0),(119800.0,0.9,242286.0),(131353.0,0.9,254862.0))
     public class MissionLogEventInfluenceAreaBoundary : MissionLogEventHeader
     {
-        public Vector3DCollection BoundaryPoints { get; set; }
-        public int AreaId { get; set; }
+        public Area Area { get; set; }
         public MissionLogEventInfluenceAreaBoundary(MissionLogEventHeader header)
             : base(header)
         {
-            AreaId = RawParameters.GetInt("AID");
-            BoundaryPoints = Util.BoundaryPointsToVectorCollection("BP");
+            var id = RawParameters.GetInt("AID");
+            var existingArea = Server.Areas[id];
+            if( existingArea != null )
+            {
+                Server.Areas[id].SetBoundaries(RawParameters.GetVectorArray("BP"));
+                Area = Server.Areas[id];
+            }
+            else
+            {
+                Area = new Area(RawParameters.GetVectorArray("BP"))
+                {
+                    Id = RawParameters.GetInt("AID")
+                };
+            }
         }
     }
     //AType:13
@@ -229,8 +255,8 @@ namespace IL2CDR.Model
 
     public class MissionLogEventInfluenceAreaInfo : MissionLogEventHeader
     {
-        
-        public int AirFieldId { get; set; }
+        public Area Area { get; set; }
+        public int AreaId { get; set; }
         public Country Country { get; set; }
         public bool IsEnabled { get; set; }
         public List<CoalitionPlanesCount> PlanesByCoalition { get; set; }
@@ -238,11 +264,33 @@ namespace IL2CDR.Model
         public MissionLogEventInfluenceAreaInfo(MissionLogEventHeader header)
             : base(header)
         {
-            AirFieldId = RawParameters.GetInt("AID");
-            IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;            
-            Country = new Country(RawParameters.GetInt("COUNTRY"));
+            var country = new Country(RawParameters.GetInt("COUNTRY"));
+            var coalition = Server.CoalitionIndexes.FirstOrDefault( c => c.Country.Id == country.Id);
+            int coalitionIndex = 0;
+            if (coalition != null)
+                coalitionIndex = coalition.Index;
+
+            var id = RawParameters.GetInt("AID");
+            var existingArea = Server.Areas[id];
+
+            if( existingArea != null )
+            {
+                Server.Areas[id].Country = country;
+                Server.Areas[id].Coalition = coalitionIndex;
+                Server.Areas[id].IsEnabled = RawParameters.GetInt("ENABLED") == 1 ? true : false;
+                Area = Server.Areas[id];
+            }
+            else
+            {
+                Area = new Area(RawParameters.GetInt("AID"),
+                    country,
+                    RawParameters.GetInt("ENABLED") == 1 ? true : false)
+                {
+                    Coalition = coalition.Index,
+                };
+            }
             PlanesByCoalition = new List<CoalitionPlanesCount>();
-            var planesNumber = Util.SequenceToIntArray(RawParameters.GetString("BC"));
+            var planesNumber = Util.SequenceToIntArray(RawParameters.GetString("BC"));            
         }
     }
     //AType:12

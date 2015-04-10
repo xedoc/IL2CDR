@@ -1,4 +1,19 @@
-﻿.mutedicon path {
+﻿
+.dropdown-menu {
+    background-color : #375A7F !important;
+}
+.dropdown-menu>li>a {
+    color : white !important;
+
+}
+.dropdown-menu>li>a:hover, .dropdown-menu>li>a:focus {
+    background-color : #28415B;
+}
+.dropdown-menu .divider {
+    background-color : #28415B;
+
+}
+.mutedicon path {
     fill : #828282;
 }
 .icon-plane {

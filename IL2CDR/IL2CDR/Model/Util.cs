@@ -56,9 +56,12 @@ namespace IL2CDR.Model
                 return new System.Diagnostics.StackTrace(true).GetFrame(4).GetFileLineNumber().ToString(); 
             }            
         }
-        public static Vector3DCollection BoundaryPointsToVectorCollection(string bp)
+        public static Vector3D[] BoundaryPointsToVectorCollection(string bp)
         {
-            Vector3DCollection vectors = new Vector3DCollection();
+            if (String.IsNullOrWhiteSpace(bp))
+                return new Vector3D[] {};
+
+            var vectors = new List<Vector3D>();
             var matches = Regex.Matches(bp, @"\([\d|\.|,]+\)");
             foreach( Match match in matches)
             {
@@ -66,7 +69,7 @@ namespace IL2CDR.Model
                 vectors.Add(vector);
             }
 
-            return vectors;
+            return vectors.ToArray();
         }
         public static int[] SequenceToIntArray( string seq )
         {

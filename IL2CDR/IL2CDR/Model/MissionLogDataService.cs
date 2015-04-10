@@ -40,6 +40,10 @@ namespace IL2CDR.Model
                 .Do(x => data.Server.AddHit( x as MissionLogEventHit))},
             { EventType.Damage, (data) => data.With(x => x as MissionLogEventDamage)
                 .Do(x => data.Server.AddDamage( x as MissionLogEventDamage))},
+            { EventType.InfluenceAreaInfo, (data) => data.With(x => x as MissionLogEventInfluenceAreaInfo)
+                .Do(x => data.Server.Areas.AddArea( (x as MissionLogEventInfluenceAreaInfo).Area ))},
+            { EventType.InfluenceAreaBoundary, (data) => data.With(x => x as MissionLogEventInfluenceAreaBoundary)
+                .Do(x => data.Server.Areas.AddArea( (x as MissionLogEventInfluenceAreaBoundary).Area ))},
         };
 
       
@@ -164,7 +168,9 @@ namespace IL2CDR.Model
                     var fileInfo = new FileInfo(file);
                     if( fileInfo.Length > 0 && !String.IsNullOrWhiteSpace(file))
                     {
-                        tracker.AddFileOffset(file, fileInfo.Length);
+                        if( tracker != null )
+                            tracker.AddFileOffset(file, fileInfo.Length);
+
                         var lines = File.ReadAllLines(file);
                         if (lines != null)
                         {

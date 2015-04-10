@@ -15,6 +15,8 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css"/>
     <link rel="stylesheet" href="/css/stats.css" type="text/css" />
     <link rel="stylesheet" href="//cdn.datatables.net/scroller/1.2.2/css/dataTables.scroller.css" type="text/css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/css/bootstrap-select.min.css" />
+
 <?php $this->insert('partial_jsconfig') ?>
 
 
@@ -32,24 +34,23 @@
       <a class="navbar-brand" href="/">IL-2 Leaderboards</a>
     </div>
 
+    
     <div class="collapse navbar-collapse" id="navcollapse">
         <?php $this->insert('partial_loginarea') ?>
 
       <ul class="nav navbar-nav">
 
         <li <?=activeIfStartsWith("wl")?> class="dropdown">
-                        <a href="#" data-toggle="dropdown" class="dropdown-toggle">Wins/Losses<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/wlpvp">Players vs Players</a></li>
-                            <li><a href="/wlpve">Players vs Environment</a></li>
-                            <li class="divider"></li>
-                            <li><a href="/wl">Total</a></li>
-                        </ul>
-                    </li>
-<!--        <li <?=activeIfMatch("snipers")?>><a href="/snipers">Snipers</a></li>
-        <li <?=activeIfMatch("survivors")?>><a href="/survivors">Survivors</a></li>-->
-        
-          <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Wins/Losses<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="/wlpvp">Players vs Players</a></li>
+                <li><a href="/wlpve">Players vs Environment</a></li>
+                <li class="divider"></li>
+                <li><a href="/wl">Total</a></li>
+            </ul>
+        </li>        
+        <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
+        <li><a data-toggle="modal" data-target="#filterModal" href="#">Filter</a></li>
 
 
       </ul>
@@ -78,6 +79,7 @@
 <?php $this->insert('partial_usermodal') ?>
 <?php $this->insert('partial_loginmodal') ?>
 <?php $this->insert('partial_signupmodal') ?>
+<?php $this->insert('partial_filtermodal') ?>
 
 </body>
 
@@ -89,8 +91,7 @@
 <script src="/js/bootstrap.min.js"></script>
 <script src="//cdn.datatables.net/scroller/1.2.2/js/dataTables.scroller.min.js"></script>
 <script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'></script>
-
-
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/js/bootstrap-select.min.js"></script>
 <script src="/js/il2info.js"></script>
 
 </html>

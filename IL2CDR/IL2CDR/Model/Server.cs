@@ -96,6 +96,7 @@ namespace IL2CDR.Model
             Players.Clear();
             AirFields.Clear();
             GameObjects.Clear();
+            Areas.Clear();
         }
         public int GetCoalitionIndex( Country country )
         {
@@ -263,13 +264,13 @@ namespace IL2CDR.Model
         /// </summary>
         public const string AreasPropertyName = "Areas";
 
-        private List<Area> _areas = new List<Area>();
+        private AreaCollection _areas = new AreaCollection();
 
         /// <summary>
         /// Sets and gets the Areas property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public List<Area> Areas
+        public AreaCollection Areas
         {
             get
             {

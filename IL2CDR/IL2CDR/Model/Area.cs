@@ -9,36 +9,54 @@ namespace IL2CDR.Model
 {
     public class Area
     {
-        private Vector3D[] vectors;
         private double minX, minY, maxX, maxY;
 
-        public Area(Vector3D[] vectors )
+        public Area(Vector3D[] boundaries )
         {
-            minX = vectors.Min(v => v.X);
-            minY = vectors.Min(v => v.Z);
-            maxX = vectors.Max(v => v.X);
-            maxY = vectors.Max(v => v.Z);
-            this.vectors = new Vector3D[vectors.Length];
-            vectors.CopyTo(this.vectors, 0 );
+            SetBoundaries(boundaries);
+        }
+        public Area( int id, Country country, bool isEnabled )
+        {
+            this.Id = id;
+            this.Country = country;
+            this.IsEnabled = isEnabled;
+            this.Boundaries = new Vector3D[] { };
         }
 
         public int Coalition { get;set; }
-        public int AreaId { get; set; }
+        public Country Country { get; set; }
+        public int Id { get; set; }
+        public Vector3D[] Boundaries { get; set; }
+        public bool IsEnabled { get; set; }
+
+        public void SetBoundaries(Vector3D[] boundaries)
+        {
+            minX = boundaries.Min(v => v.X);
+            minY = boundaries.Min(v => v.Z);
+            maxX = boundaries.Max(v => v.X);
+            maxY = boundaries.Max(v => v.Z);
+            this.Boundaries = new Vector3D[boundaries.Length];
+            boundaries.CopyTo(this.Boundaries, 0);
+        }
 
         public bool InBounds( Vector3D point )
         {
+            if (Boundaries.Length <= 0)
+                return false;
+
             if( point.X < minX || 
                 point.X > maxX ||
                 point.Z < minY ||
                 point.Z > maxY )
                 return false;
-            
-            int length = vectors.Length;
+
+            int length = Boundaries.Length;
             bool result = false;
             for (int i = 0, j = length - 1; i < length; j = i++)
             {
-                if (((vectors[i].Z > point.Z) != (vectors[j].Z > point.Z)) &&
-                 (point.X < (vectors[j].X - vectors[i].X) * (point.Z - vectors[i].Z) / (vectors[j].Z - vectors[i].Z) + vectors[i].X))
+                if (((Boundaries[i].Z > point.Z) != (Boundaries[j].Z > point.Z)) &&
+                 (point.X < (Boundaries[j].X - Boundaries[i].X) * (point.Z - Boundaries[i].Z) / 
+                 (Boundaries[j].Z - Boundaries[i].Z) + Boundaries[i].X))
                     result = !result;
             }
             return result;
