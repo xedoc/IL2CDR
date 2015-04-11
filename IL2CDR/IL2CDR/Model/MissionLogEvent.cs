@@ -54,7 +54,7 @@ namespace IL2CDR.Model
             { EventType.InfluenceAreaInfo, (header) => {return new MissionLogEventInfluenceAreaInfo(header);}},
             { EventType.InfluenceAreaBoundary, (header) => {return new MissionLogEventInfluenceAreaBoundary(header);}},
             { EventType.Version, (header) => {return new MissionLogEventVersion(header);}},
-            { EventType.BotPilotSpawn, (header) => {return new MissionLogEject(header);}},
+            { EventType.BotPilotSpawn, (header) => {return new MissionLogRemoveBot(header);}},
             { EventType.Join, (header) => {return new MissionLogEventPlayerJoin(header);}},
             { EventType.Leave, (header) => {return new MissionLogEventPlayerLeave(header);}},
         };
@@ -177,12 +177,30 @@ namespace IL2CDR.Model
     //TODO: Handle Atype:19
     //T:180021 AType:19 
  
-    //TODO: Handle AType:18 Eject maybe??
+    //TODO: Handle AType:18
     //T:1982216 AType:18 BOTID:725017 PARENTID:723993 POS(112101.023,1238.855,99265.477)
+    public class MissionLogEject : MissionLogEventHeader
+    {
+        public Player Player { get; set; }
+        public bool IsFriendlyArea { get; set; }
+        public Vector3D Position { get; set; }
 
+        public MissionLogEject(MissionLogEventHeader header)
+            : base(header)
+        {
+            Position = RawParameters.GetVector3D("POS");
+            var area = Server.Areas.FindAreaByPos(RawParameters.GetVector3D("POS"));
+
+            Player = Server.Players[RawParameters.GetInt("PARENTID")] ?? Server.Players[RawParameters.GetInt("BOTID")];
+            if (Player != null && area != null )
+            {
+                IsFriendlyArea = area.Coalition == Player.CoalitionIndex;
+            }
+        }
+    }
     //AType:16 
     //T:28250 AType:16 BOTID:182273 POS(113655.180,129.202,243216.594)
-    public class MissionLogEject : MissionLogEventHeader
+    public class MissionLogRemoveBot : MissionLogEventHeader
     {
         public Player Player { get; set; }
         public GameObject Bot { get; set; }
@@ -190,21 +208,25 @@ namespace IL2CDR.Model
         public bool IsFriendlyArea { get; set; }
         public Vector3D Position {get;set;}
 
-        public MissionLogEject(MissionLogEventHeader header) 
+        public MissionLogRemoveBot(MissionLogEventHeader header) 
             : base(header)
         {
             Position = RawParameters.GetVector3D("POS");
             var area = Server.Areas.FindAreaByPos(RawParameters.GetVector3D("POS"));
 
             Player = Server.Players[RawParameters.GetInt("BOTID")];
-            if( Player == null )
+            
+            if( area != null )
             {
-                Bot = Server.GameObjects[RawParameters.GetInt("BOTID")];
-                IsFriendlyArea = area.Coalition == Bot.CoalitionIndex;
-            }
-            else
-            {
-                IsFriendlyArea = area.Coalition == Player.CoalitionIndex;
+                if (Player == null)
+                {
+                    Bot = Server.GameObjects[RawParameters.GetInt("BOTID")];
+                    IsFriendlyArea = area.Coalition == Bot.CoalitionIndex;
+                }
+                else
+                {
+                    IsFriendlyArea = area.Coalition == Player.CoalitionIndex;
+                }
             }
         }
     }
@@ -611,8 +633,18 @@ namespace IL2CDR.Model
 
             AttackerPlayer = Server.Players[AttackerId];
             AttackerObject = Server.GameObjects[AttackerId];   
+
             TargetPlayer = Server.Players[TargetId];
             TargetObject = Server.GameObjects[TargetId];     
+
+            if( AttackerPlayer == null &&
+                AttackerObject == null && 
+                TargetPlayer != null && TargetPlayer.HitsSources.Count > 0 )
+            {
+                AttackerPlayer = TargetPlayer.MostDamageByPlayer();
+                if (AttackerPlayer == null)
+                    AttackerObject = TargetPlayer.MostDamageByObject();
+            }
         }
     }
     //AType:2
@@ -666,10 +698,12 @@ namespace IL2CDR.Model
             TargetId = RawParameters.GetInt("TID");
             AmmoName = RawParameters.GetString("AMMO");
 
-            //AttackerPlayer = Server.Players[AttackerId];
-            AttackerObject = Server.GameObjects[AttackerId];
-            //TargetPlayer = Server.Players[TargetId];
-            TargetObject = Server.GameObjects[TargetId];
+            AttackerPlayer = Server.Players[AttackerId];
+            if( AttackerPlayer == null )
+                AttackerObject = Server.GameObjects[AttackerId];
+            TargetPlayer = Server.Players[TargetId];
+            if( TargetPlayer == null )
+                TargetObject = Server.GameObjects[TargetId];
 
         }
     }

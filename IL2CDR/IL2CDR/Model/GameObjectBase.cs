@@ -36,6 +36,24 @@ namespace IL2CDR.Model
             
             return 0;
         }
+        public Player MostDamageByPlayer()
+        {
+            var obj = HitsSources.OrderByDescending(x => x.Hits.Damage).FirstOrDefault();
+            if (obj != null)
+                return obj.Player;
+            else
+                return null;
+        }
+
+        public GameObject MostDamageByObject()
+        {
+            var obj = HitsSources.OrderByDescending(x => x.Hits.Damage).FirstOrDefault();
+            if (obj != null)
+                return obj.Object;
+            else
+                return null;
+        }
+
         public double GetDamageBy(object obj)
         {
             if (obj == null)

@@ -11,7 +11,7 @@ namespace IL2CDR.Model
         public Player()
         {
             IsOnline = true;
-           
+            IsEjected = false;
         }
         public int Id { get; set; }
         public Guid NickId { get; set; }
@@ -30,6 +30,7 @@ namespace IL2CDR.Model
         public int Hits { get; set; }
         public int Shots { get; set; }
         public Guid SortieId { get; set; }
+        public bool IsEjected { get; set; }
     }
 
     public enum PlayerStatus

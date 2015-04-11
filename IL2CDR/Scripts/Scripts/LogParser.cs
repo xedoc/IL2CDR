@@ -84,7 +84,6 @@ namespace IL2CDR.Scripts
         {
             if (data == null)
                 return;
-
             if (
                 //data is MissionLogEventStart ||
                 data is MissionLogEventMissionEnd ||
@@ -98,6 +97,7 @@ namespace IL2CDR.Scripts
                 !(data is MissionLogEventHeader)                
                 )
             {
+                Log.WriteInfo((data as MissionLogEventHeader).Type.ToString());
 
                 if (data is MissionLogEventKill)
                 {
@@ -115,6 +115,8 @@ namespace IL2CDR.Scripts
 
         public override void OnHistory(object data)
         {
+            if( data is MissionLogEventHeader)
+                Log.WriteInfo((data as MissionLogEventHeader).Type.ToString());
         }
         
 
