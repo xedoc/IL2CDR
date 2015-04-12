@@ -96,7 +96,12 @@ namespace IL2CDR.Model
                     StartNewMission(filePath);
                 }
             };
+
+            server.OnPlayerListChange = (players) => {
+                actionManager.ProcessPlayerListChange(players);
+            };
         }
+
         private void StartNewMission(string logFilePath)
         {
             //Check if MissionEnd is sent

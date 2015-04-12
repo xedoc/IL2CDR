@@ -133,6 +133,18 @@ namespace IL2CDR.Model
             }
         }
 
+        public void ProcessPlayerListChange(List<Player> players)
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
+                script.OnPlayerListChange(players);
+            }
+        }
+
         private void DisposeScriptAssembly(string fileName)
         {
                 var asm = loadedScripts.FirstOrDefault(script => script.Path.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
@@ -163,6 +175,13 @@ namespace IL2CDR.Model
         }
         public object LoadScript(string scriptPath)
         {
+            if( !scriptPath.Contains( ":"))
+            {
+                string folder = AppDomain.CurrentDomain.GetData("DataDirectory") + scriptsSubFolder;
+                scriptPath = String.Format(@"{0}\{1}", folder, scriptPath);
+            }
+
+
             var curTime = File.GetLastWriteTime(scriptPath).ToString();
             if (loadedScripts.Any(script => script.Path.Equals(scriptPath, StringComparison.InvariantCultureIgnoreCase) && curTime == script.Id))
                 return null;

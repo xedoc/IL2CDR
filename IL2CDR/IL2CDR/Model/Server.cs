@@ -20,10 +20,11 @@ namespace IL2CDR.Model
         public MissionLogDataService MissionLogService { get; set; }
         [JsonIgnore]
         public ProcessItem Process { get; set; }
-
+        public Action<List<Player>> OnPlayerListChange { get; set; }
         public string CurrentMissionId { get; set; }
         public int TimeZoneOffset { get; set; }
 
+        private Timer timerPlayerList;
         public Server(RconConnection rcon, ProcessItem process)
         {
             Name = String.Format(@"PID: {0} {1}\DServer.exe", process.ProcessId, process.ProcessPath);
@@ -33,7 +34,7 @@ namespace IL2CDR.Model
             ServerId = default(Guid);
             IsConfigSet = false;
             IsRconConnected = false;
-            TimeZoneOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
+            TimeZoneOffset = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;            
             Initialize();
 
         }
@@ -47,6 +48,8 @@ namespace IL2CDR.Model
         }
         private void Initialize()
         {
+            timerPlayerList = new Timer((sender) => { UpdateOnlinePlayers(sender); }, this, 0, 5000 );
+            OnlinePlayers.CollectionChanged += OnlinePlayers_CollectionChanged;
             Players = new PlayersCollection();
             Players.OnPlayerJoin = (player) => {
                 if( player == null )
@@ -73,6 +76,54 @@ namespace IL2CDR.Model
             GameObjects = new GameObjectsCollection();
             AirFields = new AirFieldCollection();
             CoalitionIndexes = new List<CoalitionIndex>();
+        }
+
+        void OnlinePlayers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (OnPlayerListChange != null)
+                OnPlayerListChange(OnlinePlayers.ToList());
+        }
+
+        private void UpdateOnlinePlayers(object sender)
+        {
+            var server = sender as Server;
+            if( sender == null || !server.IsRconConnected )
+                return;
+
+            var newList = Rcon.GetPlayerList().With( list => list.Where(p => p != null));
+            if (newList == null)
+                return;
+          
+            if( newList.Count() == 0 )
+            {
+                lock(server.lockOnlinePlayers)
+                    OnlinePlayers.Clear();
+
+                return;
+            }
+
+            HashSet<Guid> onlineIds = new HashSet<Guid> ( newList.Select( player => player.NickId ) );
+
+            lock (server.lockOnlinePlayers)
+            {
+                OnlinePlayers.RemoveAll(player => !onlineIds.Contains(player.NickId)); 
+               
+                foreach( var player in newList )
+                {
+                    var existing = OnlinePlayers.FirstOrDefault(p => p.NickId.Equals(player.NickId));
+                    if( existing == null )
+                    {
+                        OnlinePlayers.Add(player);
+                    }
+                    else
+                    {
+                        existing.Ping = player.Ping;
+                        existing.Status = player.Status;
+                    }
+                }
+            }
+
+
         }
         public void Login()
         {

@@ -33,6 +33,6 @@ namespace IL2CDR.Model
         void OnHistory(object data);
         void OnServerLogStart(Server server);
         void OnButtonClick(string buttonName);
-
+        void OnPlayerListChange(List<Player> players);
     }
 }

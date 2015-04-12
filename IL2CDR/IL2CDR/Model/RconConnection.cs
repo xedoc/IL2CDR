@@ -17,6 +17,7 @@ namespace IL2CDR.Model
         private TcpClient connection;
         private NetworkStream netStream;
         private bool isStopped = false;
+        private object cmdLock = new object();
         private Dictionary<string, string> errorCodes = new Dictionary<string, string>()
         {
             {"1", "OK"},
@@ -293,27 +294,30 @@ namespace IL2CDR.Model
         /// <returns>List of Player objects</returns>
         public List<Player> GetPlayerList()
         {
-            List<Player> result = new List<Player>();
-            var rconResult = RawCommand("getplayerlist");
-            if( rconResult["STATUS"] == "1")
+            lock(cmdLock)
             {
-                var playerList = rconResult["playerList"];
-                if( !String.IsNullOrEmpty( playerList ))
+                List<Player> result = new List<Player>();
+                var rconResult = RawCommand("getplayerlist");
+                if (rconResult["STATUS"] == "1")
                 {
-                    var table = playerList.Split('|');
-                    if( table.Length > 1 )
+                    var playerList = rconResult["playerList"];
+                    if (!String.IsNullOrEmpty(playerList))
                     {
-                        result = new List<Player>(
-                            table.Select(line => line.Split(',')).Select(x => {
+                        var table = playerList.Split('|').Skip(1).ToArray();
+                        if (table.Length > 0)
+                        {
+                            result = new List<Player>(
+                                table.Select(line => line.Split(',')).Select(x =>
+                                {
                                     int cid, ping;
                                     Guid nickGuid, userGuid;
                                     PlayerStatus status;
                                     if (x.Length == 6 &&
                                         int.TryParse(x[0], out cid) &&
-                                        Guid.TryParse(x[1], out nickGuid) &&
-                                        Guid.TryParse(x[2], out userGuid) &&
-                                        int.TryParse(x[5], out ping) && 
-                                        Enum.TryParse<PlayerStatus>( x[4], out status))
+                                        Guid.TryParse(HttpUtility.UrlDecode(x[5]), out nickGuid) &&
+                                        Guid.TryParse(HttpUtility.UrlDecode(x[4]), out userGuid) &&
+                                        int.TryParse(x[2], out ping) &&
+                                        Enum.TryParse<PlayerStatus>(x[1], out status))
                                     {
                                         return new Player()
                                         {
@@ -330,11 +334,12 @@ namespace IL2CDR.Model
                                     {
                                         return null;
                                     }
-                            }));
+                                }));
+                        }
                     }
                 }
+                return result;
             }
-            return result;
         }
 
         /// <summary>

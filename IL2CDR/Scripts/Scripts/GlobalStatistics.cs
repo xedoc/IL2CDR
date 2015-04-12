@@ -222,6 +222,13 @@ namespace IL2CDR.Scripts
             }
 
         }
+        public override void OnPlayerListChange(List<Player> players)
+        {
+            foreach(var player in players)
+            {
+                Log.WriteInfo("{0} ping: {1} status:{2}", player.NickName, player.Ping, player.Status);
+            }
+        }
         
 
 

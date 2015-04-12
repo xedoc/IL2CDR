@@ -129,6 +129,13 @@ namespace IL2CDR.Model
         /// </summary>
         /// <param name="buttonName">Button name specified in config initializer</param>
         virtual public void OnButtonClick(string buttonName) { }
+        /// <summary>
+        /// Online player list was changed
+        /// </summary>
+        /// <param name="players"></param>
+        
+        virtual public void OnPlayerListChange( List<Player> players ){ }
+
 
         /// <summary>
         /// Default config 
