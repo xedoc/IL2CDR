@@ -82,37 +82,41 @@ namespace IL2CDR.Scripts
             sendTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
-        public void SendDataToServer()
+        public void SendDataToServer(object sender)
         {
-            lock( lockSend )
-            {
-                string result = "FAIL";
-                if( String.IsNullOrWhiteSpace( lastPacket ) )
-                    lastPacket = GetNextPacket();
+            var obj = sender as GlobalStatistics;
+            if (obj == null)
+                return;
 
-                if (String.IsNullOrWhiteSpace(lastPacket))                
+            lock( obj.lockSend )
+            {
+
+                string result = "FAIL";
+                if( String.IsNullOrWhiteSpace( obj.lastPacket ) )
+                    obj.lastPacket = GetNextPacket();
+
+                if (String.IsNullOrWhiteSpace(obj.lastPacket))                
                     return;
 
 
                 using( WebClientBase webClient = new WebClientBase())
                 {
-                    var data = webClient.GZipBytes(lastPacket);
+                    var data = webClient.GZipBytes(obj.lastPacket);
                     webClient.ContentType = ContentType.JsonUTF8;
                     webClient.KeepAlive = false;
                     webClient.SetCookie("srvtoken", Token, DOMAIN);
-                    result = webClient.UploadCompressed(URL, lastPacket);
+                    result = webClient.UploadCompressed(URL, obj.lastPacket);
                     if (!String.IsNullOrWhiteSpace(result))
                     {
                         if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            if( !firstPacketSent)
+                            if (!obj.firstPacketSent)
                             {
-                                firstPacketSent = true;
+                                obj.firstPacketSent = true;
                                 Log.WriteInfo("Successfuly connected to il2.info");
                             }
-                            lastPacket = String.Empty;
-                        }
-                            
+                            obj.lastPacket = String.Empty;
+                        }                            
                         else
                             Log.WriteInfo("Send result: {0}", result);
 
@@ -182,14 +186,14 @@ namespace IL2CDR.Scripts
             }
 
             if (events.Count >= 5 || data is MissionLogEventMissionEnd || data is MissionLogEventPlayerAmmo)
-                SendDataToServer();
+                Task.Factory.StartNew( (obj) => SendDataToServer(obj), this);
 
         }
 
         private void SendTimerCallback( object sender )
         {
             if (events.Count > 0)
-                SendDataToServer();
+                SendDataToServer(this);
         }
         public override void OnHistory(object data)
         {
@@ -199,35 +203,36 @@ namespace IL2CDR.Scripts
             if (!dictionarySent)
             {
                 //Send game objects classification info
-                var packet = new
-                {
-                    Token = Token,
-                    Type = 9998,
-                    ObjectInfo = GameInfo.ObjectsClassification.Select(
-                    pair => new
-                    {
-                        ObjectId = GuidUtility.Create(GuidUtility.IsoOidNamespace, pair.Key),
-                        Name = pair.Key,
-                        Class = pair.Value.Classification.ToString("g"),
-                        Purpose = pair.Value.Purpose
-                    }).ToArray()
-                };
-
-                AddToQueue(packet);
-                dictionarySent = true;
+                AddGameObjectsToQueue();
             }
-            else
+            AddToQueue(data);
+            dictionarySent = true;
+        }
+
+        private void AddGameObjectsToQueue()
+        {
+            var packet = new
             {
-                AddToQueue(data);
-            }
+                Token = Token,
+                Type = 9998,
+                ObjectInfo = GameInfo.ObjectsClassification.Select(
+                pair => new
+                {
+                    ObjectId = GuidUtility.Create(GuidUtility.IsoOidNamespace, pair.Key),
+                    Name = pair.Key,
+                    Class = pair.Value.Classification.ToString("g"),
+                    Purpose = pair.Value.Purpose
+                }).ToArray()
+            };
 
+            AddToQueue(packet);
         }
         public override void OnPlayerListChange(List<Player> players)
         {
-            foreach(var player in players)
-            {
-                Log.WriteInfo("{0} ping: {1} status:{2}", player.NickName, player.Ping, player.Status);
-            }
+            //foreach(var player in players)
+            //{
+            //    Log.WriteInfo("{0} ping: {1} status:{2}", player.NickName, player.Ping, player.Status);
+            //}
         }
         
 

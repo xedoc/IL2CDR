@@ -396,7 +396,6 @@
     <Compile Include="templates\layout.php" />
     <Compile Include="testw.php" />
     <Compile Include="test.php" />
-    <Compile Include="test2.php" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="css\" />
@@ -474,5 +473,6 @@
     <Content Include="phpfastcache\_extensions\predis-1.0\package.ini" />
     <Content Include="phpfastcache\_extensions\predis-1.0\README.md" />
     <Content Include="phpfastcache\_extensions\predis-1.0\VERSION" />
+    <Content Include="webrcon.txt" />
   </ItemGroup>
 </Project>

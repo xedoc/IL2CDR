@@ -87,7 +87,9 @@ namespace IL2CDR.Model
         private void UpdateOnlinePlayers(object sender)
         {
             var server = sender as Server;
-            if( sender == null || !server.IsRconConnected )
+            if( sender == null || 
+                !server.IsRconConnected || 
+                Rcon == null)
                 return;
 
             var newList = Rcon.GetPlayerList().With( list => list.Where(p => p != null));
