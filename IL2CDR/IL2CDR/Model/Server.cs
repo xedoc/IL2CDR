@@ -20,7 +20,7 @@ namespace IL2CDR.Model
         public MissionLogDataService MissionLogService { get; set; }
         [JsonIgnore]
         public ProcessItem Process { get; set; }
-        public Action<List<Player>> OnPlayerListChange { get; set; }
+        public Action<List<Player>, Server> OnPlayerListChange { get; set; }
         public string CurrentMissionId { get; set; }
         public int TimeZoneOffset { get; set; }
 
@@ -72,6 +72,7 @@ namespace IL2CDR.Model
                     }
                 }
             };
+            
 
             GameObjects = new GameObjectsCollection();
             AirFields = new AirFieldCollection();
@@ -81,7 +82,7 @@ namespace IL2CDR.Model
         void OnlinePlayers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (OnPlayerListChange != null)
-                OnPlayerListChange(OnlinePlayers.ToList());
+                OnPlayerListChange(OnlinePlayers.ToList(), this);
         }
 
         private void UpdateOnlinePlayers(object sender)

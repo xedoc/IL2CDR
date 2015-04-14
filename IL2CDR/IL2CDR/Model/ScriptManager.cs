@@ -133,7 +133,7 @@ namespace IL2CDR.Model
             }
         }
 
-        public void ProcessPlayerListChange(List<Player> players)
+        public void ProcessPlayerListChange(Server server, List<Player> players)
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach (IActionScript script in actScripts)
@@ -141,7 +141,7 @@ namespace IL2CDR.Model
                 if (!(script as IScriptConfig).Config.IsEnabled)
                     continue;
 
-                script.OnPlayerListChange(players);
+                script.OnPlayerListChange(server, players);
             }
         }
 

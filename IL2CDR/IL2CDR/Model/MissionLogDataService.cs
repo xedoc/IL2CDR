@@ -97,8 +97,8 @@ namespace IL2CDR.Model
                 }
             };
 
-            server.OnPlayerListChange = (players) => {
-                actionManager.ProcessPlayerListChange(players);
+            server.OnPlayerListChange = (players,srv) => {
+                actionManager.ProcessPlayerListChange(srv, players);
             };
         }
 

@@ -67,7 +67,30 @@ namespace IL2CDR.Scripts.Tests
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Damage]));
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Join]));
             gs.AddToQueue(Data.GetTestMissionEvent(Data.testLines[EventType.Kill]));
-            gs.SendDataToServer();
+            gs.SendDataToServer(gs);
+        }
+
+        [TestMethod()]
+        public void OnPlayerListChangeTest()
+        {
+            var gs = new GlobalStatistics();
+            gs.Config = new ScriptConfig()
+            {
+                ConfigFields = new ConfigFieldList()
+                    {
+                        { "token", "Token", "Server authentication token", FieldType.Text, "0695da663534558c209f052ac2af4112", true},
+                    },
+            };
+
+            var startPacket = Data.GetTestMissionEvent(Data.testLines[EventType.MissionStart]);
+            gs.OnPlayerListChange(((MissionLogEventHeader)startPacket).Server, new List<Player>()
+            {
+                new Player() {
+                    NickId = Guid.NewGuid(),
+                    Country = new Country(101) { Name = "Russia"},
+                    Ping = 100,
+                }
+            });
         }
     }
 }

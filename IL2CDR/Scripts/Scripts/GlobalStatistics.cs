@@ -13,12 +13,14 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        //private const string DOMAIN = "localhost";
-        //private const string URL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
-        //private const string URL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
-        
-        private const string DOMAIN = "il2.info";
-        private const string URL = "http://" + DOMAIN + "/e";
+        private const string DOMAIN = "localhost";
+        private const string EVENTURL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
+        private const string PLAYERURL = "http://" + DOMAIN + ":49191/update/players/?XDEBUG_SESSION_START=55A2686E";
+        //private const string EVENTURL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
+
+        //private const string DOMAIN = "il2.info";
+        //private const string EVENTURL = "http://" + DOMAIN + "/e";
+        //private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
@@ -102,10 +104,11 @@ namespace IL2CDR.Scripts
                 using( WebClientBase webClient = new WebClientBase())
                 {
                     var data = webClient.GZipBytes(obj.lastPacket);
+                    webClient.Timeout = 9000;
                     webClient.ContentType = ContentType.JsonUTF8;
                     webClient.KeepAlive = false;
                     webClient.SetCookie("srvtoken", Token, DOMAIN);
-                    result = webClient.UploadCompressed(URL, obj.lastPacket);
+                    result = webClient.UploadCompressed(EVENTURL, obj.lastPacket);
                     if (!String.IsNullOrWhiteSpace(result))
                     {
                         if (result.Equals("OK", StringComparison.InvariantCultureIgnoreCase))
@@ -227,13 +230,35 @@ namespace IL2CDR.Scripts
 
             AddToQueue(packet);
         }
-        public override void OnPlayerListChange(List<Player> players)
+        public override void OnPlayerListChange(Server server, List<Player> players)
         {
-            //foreach(var player in players)
-            //{
-            //    Log.WriteInfo("{0} ping: {1} status:{2}", player.NickName, player.Ping, player.Status);
-            //}
+            Log.WriteInfo("Players: {0}", players.Count);
+
+            if( players == null || 
+                players.Count <= 0 )
+                return;
+
+            var packet = new
+            {
+                ServerId = server.ServerId.ToString(),
+                Players = players.Select(p => new
+                {
+                    NickId = p.NickId.ToString(),
+                    CountryId = p.Country.Id,
+                    Ping = p.Ping,
+                })
+            };
+            var json = Json.Serialize(packet);
+            using (WebClientBase webClient = new WebClientBase())
+            {
+                webClient.Timeout = 9000;
+                webClient.ContentType = ContentType.JsonUTF8;
+                webClient.KeepAlive = false;
+                webClient.SetCookie("srvtoken", Token, DOMAIN);
+                webClient.Upload( PLAYERURL, json );
+            }
         }
+
         
 
 

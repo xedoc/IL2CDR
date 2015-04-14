@@ -114,11 +114,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Scripts\Scripts\LogParser.cs">
-      <Link>Scripts\LogParser.cs</Link>
+      <Link>ScriptExamples\LogParser.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Scripts\Scripts\WebRcon.cs">
-      <Link>Scripts\WebRcon.cs</Link>
+      <Link>ScriptExamples\WebRcon.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Compile Include="Control\ScrollingTextBox.cs" />

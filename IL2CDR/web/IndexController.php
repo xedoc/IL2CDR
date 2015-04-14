@@ -6,6 +6,7 @@ require_once 'Model/Servers.php';
 require_once 'Model/TZ.php';
 require_once 'Model/Cache.php';
 require_once 'Model/Filter.php';
+require_once 'Model/Players.php';
 require 'phpfastcache.php';
 
 /**
@@ -208,17 +209,11 @@ class IndexController
     }
     public function GetServers()
     {    
-        $auth = new Auth();
-        $servers = new Servers();
+        $this->CheckAuth();
         
-        if( $auth->IsLoggedIn() )
-        {
-            return $this->templates->render('servers', ['servers' => $servers->GetServers()]);  
-        }
-        else
-        {
-            return $this->templates->render('message', ['message' => 'Authorization required!']);  
-        }    
+        $servers = new Servers();  
+        return $this->templates->render('servers', ['servers' => $servers->GetServers()]);  
+        
     }
     public function PostFilter($request)
     {
@@ -234,17 +229,23 @@ class IndexController
         }
         
     }
+    
+    public function PostPlayers($request)
+    {
+        $this->CheckAuth();
 
+        if( $request->isPost() )
+        {
+            $players = new Players( $request->getBody() );
+            $players->UpdatePlayersOnline();
+        }
+        
+    }
+    
     public function PostServers($request)
     {
-        $auth = new Auth();
+        $this->CheckAuth();
         
-        if( !$auth->IsLoggedIn() )
-        {
-            echo $this->templates->render('message', ['message' => 'Authorization required!']);  
-            die();
-        }
-
         if( $request->isPost() )
         {
             $servers = new Servers();
@@ -252,10 +253,19 @@ class IndexController
                 $request->post('servers'), 
                 $request->post('ishidden') );
         }
-       
+        
     }
     
-    
+    public function CheckAuth()
+    {
+        $auth = new Auth();
+        
+        if( !$auth->IsLoggedIn() )
+        {
+            echo $this->templates->render('message', ['message' => 'Authorization required!']);  
+            die();
+        }        
+    }
     
     public function GetMissions()
     {

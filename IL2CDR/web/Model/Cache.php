@@ -24,11 +24,11 @@ class Cache
         
         if( $token == null )
         {
-            __c()->set($name . '_' . $this->tz->GetTimeZone(), $content,600);                   
+            __c()->set($name . '_' . $this->tz->GetTimeZone(), $content,$seconds);                   
         }
         else
         {
-            __c()->set($token.$name . '_' . $this->tz->GetTimeZone() , $content ,600);
+            __c()->set($token.$name . '_' . $this->tz->GetTimeZone() , $content ,$seconds);
         }
     }
     public function GetCache($name)
@@ -47,5 +47,15 @@ class Cache
             $content = __c()->get($token.$name . '_' . $this->tz->GetTimeZone());
         }
         return $content;    
+    }
+    
+    public function UpdateTimestamp($name)
+    {
+        $this->AddCache( $name, 3600, time() );
+    }
+    
+    public function Delete($name)
+    {
+        __c()->delete($name);
     }
 }

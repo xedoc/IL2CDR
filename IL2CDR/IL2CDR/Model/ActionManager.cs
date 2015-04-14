@@ -33,9 +33,9 @@ namespace IL2CDR.Model
             scriptManager.ProcessButtonClick(buttonName);
         }
 
-        public void ProcessPlayerListChange( List<Player> players)
+        public void ProcessPlayerListChange( Server server, List<Player> players)
         {
-            scriptManager.ProcessPlayerListChange(players);
+            scriptManager.ProcessPlayerListChange(server, players);
         }
     }
 }

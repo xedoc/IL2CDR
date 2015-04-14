@@ -65,11 +65,15 @@ class Router
             unset($unzipped);
             $unzipped = null;
         });
-        $this->app->post('/update/servers', function() { 
+
+        $this->app->post('/update/players/', function() { 
+            $this->indexController->PostPlayers( $this->app->request ); 
+        });
+        $this->app->post('/update/servers/', function() { 
             $this->indexController->PostServers( $this->app->request );
             $this->app->redirect('/servers');
         });
-        $this->app->post('/update/filter', function() { 
+        $this->app->post('/update/filter/', function() { 
             $this->indexController->PostFilter( $this->app->request );
         });
         $this->app->post('/signup/', function() { 

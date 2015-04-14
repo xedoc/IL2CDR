@@ -2,6 +2,8 @@
 require_once 'MySQL.php';
 require_once 'Utils.php';
 require_once 'Mailer.php';
+require_once 'Cache.php';
+
 /**
  * Auth short summary.
  *
@@ -94,9 +96,14 @@ class Auth
     }
     public function IsLoggedIn()
     {
+        $cache = new Cache();
         if( isset( $_COOKIE['authtoken']) && !empty($_COOKIE['authtoken']) )
         {
             $token =  $_COOKIE['authtoken'];
+            
+            if( $cache->GetCache( 'isauth' . $token) )
+                return true;
+                
             $result = $this->db->query( sprintf('CALL Login(%s,%s,%s)', $this->db->EaQ($this->email), $this->db->EaQ($this->password), $this->db->EaQ($token) ));            
             if( $result )
             {
@@ -106,6 +113,8 @@ class Auth
                     {
                         $this->CurrentUser = $obj->Email;
                         $this->StatToken = $obj->Token;
+                        $cache->AddCache( 'isauth' . $token, 3600, true );
+                        
                         return true;
                     }
                 }

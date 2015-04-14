@@ -260,20 +260,15 @@ namespace IL2CDR.Model
             }
             public String Upload(string url, string args)
             {
-                string result = null;
-                try
+                return (string)TryWeb(url, () =>
                 {
                     lock (downloadLock)
                     {
-                        result = base.UploadString(url, "POST", args);
+                        var result = base.UploadString(url, "POST", args);
                         SuccessHandler();
+                        return result;
                     }
-                }
-                catch
-                {
-                    ErrorHandler(String.Format("Error uploading to {0}", url));
-                }
-                return result;
+                });
             }
 
             public Stream PutStream(string url, Stream stream)

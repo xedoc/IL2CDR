@@ -134,7 +134,7 @@ namespace IL2CDR.Model
         /// </summary>
         /// <param name="players"></param>
         
-        virtual public void OnPlayerListChange( List<Player> players ){ }
+        virtual public void OnPlayerListChange( Server server, List<Player> players ){ }
 
 
         /// <summary>
