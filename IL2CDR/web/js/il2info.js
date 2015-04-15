@@ -22,11 +22,10 @@ $(document).ready(function () {
                 if (!(json instanceof Array))
                     json = JSON.parse(json);
 
+                $('#playerlist').empty();
+
                 if (json instanceof Array) {
-                    if (json.length <= 0) {
-                        $('#playerlist').empty();
-                    }
-                    else
+                    if (json.length > 0) {
                     {
                         var transform = {
                             "tag": "tr", "children": [
