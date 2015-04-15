@@ -25,7 +25,7 @@ $(document).ready(function () {
                 $('#playerlist').empty();
 
                 if (json instanceof Array) {
-                    if (json.length > 0) {
+                    if (json.length > 0) 
                     {
                         var transform = {
                             "tag": "tr", "children": [
