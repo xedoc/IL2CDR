@@ -370,6 +370,7 @@
     <Compile Include="svg\plane.svg" />
     <Compile Include="svg\truck.svg" />
     <Compile Include="templates\missions.php" />
+    <Compile Include="templates\monitor.php" />
     <Compile Include="templates\partial_filtermodal.php" />
     <Compile Include="templates\partial_jsconfig.php" />
     <Compile Include="templates\partial_serverdifficulty.php" />
@@ -461,7 +462,9 @@
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
     <Content Include="js\il2info.js" />
+    <Content Include="js\jquery.json2html.js" />
     <Content Include="js\jquery.min.js" />
+    <Content Include="js\json2html.js" />
     <Content Include="js\npm.js" />
     <Content Include="phpfastcache\3.0.0\index.html" />
     <Content Include="phpfastcache\3.0.0\readme.txt" />

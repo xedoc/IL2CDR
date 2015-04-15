@@ -135,3 +135,8 @@ div.DTS tbody tr.even {
     padding-left : 0px !important;
 
 }
+
+.serverlist{
+    height : 500px;
+    overflow-y : auto;
+}

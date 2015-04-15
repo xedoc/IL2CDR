@@ -135,6 +135,9 @@ namespace IL2CDR.Model
 
         public void ProcessPlayerListChange(Server server, List<Player> players)
         {
+            if (server == null || players == null)
+                return;
+
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
             foreach (IActionScript script in actScripts)
             {

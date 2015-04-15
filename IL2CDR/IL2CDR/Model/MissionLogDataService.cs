@@ -97,9 +97,6 @@ namespace IL2CDR.Model
                 }
             };
 
-            server.OnPlayerListChange = (players,srv) => {
-                actionManager.ProcessPlayerListChange(srv, players);
-            };
         }
 
         private void StartNewMission(string logFilePath)
@@ -260,6 +257,12 @@ namespace IL2CDR.Model
                 scriptManager.Start();
                 actionManager = new ActionManager(new ScriptManager());
             }
+
+            server.OnPlayerListChange = (players, srv) =>
+            {
+                actionManager.ProcessPlayerListChange(srv, players);
+            };
+
             
             ReadMissionHistory();
             

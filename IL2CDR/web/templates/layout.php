@@ -51,6 +51,7 @@
         </li>        
         <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
         <li><a data-toggle="modal" data-target="#filterModal" href="#">Filter</a></li>
+        <li <?=activeIfMatch("monitor")?>><a href="/monitor">Monitor</a></li>
 
 
       </ul>
@@ -92,6 +93,8 @@
 <script src="//cdn.datatables.net/scroller/1.2.2/js/dataTables.scroller.min.js"></script>
 <script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/js/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="/js/jquery.json2html.js"></script>
+<script type="text/javascript" src="/js/json2html.js"></script>
 <script src="/js/il2info.js"></script>
 
 </html>

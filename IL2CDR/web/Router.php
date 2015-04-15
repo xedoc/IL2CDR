@@ -51,13 +51,15 @@ class Router
     	$this->app->get('/logout/', function() { $this->indexController->GetLogout(); $this->app->redirect('/'); } );
     	$this->app->get('/missions/', function() { echo $this->indexController->GetMissions(); } );
     	$this->app->get('/servers/', function() { echo $this->indexController->GetServers(); } );
+    	$this->app->get('/monitor/', function() { echo $this->indexController->GetMonitor(); } );
 
-        //top score json
         $this->app->get('/json/wl/', function() { echo $this->indexController->GetJsonWl($this->app->request); } );
         $this->app->get('/json/wlpvp/', function() { echo $this->indexController->GetJsonWlPvP($this->app->request); } );
         $this->app->get('/json/wlpve/', function() { echo $this->indexController->GetJsonWlPvE($this->app->request); } );
         $this->app->get('/json/snipers/', function() { echo $this->indexController->GetJsonSnipers($this->app->request); } );
         $this->app->get('/json/missions/', function() { echo $this->indexController->GetJsonMissions($this->app->request); } );
+        $this->app->get('/json/playerlist/:serverid', function($serverid) { echo $this->indexController->GetJsonPlayerList($serverid); } );
+        
         
         $this->app->post('/e/', function() { 
             $unzipped = gzdecode($this->app->request->getBody());

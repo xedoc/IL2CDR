@@ -34,16 +34,17 @@ class Players
                 $values = array();
                 foreach( $this->players->Players as $player )
                 {
-                    $values[] = sprintf('(%s,%s,%s,%s)', 
-                        $this->db->EaQ( $serverid ), 
-                        $this->db->EaQ( $player->NickId ), 
+                    $values[] = sprintf('(%s,%s,%s,%s,%s)', 
+                        sprintf( 'uuid2bin(%s)', $this->db->EaQ( $this->players->ServerId )), 
+                        sprintf( 'uuid2bin(%s)', $this->db->EaQ( $player->NickId )), 
                         $this->db->EaQ( $player->Ping ),
-                        $this->db->EaQ( $player->CountryId )
+                        $this->db->EaQ( $player->CountryId ),
+                        $this->db->EaQ( $player->Status )
                         );
                 }
                 $params = array(                        
                     'ServerId' => $this->db->EaQ( $this->players->ServerId ),
-                    'Values' => implode( ',', $values )                    
+                    'Values' => $this->db->EaQ( implode( ',', $values ) )
                 );
                 
                 $this->cache->Delete( 'playersonline_' . $serverid );
@@ -92,7 +93,7 @@ class Players
                 }            
                 $result->close();
                 $this->db->nextresult();
-                $this->cache->AddCache($cacheid, 3600, $table );
+                $this->cache->AddCache($cacheid, 60, $table );
 
                 return $table;
             }

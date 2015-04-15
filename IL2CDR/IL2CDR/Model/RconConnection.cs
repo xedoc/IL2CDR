@@ -248,8 +248,10 @@ namespace IL2CDR.Model
                     }
                     return new NameValueCollection();
                 });
-                writeTask.Wait(1000);
-                return writeTask.Result;
+                if (writeTask.Wait(1000))
+                    return writeTask.Result;
+                else
+                    return new NameValueCollection();
             }
         }
         /// <summary>

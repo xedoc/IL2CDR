@@ -12,6 +12,43 @@ $.extend($.fn.dataTable.defaults, {
 });
 
 $(document).ready(function () {
+    $('.serveritem').on('click', function (e) {
+        var serverId = $(this).data('id');
+
+        $.ajax({
+            url: "/json/playerlist/" + serverId,
+            cache: false,
+            success: function (json) {
+                if (!(json instanceof Array))
+                    json = JSON.parse(json);
+
+                if (json instanceof Array) {
+                    if (json.length <= 0) {
+                        $('#playerlist').empty();
+                    }
+                    else
+                    {
+                        var transform = {
+                            "tag": "tr", "children": [
+                            { "tag": "td", "html": "${Country}", },
+                            { "tag": "td", "html": "${Nickname}",},
+                            { "tag": "td", "html": "${Ping}" },
+                            ]
+                        };
+
+                        $('#playerlist').json2html(json, transform );                
+                    }
+                }
+            },
+            timeout: 15000,
+            //error: function () {
+            //    setTimeout(function () {
+            //        refreshCommands()
+            //    }, interval);
+
+        });
+
+    });
     $('#filter').on('submit', function (e) {
         e.preventDefault();  
         var data = $("#filter").find(":selected").text();

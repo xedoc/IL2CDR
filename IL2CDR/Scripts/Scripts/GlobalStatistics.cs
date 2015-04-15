@@ -13,14 +13,14 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        private const string DOMAIN = "localhost";
-        private const string EVENTURL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
-        private const string PLAYERURL = "http://" + DOMAIN + ":49191/update/players/?XDEBUG_SESSION_START=55A2686E";
+        //private const string DOMAIN = "localhost";
+        //private const string EVENTURL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
+        //private const string PLAYERURL = "http://" + DOMAIN + ":49191/update/players/?XDEBUG_SESSION_START=55A2686E";
         //private const string EVENTURL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
 
-        //private const string DOMAIN = "il2.info";
-        //private const string EVENTURL = "http://" + DOMAIN + "/e";
-        //private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
+        private const string DOMAIN = "il2.info";
+        private const string EVENTURL = "http://" + DOMAIN + "/e";
+        private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
@@ -232,21 +232,16 @@ namespace IL2CDR.Scripts
         }
         public override void OnPlayerListChange(Server server, List<Player> players)
         {
-            Log.WriteInfo("Players: {0}", players.Count);
-
-            if( players == null || 
-                players.Count <= 0 )
-                return;
-
             var packet = new
             {
                 ServerId = server.ServerId.ToString(),
-                Players = players.Select(p => new
+                Players = players.Where(p => p != null && p.ClientId != 0 && p.NickId != null ).Select(p => new
                 {
                     NickId = p.NickId.ToString(),
-                    CountryId = p.Country.Id,
+                    CountryId = p.Country == null ? 0 : p.Country.Id,
                     Ping = p.Ping,
-                })
+                    Status = p.Status.ToString(),
+                }).ToArray()
             };
             var json = Json.Serialize(packet);
             using (WebClientBase webClient = new WebClientBase())

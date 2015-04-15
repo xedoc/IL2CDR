@@ -31,7 +31,7 @@ namespace IL2CDR.Model
         public void Start()
         {
             dserverProcMonitor.Start();
-            foreach (var server in dserverProcMonitor.RunningProcesses)
+            foreach (var server in dserverProcMonitor.RunningProcesses.ToList())
             {
                 AddServer(GetServer(server));
             }

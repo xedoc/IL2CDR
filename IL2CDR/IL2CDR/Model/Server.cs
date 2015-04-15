@@ -48,18 +48,22 @@ namespace IL2CDR.Model
         }
         private void Initialize()
         {
-            timerPlayerList = new Timer((sender) => { UpdateOnlinePlayers(sender); }, this, 0, 5000 );
-            OnlinePlayers.CollectionChanged += OnlinePlayers_CollectionChanged;
+            timerPlayerList = new Timer((sender) => { UpdateOnlinePlayers(sender); }, this, 0, 30000 );
             Players = new PlayersCollection();
             Players.OnPlayerJoin = (player) => {
                 if( player == null )
                     return;
-                if( !OnlinePlayers.Any( p => p.NickId.Equals( player.NickId )) )
+                var existing = OnlinePlayers.FirstOrDefault(p => p.NickId.Equals(player.NickId));
+                if (existing == null)
                 {
-                    lock( lockOnlinePlayers )
+                    lock (lockOnlinePlayers)
                     {
                         OnlinePlayers.Add(player);
                     }
+                }
+                else
+                {
+                    existing.Country = player.Country;
                 }
                     
             };
@@ -79,14 +83,11 @@ namespace IL2CDR.Model
             CoalitionIndexes = new List<CoalitionIndex>();
         }
 
-        void OnlinePlayers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (OnPlayerListChange != null)
-                OnPlayerListChange(OnlinePlayers.ToList(), this);
-        }
 
         private void UpdateOnlinePlayers(object sender)
         {
+            bool playerListChanged = false;
+
             var server = sender as Server;
             if( sender == null || 
                 !server.IsRconConnected || 
@@ -102,6 +103,9 @@ namespace IL2CDR.Model
                 lock(server.lockOnlinePlayers)
                     OnlinePlayers.Clear();
 
+                if (OnPlayerListChange != null)
+                    OnPlayerListChange(OnlinePlayers.ToList(), this);
+
                 return;
             }
 
@@ -109,6 +113,9 @@ namespace IL2CDR.Model
 
             lock (server.lockOnlinePlayers)
             {
+
+                playerListChanged = OnlinePlayers.Count(p => !onlineIds.Contains(p.NickId)) > 0;
+                
                 OnlinePlayers.RemoveAll(player => !onlineIds.Contains(player.NickId)); 
                
                 foreach( var player in newList )
@@ -117,13 +124,21 @@ namespace IL2CDR.Model
                     if( existing == null )
                     {
                         OnlinePlayers.Add(player);
+                        playerListChanged = true;
                     }
                     else
                     {
+                        if (!playerListChanged)
+                            playerListChanged = existing.Ping != player.Ping ||
+                                                 existing.Status != player.Status;
+
                         existing.Ping = player.Ping;
                         existing.Status = player.Status;
                     }
                 }
+
+                if (playerListChanged && OnPlayerListChange != null)
+                    OnPlayerListChange(OnlinePlayers.ToList(), this);
             }
 
 

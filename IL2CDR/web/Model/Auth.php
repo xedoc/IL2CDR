@@ -100,27 +100,35 @@ class Auth
         if( isset( $_COOKIE['authtoken']) && !empty($_COOKIE['authtoken']) )
         {
             $token =  $_COOKIE['authtoken'];
-            
-            if( $cache->GetCache( 'isauth' . $token) )
-                return true;
-                
-            $result = $this->db->query( sprintf('CALL Login(%s,%s,%s)', $this->db->EaQ($this->email), $this->db->EaQ($this->password), $this->db->EaQ($token) ));            
-            if( $result )
-            {
-                if( $obj = $result->fetch_object() )
-                {
-                    if( isset($obj->Email) && isset( $obj->AuthToken ) && $obj->AuthToken == $_COOKIE['authtoken'] )
-                    {
-                        $this->CurrentUser = $obj->Email;
-                        $this->StatToken = $obj->Token;
-                        $cache->AddCache( 'isauth' . $token, 3600, true );
-                        
-                        return true;
-                    }
-                }
-                $this->db->nextresult();
-            }             
         }
+        else if( isset( $_COOKIE['srvtoken']) && !empty( $_COOKIE['srvtoken']))
+        {
+            $token =  $_COOKIE['srvtoken'];
+        }
+        else
+        {
+            return false;
+        }
+        
+        if( $cache->GetCache( 'isauth' . $token) )
+            return true;
+                
+        $result = $this->db->query( sprintf('CALL Login(%s,%s,%s)', $this->db->EaQ($this->email), $this->db->EaQ($this->password), $this->db->EaQ($token) ));            
+        if( $result )
+        {
+            if( $obj = $result->fetch_object() )
+            {
+                if( isset($obj->Email) && isset( $obj->AuthToken ) && ($obj->AuthToken == $token || $obj->Token == $token) )
+                {
+                    $this->CurrentUser = $obj->Email;
+                    $this->StatToken = $obj->Token;
+                    $cache->AddCache( 'isauth' . $token, 86400, true );
+                        
+                    return true;
+                }
+            }
+            $this->db->nextresult();
+        }             
         return false;
     }
     public function Login($remember)

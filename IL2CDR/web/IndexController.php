@@ -45,9 +45,18 @@ class IndexController
             $onpage = 10;
             $missions = json_decode( $this->top->GetMissions(1,0,80,null));
             $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
+            $playersbyserver = $servers->GetPlayerCountByServer();
+            $firstserver = array_values($playersbyserver)[0];
+            if( count($playersbyserver) > 0 )
+                $serverplayers = $servers->GetOnlinePlayers($firstserver->Id);
+            else
+                $serverplayers = array();
             
             $data = [ 'isloggedin' => $this->auth->IsLoggedIn(),                
+                'firstserverid' => $firstserver->Id,
                 'allservers' => $servers->GetVisibleServers(),
+                'playersbyserver' => $playersbyserver,     
+                'serverplayers' => $serverplayers,
                 'currentuser' => $this->auth->CurrentUser,
                 'difficulties' => $servers->GetDifficulties(),
                 'stattoken' => $this->auth->StatToken,
@@ -59,7 +68,7 @@ class IndexController
                 'missionCount' => $missions->recordsTotal,
                 'tz' => $this->tz->GetTimeZone(),
                 ];
-            $this->datacache->AddCache('start_page', 600, $data );
+            $this->datacache->AddCache('start_page', 60, $data );
             $this->templates->addData($data); 
         }
         
@@ -195,6 +204,11 @@ class IndexController
         $result =  $this->top->GetTotalSnipers($draw,$start,$length, $search);
         return $this->AddJsonToCache( 'snipers', $draw,$start,$length, $search, $result);
     }
+    public function GetJsonPlayerList($serverid)
+    {
+        $servers = new Servers();        
+        return json_encode($servers->GetOnlinePlayers( $serverid ), JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES);
+    }
     public function GetJsonMissions($request)
     {
         $draw = $request->get('draw');
@@ -215,6 +229,14 @@ class IndexController
         return $this->templates->render('servers', ['servers' => $servers->GetServers()]);  
         
     }
+    
+    public function GetMonitor()
+    {
+               
+        return $this->templates->render('monitor');  
+        
+    }
+    
     public function PostFilter($request)
     {
         if( $request->isPost() )
