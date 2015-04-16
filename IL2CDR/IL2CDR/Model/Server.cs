@@ -135,6 +135,7 @@ namespace IL2CDR.Model
 
                         existing.Ping = player.Ping;
                         existing.Status = player.Status;
+                        existing.ClientId = player.ClientId;
                     }
                 }
 

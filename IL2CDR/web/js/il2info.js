@@ -25,33 +25,22 @@ $(document).ready(function () {
         $.ajax({
             url: "/json/playerlist/" + serverId,
             cache: false,
-            success: function (json) {
-                if (!(json instanceof Array))
-                    json = JSON.parse(json);
+            success: function (result) {
+                json = JSON.parse(result);
 
-                $('#playerlist').empty();
+                var transform = {
+                    tag: "tr",
+                    children: [
+                    { "tag": "td", "html": '${Country}' },
+                    { "tag": "td", "html": '${Nickname}' },
+                    { "tag": "td", "html": '${Ping}' },
+                    ]
+                };
 
-                if (json instanceof Array) {
-                    if (json.length > 0) 
-                    {
-                        var transform = {
-                            "tag": "tr", "children": [
-                            { "tag": "td", "html": "${Country}", },
-                            { "tag": "td", "html": "${Nickname}",},
-                            { "tag": "td", "html": "${Ping}" },
-                            ]
-                        };
-
-                        $('#playerlist').json2html(json, transform );                
-                    }
-                }
+                $('#playerlist > tbody ').empty();
+                $('#playerlist > tbody ').json2html(json, transform);
             },
-            timeout: 15000,
-            //error: function () {
-            //    setTimeout(function () {
-            //        refreshCommands()
-            //    }, interval);
-
+            timeout: 15000
         });
 
     });
