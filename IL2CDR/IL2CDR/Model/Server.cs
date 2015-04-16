@@ -20,6 +20,7 @@ namespace IL2CDR.Model
         public MissionLogDataService MissionLogService { get; set; }
         [JsonIgnore]
         public ProcessItem Process { get; set; }
+        [JsonIgnore]
         public Action<List<Player>, Server> OnPlayerListChange { get; set; }
         public string CurrentMissionId { get; set; }
         public int TimeZoneOffset { get; set; }
@@ -339,6 +340,7 @@ namespace IL2CDR.Model
         /// Sets and gets the Areas property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
+        [JsonIgnore]
         public AreaCollection Areas
         {
             get

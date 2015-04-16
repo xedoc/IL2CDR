@@ -10,6 +10,13 @@ $.extend($.fn.dataTable.defaults, {
         searchPlaceholder: "Search player"
     }
 });
+var delay = (function () {
+    var timer = 0;
+    return function (callback, ms) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();
 
 $(document).ready(function () {
     $('.serveritem').on('click', function (e) {
@@ -50,7 +57,7 @@ $(document).ready(function () {
     });
     $('#filter').on('submit', function (e) {
         e.preventDefault();  
-        var data = $("#filter").find(":selected").text();
+        var data = $("#filter").find(":selected").val();
         console.log(data); 
     });
 
@@ -58,7 +65,7 @@ $(document).ready(function () {
     $('#table_wl').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css( 'display', processing ? 'block' : 'none' );
     }).DataTable({
-        dom: '<"toolbar">frtip',
+        dom: '<"toolbar">rtip',
         pageLength: 10,
         serverSide: true,
         ajax: {
@@ -66,12 +73,11 @@ $(document).ready(function () {
             type: 'GET'
         },
         deferLoading: playersCount,
-
     });
     $('#table_wlpvp').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
-        dom: '<"toolbar">frtip',
+        dom: '<"toolbar">rtip',
         pageLength: 10,
         serverSide: true,
         ajax: {
@@ -83,7 +89,7 @@ $(document).ready(function () {
     $('#table_wlpve').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
-        dom: '<"toolbar">frtip',
+        dom: '<"toolbar">rtip',
         pageLength: 10,
         serverSide: true,
         ajax: {
@@ -96,7 +102,7 @@ $(document).ready(function () {
     $('#table_snipers').on('processing.dt', function (e, settings, processing) {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
-        dom: '<"toolbar">frtip',
+        dom: '<"toolbar">rtip',
         pageLength: 10,
         serverSide: true,
         ajax: {
@@ -109,6 +115,8 @@ $(document).ready(function () {
         $('#processingIndicator').css('display', processing ? 'block' : 'none');
     }).DataTable({
     });
+
+
 
     var missionTable = $('#table_missions').DataTable({
         "columnDefs": [
@@ -134,6 +142,14 @@ $(document).ready(function () {
         }
     });
 
+    var searchInput = $(".searchinput")[0];
+    var tables = $.fn.dataTable.tables();
+    $(searchInput).keyup(function () {
+        delay(function () {
+            $(tables[0]).DataTable().search($(searchInput).val()).draw();
+        }, 500);
+    })
+
     var tz = jstz.determine();        
         
     if (typeof (tz) === 'undefined') {
@@ -147,6 +163,8 @@ $(document).ready(function () {
 
     $("div.toolbar").html('');
 });
+
+
 
 
 

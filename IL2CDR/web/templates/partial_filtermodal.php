@@ -9,13 +9,13 @@
           <form id="filter" action="/update/filter" method="post">
              <div class="form-group">
                 <label for="servernamefilter">Server name:</label>
-                  <select name="servers[]" class="selectpicker">
+                  <select name="servers[]" class="selectpicker"  multiple data-selected-text-format="count">
                       <?php $this->insert('partial_serverlist') ?>
                   </select>                 
              </div>
              <div class="form-group">
                 <label for="servernamefilter">Difficulty:</label>
-                  <select name="difficulties[]" class="selectpicker">
+                  <select name="difficulties[]" class="selectpicker"  multiple data-selected-text-format="count">
                       <?php $this->insert('partial_serverdifficulty') ?>
                   </select>                 
              </div>

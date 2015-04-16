@@ -10,6 +10,11 @@
         <div class="top-buffer container-fluid">
           <div class="row">
             <div class="col-md-8 col-md-offset-2">
+            <div class="form-inline dataTables_filter">
+                <label>Search:
+                    <input type="search" class="form-control input-sm searchinput" data-searchtarget="table_wl" placeholder="Search player">
+                </label>
+            </div>
             <table id="table_wl" class="nowrap table table-striped table-bordered">
                 <thead>
                     <tr>

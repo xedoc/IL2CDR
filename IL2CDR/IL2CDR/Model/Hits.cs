@@ -58,6 +58,7 @@ namespace IL2CDR.Model
         }
     }
 
+    [JsonConverter(typeof(HitsSourceConverter))]
     public class HitsSource
     {
         public HitsSource()
@@ -82,10 +83,12 @@ namespace IL2CDR.Model
         }
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JToken t = JToken.FromObject(value);
+            if (value == null)
+                return;
 
-            if (!(value is HitsSource) || t.Type != JTokenType.Object)
+            if (!(value is HitsSource) )
             {
+                JToken t = JToken.FromObject(value);
                 t.WriteTo(writer);
             }    
             else

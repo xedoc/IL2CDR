@@ -17,7 +17,14 @@ class MissionEvent
     function __construct($text)
     {
         $this->db = new MySQL();
-        $this->events = json_decode( $text );
+        try
+        {
+            $this->events = json_decode( $text );
+        }
+        catch( Exception $e)
+        {
+            file_put_contents( '../error_json.log', time() . ': ' . $e->getMessage() . ' Content: ' . $text . PHP_EOL, FILE_APPEND);
+        }
         unset($text);
         $text = null;
     }

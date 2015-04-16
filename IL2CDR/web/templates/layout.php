@@ -84,17 +84,5 @@
 
 </body>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-<script src="/js/jquery.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="//cdn.datatables.net/scroller/1.2.2/js/dataTables.scroller.min.js"></script>
-<script type="text/javascript" src='//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js'></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/js/bootstrap-select.min.js"></script>
-<script type="text/javascript" src="/js/jquery.json2html.js"></script>
-<script type="text/javascript" src="/js/json2html.js"></script>
-<script src="/js/il2info.js"></script>
-
+<script type="text/javascript" src="/scripts.php?build=4&load=js/modernizr.min,js/jquery.min,js/jquery.cookie.min,js/jquery.dataTables.min,js/dataTables.bootstrap,js/bootstrap.min,js/dataTables.scroller.min,js/jstz.min,js/bootstrap-select.min,js/jquery.json2html,js/il2info"> </script>
 </html>

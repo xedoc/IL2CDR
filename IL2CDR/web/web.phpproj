@@ -345,6 +345,7 @@
     <Compile Include="plates\Template\Name.php" />
     <Compile Include="plates\Template\Template.php" />
     <Compile Include="Router.php" />
+    <Compile Include="scripts.php" />
     <Compile Include="Slim\Environment.php" />
     <Compile Include="Slim\Exception\Pass.php" />
     <Compile Include="Slim\Exception\Stop.php" />
@@ -459,12 +460,19 @@
     <Content Include="images\plane.png" />
     <Content Include="images\truck.png" />
     <Content Include="js\addclear.js" />
+    <Content Include="js\bootstrap-select.min.js" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
+    <Content Include="js\dataTables.bootstrap.js" />
+    <Content Include="js\dataTables.scroller.min.js" />
     <Content Include="js\il2info.js" />
+    <Content Include="js\jquery.cookie.min.js" />
+    <Content Include="js\jquery.dataTables.min.js" />
     <Content Include="js\jquery.json2html.js" />
     <Content Include="js\jquery.min.js" />
     <Content Include="js\json2html.js" />
+    <Content Include="js\jstz.min.js" />
+    <Content Include="js\modernizr.min.js" />
     <Content Include="js\npm.js" />
     <Content Include="phpfastcache\3.0.0\index.html" />
     <Content Include="phpfastcache\3.0.0\readme.txt" />

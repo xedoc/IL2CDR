@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace IL2CDR.Model
 {
     public class GameObjectBase
-    { 
+    {
         public List<HitsSource> HitsSources { get; set; }
         
         public GameObjectBase()

@@ -43,7 +43,7 @@ class IndexController
             $servers = new Servers();
             
             $onpage = 10;
-            $missions = json_decode( $this->top->GetMissions(1,0,80,null));
+            $missions = json_decode( $this->top->GetMissions(1,0,10,null));
             $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
             $playersbyserver = $servers->GetPlayerCountByServer();
             $firstserver = array_values($playersbyserver)[0];

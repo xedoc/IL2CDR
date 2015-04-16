@@ -141,8 +141,10 @@ namespace IL2CDR.Scripts
             string content = String.Empty;
             var jsonPackets = new List<object>();
 
-            while (!events.IsEmpty)
+            var limit = 5;
+            while (!events.IsEmpty || limit > 0)
             {
+                limit--;
                 object obj;
                 if (events.TryDequeue(out obj))
                 {
