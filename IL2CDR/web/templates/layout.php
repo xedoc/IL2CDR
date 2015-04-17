@@ -40,7 +40,8 @@
 
       <ul class="nav navbar-nav">
 
-        <li <?=activeIfStartsWith("wl")?> class="dropdown">
+         <li <?=activeIfMatch("monitor")?>><a href="/monitor">Monitor</a></li>
+         <li <?=activeIfStartsWith("wl")?> class="dropdown">           
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">Wins/Losses<b class="caret"></b></a>
             <ul class="dropdown-menu">
                 <li><a href="/wlpvp">Players vs Players</a></li>
@@ -51,7 +52,6 @@
         </li>        
         <li <?=activeIfMatch("missions")?>><a href="/missions">Missions</a></li>
         <li><a data-toggle="modal" data-target="#filterModal" href="#">Filter</a></li>
-        <li <?=activeIfMatch("monitor")?>><a href="/monitor">Monitor</a></li>
 
 
       </ul>

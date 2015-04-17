@@ -14,23 +14,23 @@
                 </div>
             </div>        
         </div>
-        <?php foreach( $servers as $server): ?>
+        <?php for( $i=0; $i<count($servers); $i++): ?>
         <div class="row">
             <div class="form-group">
-                <input type="hidden" name="servers[]" value="<?=$server->Id?>" />
+                <input type="hidden" name="servers[]" value="<?=$servers[$i]->Id?>" />
                 <div class="col-md-2 text-center">                   
-                    <div class="form-control"><input name="ishidden[]" type="checkbox" <?=$server->IsHidden?'checked':''?>/></div>
+                    <div class="form-control"><input name="ishidden[]" value="<?=$i?>" type="checkbox" <?=$servers[$i]->IsHidden?'checked':''?>/></div>
                 </div>
                 <div class="col-md-8">
-                    <label class="form-control"><?=$server->Name?></label>
+                    <label class="form-control"><?=$servers[$i]->Name?></label>
                 </div>
                 <div class="col-md-2">
                     <input data-toggle="modal" data-target="#rconModal" type="button" value="RCON" class="btn btn-warning"/>
                 </div>
             </div>
         </div>
-        <?php endforeach ?>
-        
+        <?php endfor ?>
+       
 
         <div class="row">
             <div class="form-group">

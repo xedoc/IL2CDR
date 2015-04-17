@@ -19,14 +19,11 @@ class Servers
     public function UpdateServers( $idlist, $ishiddenlist )
     {
         $hiddenservers = array();
-        if( is_array( $ishiddenlist ))
+        if( is_array( $ishiddenlist ) && is_array($idlist))
         {
-            foreach( $idlist as $key => $value )
+            foreach( $ishiddenlist as $value )
             {
-                if( $ishiddenlist[$key] )
-                {
-                    $hiddenservers[] = $idlist[$key];
-                }
+                $hiddenservers[] = $idlist[$value];
             }
         }
         $params = array(

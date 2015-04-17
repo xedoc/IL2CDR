@@ -27,49 +27,7 @@
 			        </ul>
 				</div>
 			</div>
-		</div>
-		<div class="col-md-6 column">
-    		<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						Players
-					</h3>
-				</div>
-				<div class="panel-body">
-                    <table class="table table-condensed"  id="playerlist">
-				<thead>
-					<tr>
-						<th>
-							Country
-						</th>
-						<th>
-							Nickname
-						</th>
-						<th>
-							Ping
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-                    <?php foreach( $serverplayers as $player): ?>
-					    <tr>
-                    		<td>
-							    <?=$player->Country?>
-						    </td>
-						    <td>
-							    <?=$player->Nickname?>
-						    </td>
-						    <td>
-							    <?=$player->Ping?>
-						    </td>
-					    </tr>
-                    <?php endforeach ?>
-
-				</tbody>
-			</table>
-				</div>
-			</div>
-			            <div class="panel panel-default">
+            <div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
 						Description
@@ -83,7 +41,50 @@
 				        <a class="btn" href="#">Details &gt;&gt;</a>
 			        </p>
 				</div>
-			</div>			
+			</div>
+		</div>
+		<div class="col-md-6 column">
+    		<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Players
+					</h3>
+				</div>
+				<div class="panel-body">
+                    <table class="table table-condensed"  id="playerlist">
+				        <thead>
+					        <tr>
+						        <th>
+							        Country
+						        </th>
+						        <th>
+							        Nickname
+						        </th>
+						        <th>
+							        Ping
+						        </th>
+					        </tr>
+				        </thead>
+				        <tbody>
+                            <?php foreach( $serverplayers as $player): ?>
+					            <tr>
+                    		        <td>
+							            <?=$player->Country?>
+						            </td>
+						            <td>
+							            <?=$player->Nickname?>
+						            </td>
+						            <td>
+							            <?=$player->Ping?>
+						            </td>
+					            </tr>
+                            <?php endforeach ?>
+
+				        </tbody>
+			        </table>
+				</div>
+			</div>
+						
 		</div>
 
 	</div>

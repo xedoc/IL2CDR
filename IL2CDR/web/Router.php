@@ -41,7 +41,7 @@ class Router
     function SetupRoutes( )
     {
         $this->indexController = new IndexController( new Engine('templates') );
-    	$this->app->get('/', function() { echo $this->indexController->GetWL(); } );
+    	$this->app->get('/', function() { echo $this->indexController->GetMonitor(); } );
     	$this->app->get('/wl/', function() { echo $this->indexController->GetWL(); } );
     	$this->app->get('/wlpvp/', function() { echo $this->indexController->GetWLPvP(); } );
     	$this->app->get('/wlpve/', function() { echo $this->indexController->GetWLPvE(); } );

@@ -21,7 +21,7 @@ var delay = (function () {
 $(document).ready(function () {
     $('.serveritem').on('click', function (e) {
         var serverId = $(this).data('id');
-
+        $('#playerlist > tbody ').html('<tr><td colspan="3">Loading...</td></tr>');
         $.ajax({
             url: "/json/playerlist/" + serverId,
             cache: false,
