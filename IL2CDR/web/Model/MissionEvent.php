@@ -200,6 +200,7 @@ class MissionEvent
                 case 5:
                     break;
                 case 6:
+                    
                     break;
                 case 7:
                     $params = array( 
@@ -270,6 +271,16 @@ class MissionEvent
                 case 15:
                     break;
                 case 16:
+                    if( !isset( $event->Player ) || 
+                        !isset( $event->Player->Plane ))
+                            continue;
+                        $params = array( 
+                               'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
+                               'IsFriendlyArea' => $this->db->EaQ( $event->IsFriendlyArea ),
+                               'IsInAir' => $this->db->EaQ( $event->Player->IsInAir ),
+                           );
+                        $this->db->setvars($params);
+                        $this->db->callproc("OnEject");
                     break;
                 case 17:
                     break;
