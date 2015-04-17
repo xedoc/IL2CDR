@@ -1,6 +1,7 @@
 <?php
 require_once 'MySQL.php';
 require_once 'Server.php';
+require_once 'Filter.php';
 /**
  * Servers short summary.
  *
@@ -117,6 +118,9 @@ class Servers
         if( !$this->db->IsConnected )
             return array();        
         
+        $filter = new Filter();
+        $filteredservers = $filter->GetFilteredServers();
+        
         $result = $this->db->callproc( 'GetVisibleServers');
         $servers = array();
         if( $result && $result->num_rows > 0)
@@ -127,6 +131,7 @@ class Servers
                 {
                     $server = new Server($obj->ServerName,  $obj->ServerId );
                     $server->IsHidden = $obj->IsHidden;
+                    $server->IsInFilter = in_array( $server->Id, $filteredservers );
                     $servers[] = $server;
                 }
             }

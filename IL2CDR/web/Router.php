@@ -77,17 +77,27 @@ class Router
         });
         $this->app->post('/update/filter/', function() { 
             $this->indexController->PostFilter( $this->app->request );
+            $this->GoToPreviousPage();
         });
         $this->app->post('/signup/', function() { 
             echo $this->indexController->PostSignUp( $this->app->request ); 
         });
         $this->app->post('/login/', function() { 
-            $this->indexController->PostLogIn( $this->app->request ); $this->app->redirect('/');
+            $this->indexController->PostLogIn( $this->app->request ); 
+            $this->GoToPreviousPage();
         });
         
         $this->app->run();
     }
     
+    public function GoToPreviousPage()
+    {
+        $previous = '/';
+        if(isset($_SERVER['HTTP_REFERER'])) {
+            $previous = $_SERVER['HTTP_REFERER'];
+        }
+        $this->app->redirect($previous);
+    }
     
 }
 ?>

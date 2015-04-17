@@ -13,6 +13,7 @@ class Server
     public $Name, $Id;
     public $IsHidden;
     public $PlayerCount;
+    public $IsInFilter;
     function __construct($name, $id)
     {
         $this->Name = $name;

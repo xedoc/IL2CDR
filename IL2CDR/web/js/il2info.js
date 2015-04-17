@@ -1,4 +1,6 @@
-﻿$(".nav a").on("click", function () {
+﻿var currentUrl = '';
+
+$(".nav a").on("click", function () {
     $(".nav").find(".active").removeClass("active");
     $(this).parent().addClass("active");
 });
@@ -19,6 +21,9 @@ var delay = (function () {
 })();
 
 $(document).ready(function () {
+
+    currentUrl = window.location.href;
+
     $('.serveritem').on('click', function (e) {
         var serverId = $(this).data('id');
         $('#playerlist > tbody ').html('<tr><td colspan="3">Loading...</td></tr>');
@@ -44,11 +49,11 @@ $(document).ready(function () {
         });
 
     });
-    $('#filter').on('submit', function (e) {
-        e.preventDefault();  
-        var data = $("#filter").find(":selected").val();
-        console.log(data); 
-    });
+    //$('#filter').on('submit', function (e) {
+    //    e.preventDefault();  
+    //    var data = $("#filter").find(":selected").val();
+    //    console.log(data); 
+    //});
 
 
     $('#table_wl').on('processing.dt', function (e, settings, processing) {

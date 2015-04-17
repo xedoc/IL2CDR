@@ -2,6 +2,7 @@
 require_once 'TopDataTable.php';
 require_once 'MySQL.php';
 require_once 'Utils.php';
+require_once 'Filter.php';
 /**
  * TopScore short summary.
  *
@@ -118,6 +119,11 @@ class TopScore
         if( !$this->db->IsConnected )
             return $default;
         
+        $filter = new Filter();
+        $params = array(
+            'Filter' => $this->db->EaQ($filter->GetCurrentFilter()),       
+            );
+        $this->db->setvars( $params );
         $result = $this->db->query( sprintf("CALL %s(%s,%s,%s)", $procname, $this->db->EaQ($search), $this->db->EaQ($start), $this->db->EaQ($length)) );
         if( $result )
         {

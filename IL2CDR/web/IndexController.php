@@ -7,6 +7,7 @@ require_once 'Model/TZ.php';
 require_once 'Model/Cache.php';
 require_once 'Model/Filter.php';
 require_once 'Model/Players.php';
+require_once 'Model/Filter.php';
 require 'phpfastcache.php';
 
 /**
@@ -41,18 +42,21 @@ class IndexController
         else
         {
             $servers = new Servers();
-            
             $onpage = 10;
             $missions = json_decode( $this->top->GetMissions(1,0,10,null));
             $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
             $playersbyserver = $servers->GetPlayerCountByServer();
             $firstserver = array_values($playersbyserver)[0];
+
+            if(!is_array($filteredservers))
+                $filteredservers = array();
+            
             if( count($playersbyserver) > 0 )
                 $serverplayers = $servers->GetOnlinePlayers($firstserver->Id);
             else
                 $serverplayers = array();
             
-            $data = [ 'isloggedin' => $this->auth->IsLoggedIn(),                
+            $data = [ 'isloggedin' => $this->auth->IsLoggedIn(),     
                 'firstserverid' => $firstserver->Id,
                 'allservers' => $servers->GetVisibleServers(),
                 'playersbyserver' => $playersbyserver,     
@@ -247,7 +251,7 @@ class IndexController
                 $request->post('difficulties') 
             );
             
-            setcookie('filter', $id, 0, '/');
+
         }
         
     }
