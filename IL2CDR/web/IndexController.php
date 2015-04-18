@@ -81,13 +81,13 @@ class IndexController
     public function Get10minutesCache($name)
     {
         $token = null;
-
+        $filter = new Filter();
         if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
             $token = $_COOKIE['authtoken'];
         
         if( $token == null )
         {
-            $content = __c()->get($name . '_' . $this->tz->GetTimeZone());
+            $content = __c()->get($name . '_' . $this->tz->GetTimeZone().'-'.$filter->GetCurrentFilter());
             if( $content == null )
             {
                 $content = $this->templates->render($name);
@@ -96,7 +96,7 @@ class IndexController
         }
         else
         {
-            $content = __c()->get($token.$name . '_' . $this->tz->GetTimeZone());
+            $content = __c()->get($token.$name . '_' . $this->tz->GetTimeZone().'-'.$filter->GetCurrentFilter());
             if( $content == null )
             {
                 $content = $this->templates->render($name);
@@ -113,7 +113,7 @@ class IndexController
     {
         $name = $draw . '_' . $start . '_' . $length . '_' . $search . '_' . $this->tz->GetTimeZone();
         $token = null;
-        
+        $filter = new Filter();
         if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
             $token = $_COOKIE['authtoken'];
         
@@ -123,7 +123,7 @@ class IndexController
             if( $content == null )
             {
                 $content = $fallback($draw,$start,$length, $search);
-                __c()->set($name, $content,600);                   
+                __c()->set($name.'-'.$filter->GetCurrentFilter(), $content,600);                   
             }                    
         }
         else
@@ -132,7 +132,7 @@ class IndexController
             if( $content == null )
             {
                 $content = $fallback($draw,$start,$length, $search);
-                __c()->set($token.$name, $content ,600);
+                __c()->set($token.$name.'-'.$filter->GetCurrentFilter(), $content ,600);
             }
             
         }
@@ -149,13 +149,15 @@ class IndexController
     }
     public function GetJsonFromCache( $type, $draw, $start, $length, $search )
     {
+        $filter = new Filter();
         $playerCacheStatus = __c()->get('table_players');
-        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ));            
+        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter() ));            
     }
     public function AddJsonToCache( $type, $draw, $start, $length, $search, $content )
     {
+        $filter = new Filter();
         $playerCacheStatus = __c()->get('table_players');
-        __c()->set( sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ), $content, 60000);
+        __c()->set( sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter()), $content, 60000);
         return $content;
     }
     public function GetJsonWlPvP($request)
