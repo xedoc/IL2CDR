@@ -84,18 +84,18 @@ namespace IL2CDR.Scripts
         {
             if (data == null)
                 return;
-            if (
-                //data is MissionLogEventStart ||
-                data is MissionLogEventMissionEnd ||
-                //data is MissionLogEventKill ||
-                data is MissionLogEventPlayerAmmo ||
-                //data is MissionLogEventTakeOff ||
-                //data is MissionLogEventLanding ||
-                data is MissionLogEventPlaneSpawn ||
-                //data is MissionLogEventGameObjectSpawn ||
-                //data is MissionLogEventObjectiveCompleted ||
-                !(data is MissionLogEventHeader)                
-                )
+            if (data is MissionLogEventStart ||
+                           data is MissionLogEventMissionEnd ||
+                           data is MissionLogEventKill ||
+                           data is MissionLogEventPlayerAmmo ||
+                           data is MissionLogEventTakeOff ||
+                           data is MissionLogEventLanding ||
+                           data is MissionLogEventPlaneSpawn ||
+                           data is MissionLogEventGameObjectSpawn ||
+                           data is MissionLogEventObjectiveCompleted ||
+                           data is MissionLogEject ||
+                           data is MissionLogRemoveBot ||
+                           !(data is MissionLogEventHeader))
             {
                 Log.WriteInfo((data as MissionLogEventHeader).Type.ToString());
 

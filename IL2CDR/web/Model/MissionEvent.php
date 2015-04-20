@@ -271,18 +271,20 @@ class MissionEvent
                 case 15:
                     break;
                 case 16:
-                    if( !isset( $event->Player ) || 
-                        !isset( $event->Player->Plane ))
-                            continue;
-                        $params = array( 
-                               'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
-                               'IsFriendlyArea' => $this->db->EaQ( $event->IsFriendlyArea ),
-                               'IsInAir' => $this->db->EaQ( $event->Player->IsInAir ),
-                           );
-                        $this->db->setvars($params);
-                        $this->db->callproc("OnEject");
+                    //if( !isset( $event->Player ) || 
+                    //    !isset( $event->Player->Plane ))
+                    //        continue;
+                    //    $params = array( 
+                    //           'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
+                    //           'IsFriendlyArea' => $this->db->EaQ( $event->IsFriendlyArea ),
+                    //           'IsInAir' => $this->db->EaQ( $event->Player->IsInAir ),
+                    //       );
+                    //    $this->db->setvars($params);
+                    //    $this->db->callproc("OnBotRemove");
                     break;
                 case 17:
+                    break;
+                case 18:
                     break;
                 case 20:
                     break;

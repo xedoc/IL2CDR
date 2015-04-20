@@ -13,14 +13,15 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        //private const string DOMAIN = "localhost";
+        private const string DOMAIN = "localhost";
         //private const string EVENTURL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
         //private const string PLAYERURL = "http://" + DOMAIN + ":49191/update/players/?XDEBUG_SESSION_START=55A2686E";
-        //private const string EVENTURL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
+        private const string EVENTURL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
+        private const string PLAYERURL = "http://" + DOMAIN + ":3992/update/players/?XDEBUG_SESSION_START=55A2686E";
 
-        private const string DOMAIN = "il2.info";
-        private const string EVENTURL = "http://" + DOMAIN + "/e";
-        private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
+        //private const string DOMAIN = "il2.info";
+        //private const string EVENTURL = "http://" + DOMAIN + "/e";
+        //private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
@@ -169,6 +170,8 @@ namespace IL2CDR.Scripts
                 data is MissionLogEventPlaneSpawn ||
                 data is MissionLogEventGameObjectSpawn ||
                 data is MissionLogEventObjectiveCompleted ||
+                data is MissionLogEject ||
+                data is MissionLogRemoveBot ||
                 !(data is MissionLogEventHeader))
             {
                 //if( data is MissionLogEventHeader )

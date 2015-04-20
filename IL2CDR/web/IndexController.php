@@ -151,13 +151,13 @@ class IndexController
     {
         $filter = new Filter();
         $playerCacheStatus = __c()->get('table_players');
-        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter() ));            
+        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter() ));            
     }
     public function AddJsonToCache( $type, $draw, $start, $length, $search, $content )
     {
         $filter = new Filter();
         $playerCacheStatus = __c()->get('table_players');
-        __c()->set( sprintf("%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter()), $content, 60000);
+        __c()->set( sprintf("%s_%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter()), $content, 60000);
         return $content;
     }
     public function GetJsonWlPvP($request)
