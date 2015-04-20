@@ -35,8 +35,8 @@ $(document).ready(function () {
 
                 var transform = {
                     tag: "tr",
+                    "class": function () { return this.Country == 'Germany' ? 'axisbg' : this.Country == 'Russia' ? 'sovietbg' : ''; },
                     children: [
-                    { "tag": "td", "html": '${Country}' },
                     { "tag": "td", "html": '${Nickname}' },
                     { "tag": "td", "html": '${Ping}' },
                     ]
@@ -45,7 +45,7 @@ $(document).ready(function () {
                 $('#playerlist > tbody ').empty();
                 $('#playerlist > tbody ').json2html(json, transform);
             },
-            timeout: 15000
+            timeout: 30000
         });
 
     });
@@ -114,26 +114,19 @@ $(document).ready(function () {
 
     var missionTable = $('#table_missions').DataTable({
         "columnDefs": [
-            { className: "tdcenter", "targets": [ 1, 2 ] }
+            { className: "tdcenter", "targets": [ 0,1,2,3 ] }
         ],
         serverSide: true,
+        pageLength: 10,
         ajax: {
             url: '/json/missions/',
             type: 'GET'
         },
         language: {
-            processing: "Loading data...",
             searchPlaceholder: "Server name, start/end time"
         },
         deferLoading: missionCount,
-        dom: "rftS",
-        deferRender: true,
-        paging: true,
-        scrollY: 400,
-        scroller: {
-            rowHeight : 74,
-            loadingIndicator: true,
-        }
+        dom: '<"toolbar">rtip',
     });
 
     var searchInput = $(".searchinput")[0];

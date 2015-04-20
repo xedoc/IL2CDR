@@ -84,5 +84,5 @@
 
 </body>
 
-<script type="text/javascript" src="/scripts.php?build=4&amp;load=js/modernizr.min,js/jquery.min,js/jquery.cookie.min,js/jquery.dataTables.min,js/dataTables.bootstrap,js/bootstrap.min,js/dataTables.scroller.min,js/jstz.min,js/bootstrap-select.min,js/jquery.json2html,js/json2html,js/il2info"> </script>
+<script type="text/javascript" src="/scripts.php?build=6&amp;load=js/modernizr.min,js/jquery.min,js/jquery.cookie.min,js/jquery.dataTables.min,js/dataTables.bootstrap,js/bootstrap.min,js/dataTables.scroller.min,js/jstz.min,js/bootstrap-select.min,js/jquery.json2html,js/json2html,js/il2info"> </script>
 </html>

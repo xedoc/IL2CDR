@@ -1,4 +1,13 @@
 ﻿
+th {
+    vertical-align: middle !important;
+    text-align : center !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+td span.glyphicon {
+    color:rgb(90, 90, 90);
+}
 .dropdown-menu {
     background-color : #375A7F !important;
 }
@@ -16,37 +25,41 @@
 .mutedicon path {
     fill : #828282;
 }
+.tdicon {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-left:8px;
+    display:inline-block;
+    background-repeat : no-repeat !important;    
+}
 .icon-plane {
     background-image : url("/svg/plane.svg");
-    background-repeat : no-repeat !important;    
-    padding-left:20px !important;
-    padding-bottom:5px;
-    display:inline-block;
+    padding-right : 16px;
 }
 .no-svg .icon-plane {
     background-image : url("/images/plane.png");
-    background-repeat : no-repeat !important;    
-    padding-left:20px !important;
-    padding-bottom:5px;
-    display:inline-block;
 }
 
 .icon-ground {
     background-image : url("/svg/truck.svg") ;
-    background-repeat : no-repeat !important;    
-    padding-left:36px !important;
-    padding-bottom:5px;
-    margin-left : 5px;
-    display:inline-block;
+    padding-right : 32px;
 }
-
 .no-svg .icon-ground {
     background-image : url("/images/truck.png");
-    background-repeat : no-repeat !important;    
-    padding-left:36px !important;
-    padding-bottom:5px;
-    margin-left : 5px;
-    display:inline-block;
+}
+.icon-axis {
+    background-image : url("/svg/axis.svg") ;
+     padding : 10px;
+}
+.no-svg .icon-axis {
+    background-image : url("/images/axis.png");
+}
+.icon-soviet {
+    background-image : url("/svg/soviet.svg") ;
+    padding : 10px;
+}
+.no-svg .icon-soviet {
+    background-image : url("/images/soviet.png");
 }
 
 .icon-total {
@@ -117,7 +130,7 @@ div.DTS tbody tr.even {
 {
     border: 1px solid #222222;
     background-color: rgb(60,60,60);
-    min-height:45px;
+    /*min-height:45px;*/
 }
 
 .missionlost {
@@ -139,4 +152,18 @@ div.DTS tbody tr.even {
 .serverlist{
     max-height: 400px;
     overflow-y : auto;
+}
+
+.axisbg { 
+    background-color: rgb(19, 90, 111);
+}
+
+.sovietbg { 
+    background-color: rgb(118, 80, 87);
+}
+
+#playerlist td, th{
+    vertical-align: middle !important;
+    text-align : left !important;
+    padding-left: 10px !important;
 }

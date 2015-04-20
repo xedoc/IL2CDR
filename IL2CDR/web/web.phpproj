@@ -485,6 +485,8 @@
     <Content Include="phpfastcache\_extensions\predis-1.0\package.ini" />
     <Content Include="phpfastcache\_extensions\predis-1.0\README.md" />
     <Content Include="phpfastcache\_extensions\predis-1.0\VERSION" />
+    <Content Include="svg\soviet.svg" />
+    <Content Include="svg\axis.svg" />
     <Content Include="webrcon.txt" />
   </ItemGroup>
 </Project>

@@ -55,9 +55,6 @@
 				        <thead>
 					        <tr>
 						        <th>
-							        Country
-						        </th>
-						        <th>
 							        Nickname
 						        </th>
 						        <th>
@@ -67,10 +64,13 @@
 				        </thead>
 				        <tbody>
                             <?php foreach( $serverplayers as $player): ?>
-					            <tr>
-                    		        <td>
-							            <?=$player->Country?>
-						            </td>
+                                <?php if($player->Country == "Germany"): ?>
+                                    <tr class="axisbg">
+					            <?php elseif( $player->Country == 'Russia'):?>
+                                    <tr class="sovietbg">
+					            <?php else: ?>
+                                    <tr>
+                                <?php endif?>
 						            <td>
 							            <?=$player->Nickname?>
 						            </td>

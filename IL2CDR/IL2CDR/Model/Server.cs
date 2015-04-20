@@ -131,11 +131,13 @@ namespace IL2CDR.Model
                     {
                         if (!playerListChanged)
                             playerListChanged = existing.Ping != player.Ping ||
-                                                 existing.Status != player.Status;
+                                                 existing.Status != player.Status ||
+                                                 existing.CoalitionIndex != player.CoalitionIndex;
 
                         existing.Ping = player.Ping;
                         existing.Status = player.Status;
                         existing.ClientId = player.ClientId;
+                        existing.CoalitionIndex = player.CoalitionIndex;
                     }
                 }
 

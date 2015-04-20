@@ -59,28 +59,62 @@ class TopScore
         {
             $c1total = $row->C1PlanesScore + $row->C1GroundScore;
             $c2total = $row->C2PlanesScore + $row->C2GroundScore;
-            if( $c1total == $c2total )
+       
+            $startDate = date("M j,", strtotime($row->MissionStartTime));
+            $startTime = date( " H:i", strtotime($row->MissionStartTime));
+            $endDate = '';
+            if( !empty($row->MissionEndTime) )
             {
-                $c1class = '';
-                $c2class = $c1class;
+                $endDate = date("M j,", strtotime( $row->MissionEndTime ));
+                $endTime = date( " H:i", strtotime($row->MissionEndTime ));
+            }                     
+            else
+            {
+                $endTime = "--:--";
             }
-            else if( $c1total > $c2total)
+            $startIcon = "<span class=\"glyphicon glyphicon-play\"></span>";
+            $stopIcon = "<span class=\"glyphicon glyphicon-stop\"></span>";
+            $axisIcon = "<span class=\"tdicon icon-axis\"></span>";
+            $sovietIcon = "<span class=\"tdicon icon-soviet\"></span>";
+            $mission = strtolower(basename($row->MissionFile, ".msnbin"));
+            $planeIcon = "<span class=\"tdicon icon-plane\"></span>";
+            $groundIcon = "<span class=\"tdicon icon-ground\"></span>";
+            $sovietScore = sprintf("%s %s %s %s %s", $sovietIcon, $planeIcon, $row->C1PlanesScore, $groundIcon, $row->C1GroundScore);
+            $axisScore = sprintf("%s %s %s %s %s", $axisIcon, $planeIcon, $row->C2PlanesScore, $groundIcon, $row->C2GroundScore);
+            
+            if( $row->ObjectiveCompleteBy )
             {
-                $c1class = 'missionwon';
-                $c2class = '';
+                $winnerIcon = $row->ObjectiveCompleteBy == "1" ? $sovietIcon : $axisIcon;
+                $trigger = "objective completed";
             }
             else
             {
-                $c1class = '';
-                $c2class = 'missionwon';
-            }            
-                return (object)array(
-                        '0' => sprintf("<p>%s</p> <p class=\"text-muted xsmall\">%s - %s</p>", $row->ServerName,$row->MissionStartTime,empty($row->MissionEndTime) ? 'Not finished' : $row->MissionEndTime),
-                        '1' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C1PlanesScore,$row->C1GroundScore, $c1class, $c1total),
-                        '2' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C2PlanesScore,$row->C2GroundScore, $c2class, $c2total),
-                        "DT_RowId" => "mis" . $i,                
-                    );
+                if( $c1total > $c2total )
+                    $winnerIcon = $sovietIcon;
+                else if( $c1total < $c2total )
+                    $winnerIcon = $axisIcon;
+                else
+                    $winnerIcon = '<b>DRAW</b>';                
+                
+                $trigger = "by score";
+            }
+            
+            
+            
+            $winner = sprintf( "%s<br>%s", $winnerIcon, $trigger);
+            $startend = sprintf("%s %s%s %s %s%s", $startIcon, $startDate, $startTime, $stopIcon, $endDate, $endTime);
+            return (object)array(
+                    '0' => sprintf("<strong>%s</strong><p><small>%s</small></p>", $row->ServerName, $startend),
+                    '1' => $mission,
+                    '2' => sprintf("%s<br/>%s", $sovietScore, $axisScore),
+                    '3' => $winner,
+                    "DT_RowId" => "mis" . $i,                
+                );
             });
+            //'0' => sprintf("<p>%s</p> <p class=\"text-muted xsmall\">%s - %s</p>", $row->ServerName,$row->MissionStartTime,empty($row->MissionEndTime) ? 'Not finished' : $row->MissionEndTime),
+            //'1' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C1PlanesScore,$row->C1GroundScore, $c1class, $c1total),
+            //'2' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C2PlanesScore,$row->C2GroundScore, $c2class, $c2total),
+            //'3' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C2PlanesScore,$row->C2GroundScore, $c2class, $c2total),
     }
     public function GetWLPvP($draw, $start, $length, $search)
     {

@@ -47,9 +47,6 @@ class IndexController
             $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
             $playersbyserver = $servers->GetPlayerCountByServer();
             $firstserver = array_values($playersbyserver)[0];
-
-            if(!is_array($filteredservers))
-                $filteredservers = array();
             
             if( count($playersbyserver) > 0 )
                 $serverplayers = $servers->GetOnlinePlayers($firstserver->Id);
