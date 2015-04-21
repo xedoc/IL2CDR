@@ -26,12 +26,23 @@ $(document).ready(function () {
 
     $('.serveritem').on('click', function (e) {
         var serverId = $(this).data('id');
-        $('#playerlist > tbody ').html('<tr><td colspan="3">Loading...</td></tr>');
+        $('#plde > tbody ').empty();
+        $('#plsu > tbody ').html('<tr><td colspan="3">Loading...</td></tr>');
         $.ajax({
             url: "/json/playerlist/" + serverId,
             cache: false,
             success: function (result) {
                 json = JSON.parse(result);
+
+                arde = [];
+                arsu = [];
+                for (i = 0; i < json.length ; i++)
+                {
+                    if (json[i].Country == 'Germany')
+                        arde.push(json[i]);
+                    else
+                        arsu.push(json[i]);
+                }
 
                 var transform = {
                     tag: "tr",
@@ -42,8 +53,10 @@ $(document).ready(function () {
                     ]
                 };
 
-                $('#playerlist > tbody ').empty();
-                $('#playerlist > tbody ').json2html(json, transform);
+                $('#plde > tbody ').empty();
+                $('#plde > tbody ').json2html(arde, transform);
+                $('#plsu > tbody ').empty();
+                $('#plsu > tbody ').json2html(arsu, transform);
             },
             timeout: 30000
         });

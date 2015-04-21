@@ -13,15 +13,15 @@ namespace IL2CDR.Scripts
 {
     public class GlobalStatistics : ActionScriptBase
     {
-        private const string DOMAIN = "localhost";
+        //private const string DOMAIN = "localhost";
         //private const string EVENTURL = "http://" + DOMAIN + ":49191/e/?XDEBUG_SESSION_START=55A2686E";
         //private const string PLAYERURL = "http://" + DOMAIN + ":49191/update/players/?XDEBUG_SESSION_START=55A2686E";
-        private const string EVENTURL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
-        private const string PLAYERURL = "http://" + DOMAIN + ":3992/update/players/?XDEBUG_SESSION_START=55A2686E";
+        //private const string EVENTURL = "http://" + DOMAIN + ":3992/e/?XDEBUG_SESSION_START=F3623ADB";
+        //private const string PLAYERURL = "http://" + DOMAIN + ":3992/update/players/?XDEBUG_SESSION_START=55A2686E";
 
-        //private const string DOMAIN = "il2.info";
-        //private const string EVENTURL = "http://" + DOMAIN + "/e";
-        //private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
+        private const string DOMAIN = "il2.info";
+        private const string EVENTURL = "http://" + DOMAIN + "/e";
+        private const string PLAYERURL = "http://" + DOMAIN + "/update/players";
         private const string BACKLOGFILE = "eventback.log";
         private ConcurrentQueue<object> events;
         private Timer sendTimer;
@@ -105,7 +105,7 @@ namespace IL2CDR.Scripts
                 using( WebClientBase webClient = new WebClientBase())
                 {
                     var data = webClient.GZipBytes(obj.lastPacket);
-                    webClient.Timeout = 9000;
+                    webClient.Timeout = 59000;
                     webClient.ContentType = ContentType.JsonUTF8;
                     webClient.KeepAlive = false;
                     webClient.SetCookie("srvtoken", Token, DOMAIN);
@@ -143,9 +143,12 @@ namespace IL2CDR.Scripts
             var jsonPackets = new List<object>();
 
             var limit = 5;
-            while (!events.IsEmpty || limit > 0)
+            while (!events.IsEmpty)
             {
                 limit--;
+                if (limit <= 0)
+                    break;
+
                 object obj;
                 if (events.TryDequeue(out obj))
                 {
@@ -185,6 +188,7 @@ namespace IL2CDR.Scripts
                     //Record kill only if player participate
                     if (kill.TargetPlayer == null && kill.AttackerPlayer == null)
                         return;
+
                 }
                 //var length = Json.Serialize(data).Length;
                 //Log.WriteInfo("{0} JSON length: {1}", data.GetType(), length);

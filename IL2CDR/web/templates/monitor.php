@@ -1,6 +1,6 @@
 <?php $this->layout('layout', ['title' => 'Online monitor'])?>
 <div class="row clearfix">
-		<div class="col-md-6 column">
+		<div class="col-md-4 column">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -43,7 +43,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-md-6 column">
+		<div class="col-md-8 column">
     		<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -51,7 +51,47 @@
 					</h3>
 				</div>
 				<div class="panel-body">
-                    <table class="table table-condensed"  id="playerlist">
+                    <div class="col-md-6 column">
+                    <table class="table table-condensed"  id="plsu">
+				        <thead>
+					        <tr>
+						        <th>
+							        Nickname
+						        </th>
+						        <th>
+							        Ping
+						        </th>
+					        </tr>
+				        </thead>
+				        <tbody>
+                            <?php foreach( $serverplayers as $player): ?>
+					            <?php if( $player->Country == 'Russia'):?>
+                                    <tr class="sovietbg">
+						                <td>
+							                <?=$player->Nickname?>
+						                </td>
+						                <td>
+							                <?=$player->Ping?>
+						                </td>
+    					            </tr>
+					            <?php elseif( $player->Country == 'Neutral'): ?>
+                                    <tr>
+						                <td>
+							                <?=$player->Nickname?>
+						                </td>
+						                <td>
+							                <?=$player->Ping?>
+						                </td>
+	    				            </tr>
+                                <?php endif?>
+                            <?php endforeach ?>
+
+				        </tbody>
+			        </table>
+
+                    </div>
+                    <div class="col-md-6 column">
+                        <table class="table table-condensed"  id="plde">
 				        <thead>
 					        <tr>
 						        <th>
@@ -66,22 +106,20 @@
                             <?php foreach( $serverplayers as $player): ?>
                                 <?php if($player->Country == "Germany"): ?>
                                     <tr class="axisbg">
-					            <?php elseif( $player->Country == 'Russia'):?>
-                                    <tr class="sovietbg">
-					            <?php else: ?>
-                                    <tr>
+						                <td>
+							                <?=$player->Nickname?>
+						                </td>
+						                <td>
+							                <?=$player->Ping?>
+						                </td>
+					                </tr>
                                 <?php endif?>
-						            <td>
-							            <?=$player->Nickname?>
-						            </td>
-						            <td>
-							            <?=$player->Ping?>
-						            </td>
-					            </tr>
                             <?php endforeach ?>
 
 				        </tbody>
 			        </table>
+                    </div>
+                    
 				</div>
 			</div>
 						

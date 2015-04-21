@@ -58,20 +58,20 @@ namespace IL2CDR.Scripts
 
             dataService.Start();
             History = dataService.MissionHistory;
-            var sorties = from SortieStart in dataService.MissionHistory.Where(o => o is MissionLogEventPlaneSpawn)
-                              .Select(o => o as MissionLogEventPlaneSpawn)
-                              .Select(o => new { o.Player.SortieId, o.EventTime, o.Player.NickName, o.Player.Plane.Bullets })
-                          join SortieEnd in dataService.MissionHistory.Where(o => o is MissionLogEventPlayerAmmo)
-                              .Select(o => o as MissionLogEventPlayerAmmo)
-                              .Select(o => new { o.Player.SortieId, o.EventTime, o.Player.NickName, o.Bullets })
-                              on SortieStart.SortieId equals SortieEnd.SortieId
-                              select new { SortieStart, SortieEnd };
+            //var sorties = from SortieStart in dataService.MissionHistory.Where(o => o is MissionLogEventPlaneSpawn)
+            //                  .Select(o => o as MissionLogEventPlaneSpawn)
+            //                  .Select(o => new { o.Player.SortieId, o.EventTime, o.Player.NickName, o.Player.Plane.Bullets })
+            //              join SortieEnd in dataService.MissionHistory.Where(o => o is MissionLogEventPlayerAmmo)
+            //                  .Select(o => o as MissionLogEventPlayerAmmo)
+            //                  .Select(o => new { o.Player.SortieId, o.EventTime, o.Player.NickName, o.Bullets })
+            //                  on SortieStart.SortieId equals SortieEnd.SortieId
+            //                  select new { SortieStart, SortieEnd };
 
 
-            foreach (var item in sorties)
-            {
-                Log.WriteInfo("{0}\n\t\t\ttime: {1} - {2}\tbullets: {3} ->\t {4}", item.SortieStart.NickName, item.SortieStart.EventTime, item.SortieEnd.EventTime, item.SortieStart.Bullets, item.SortieEnd.Bullets );
-            }
+            //foreach (var item in sorties)
+            //{
+            //    Log.WriteInfo("{0}\n\t\t\ttime: {1} - {2}\tbullets: {3} ->\t {4}", item.SortieStart.NickName, item.SortieStart.EventTime, item.SortieEnd.EventTime, item.SortieStart.Bullets, item.SortieEnd.Bullets );
+            //}
         }
 
         public override void OnButtonClick(string buttonName)

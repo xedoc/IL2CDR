@@ -113,7 +113,7 @@ class MissionEvent
                     break;
                 case 3:
                     $params = array(
-                        'IsTeamKill' => $this->db->EaQ( $event->IsTeamKill ),                                                
+                        'IsTeamKill' => $this->db->EaQ( $event->IsTeamKill ? '1' : '0' ),                                                
                         );
                     
                     if( isset( $event->AttackerPlayer ) )
@@ -149,7 +149,7 @@ class MissionEvent
                         $params += array(
                             'TargetPlayerID' => $this->db->EaQ( $event->TargetPlayer->NickId ),                            
                             'TargetSortieID' => $this->db->EaQ( $event->TargetPlayer->SortieId ),
-                            'IsInAir' => $this->db->EaQ( $event->TargetPlayer->IsInAir ),
+                            'IsInAir' => $this->db->EaQ( $event->TargetPlayer->IsInAir ? '1' : '0' ),
                             );
                     }
                     else
@@ -212,7 +212,7 @@ class MissionEvent
                 case 8:
                     $params = array( 
                            'CoalitionIndex'=>  $this->db->EaQ( $event->CoalitionIndex ),
-                           'IsCompleted'=>  $this->db->EaQ( $event->IsCompleted ),
+                           'IsCompleted'=>  $this->db->EaQ( $event->IsCompleted ? '1' : '0' ),
                        );
                     //$params = array(
                     //        'Text' => $this->db->EaQ(sprintf('%s %s %s %s', 
@@ -275,16 +275,16 @@ class MissionEvent
                 case 15:
                     break;
                 case 16:
-                    //if( !isset( $event->Player ) || 
-                    //    !isset( $event->Player->Plane ))
-                    //        continue;
-                    //    $params = array( 
-                    //           'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
-                    //           'IsFriendlyArea' => $this->db->EaQ( $event->IsFriendlyArea ),
-                    //           'IsInAir' => $this->db->EaQ( $event->Player->IsInAir ),
-                    //       );
-                    //    $this->db->setvars($params);
-                    //    $this->db->callproc("OnBotRemove");
+                    if( !isset( $event->Player ) || 
+                        !isset( $event->Player->Plane ))
+                            continue;
+                        $params = array( 
+                               'SortieID' => $this->db->EaQ( $event->Player->SortieId ),
+                               'IsFriendlyArea' => $this->db->EaQ( $event->IsFriendlyArea ? '1' : '0' ),
+                               'IsInAir' => $this->db->EaQ( $event->Player->IsInAir ? '1' : '0' ),
+                           );
+                        $this->db->setvars($params);
+                        $this->db->callproc("OnBotRemove");
                     break;
                 case 17:
                     break;
