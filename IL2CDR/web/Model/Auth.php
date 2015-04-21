@@ -50,11 +50,12 @@ class Auth
         {
             if( isset($obj->result ))
             {
+                //$result->close();
+                $this->db->nextresult();
                 return $obj->result;
             }
-            $this->db->nextresult();
         }
-
+        
         return false;
     }
     public function AddServerOwner()
@@ -75,7 +76,11 @@ class Auth
             if( isset( $obj->result ))
             {
                 if( $obj->result == 'DUP')
+                {
+                    //$result->close();
+                    $this->db->nextresult();                
                     return 'User already exist!';
+                }
                 else
                 {
                     $this->confirmtoken = $obj->confirmtoken; 
@@ -85,9 +90,12 @@ class Auth
                     $m = new Mailer();                    
                     $m->Send($this->email, 'Email Confirmation', $body);
                     
+                    //$result->close();
+                    $this->db->nextresult();
                     return 'OK';
                 }
             }
+            //$result->close();
             $this->db->nextresult();
         }
 
@@ -123,10 +131,12 @@ class Auth
                     $this->CurrentUser = $obj->Email;
                     $this->StatToken = $obj->Token;
                     $cache->AddCache( 'isauth' . $token, 86400, true );
-                        
+                    //$result->close();
+                    $this->db->nextresult();                    
                     return true;
                 }
             }
+            //$result->close();
             $this->db->nextresult();
         }             
         return false;
@@ -148,10 +158,13 @@ class Auth
                      else
                          setcookie( "authtoken", $obj->AuthToken, time()+60*60*24*9000, '/');
                      
+                     //$result->close();
+                     $this->db->nextresult();
                      return true;
                  }
                  
              }
+             //$result->close();
              $this->db->nextresult();
          }
         

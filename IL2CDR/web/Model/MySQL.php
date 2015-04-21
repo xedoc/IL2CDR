@@ -22,6 +22,11 @@ class MySQL implements iDatabase
         $this->timeZone = new TZ();
         $this->connect();
     }
+    
+    function __destruct()
+    {
+        $this->disconnect();
+    }
     public function nextresult()
     {
         $this->my->next_result();

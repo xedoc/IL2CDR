@@ -46,7 +46,12 @@ class IndexController
             $missions = json_decode( $this->top->GetMissions(1,0,10,null));
             $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
             $playersbyserver = $servers->GetPlayerCountByServer();
-            $firstserver = array_values($playersbyserver)[0];
+            
+            $plbyserv = array_values($playersbyserver);
+            if( count($plbyserv) > 0 )
+                $firstserver = $plbyserv[0];
+            else
+                $firstserver = new Server('','');
             
             if( count($playersbyserver) > 0 )
                 $serverplayers = $servers->GetOnlinePlayers($firstserver->Id);
