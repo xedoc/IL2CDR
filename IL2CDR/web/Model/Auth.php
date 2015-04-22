@@ -147,7 +147,7 @@ class Auth
              return false;
         
          $result = $this->db->query( sprintf('CALL Login(%s,%s,%s)', $this->db->EaQ($this->email), $this->db->EaQ($this->password), $this->db->EaQ($this->authToken) ));
-         if( isset( $result ))
+         if( $result )
          {
              if( $obj = $result->fetch_object() )
              {
