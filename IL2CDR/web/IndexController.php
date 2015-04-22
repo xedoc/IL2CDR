@@ -8,6 +8,7 @@ require_once 'Model/Cache.php';
 require_once 'Model/Filter.php';
 require_once 'Model/Players.php';
 require_once 'Model/Filter.php';
+require_once 'Model/Server.php';
 require 'phpfastcache.php';
 
 /**
@@ -26,14 +27,18 @@ class IndexController
     private $tz;
     private $auth;
     private $datacache;
+    private $db;
+    private $servers;
     function __construct( League\Plates\Engine $templates)
     {
+        $this->db = new MySQL();
     	$this->templates = $templates;               
-        $this->auth = new Auth();
+        $this->auth = new Auth(null, null, null, null, $this->db);
         $this->datacache = new Cache();
-        $this->top = new TopScore();
+        $this->top = new TopScore($this->db);
         $this->tz = new TZ();        
-        
+        $this->servers = new Servers($this->db);
+        $this->cache = new Cache();
         $data = $this->datacache->GetCache( 'start_page');
         if( isset($data) && !empty($data) )
         {
@@ -41,7 +46,7 @@ class IndexController
         }
         else
         {
-            $servers = new Servers();
+            $servers = $this->servers;
             $onpage = 10;
             $missions = json_decode( $this->top->GetMissions(1,0,10,null));
             $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
@@ -82,84 +87,43 @@ class IndexController
 
     public function Get10minutesCache($name)
     {
-        $token = null;
-        $filter = new Filter();
-        if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
-            $token = $_COOKIE['authtoken'];
-        
-        if( $token == null )
-        {
-            $content = __c()->get($name . '_' . $this->tz->GetTimeZone().'-'.$filter->GetCurrentFilter());
-            if( $content == null )
-            {
-                $content = $this->templates->render($name);
-                __c()->set($name . '_' . $this->tz->GetTimeZone(), $content,600);                   
-            }                    
-        }
-        else
-        {
-            $content = __c()->get($token.$name . '_' . $this->tz->GetTimeZone().'-'.$filter->GetCurrentFilter());
-            if( $content == null )
-            {
-                $content = $this->templates->render($name);
-                __c()->set($token.$name . '_' . $this->tz->GetTimeZone() , $content ,600);
-            }
-            
-        }
+        $content = $this->cache->GetCache($name);        
         if( $content == null )
+        {
             $content = $this->templates->render($name);
+            $this->cache->AddCache($name, 600, $content );
+        }                    
         
         return $content;
     }
     public function Get10minutesTopCache($draw,$start,$length, $search, $fallback)
     {
-        $name = $draw . '_' . $start . '_' . $length . '_' . $search . '_' . $this->tz->GetTimeZone();
-        $token = null;
-        $filter = new Filter();
-        if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
-            $token = $_COOKIE['authtoken'];
-        
-        if( $token == null )
-        {
-            $content = __c()->get($name);
-            if( $content == null )
-            {
-                $content = $fallback($draw,$start,$length, $search);
-                __c()->set($name.'-'.$filter->GetCurrentFilter(), $content,600);                   
-            }                    
-        }
-        else
-        {
-            $content = __c()->get($token.$name);
-            if( $content == null )
-            {
-                $content = $fallback($draw,$start,$length, $search);
-                __c()->set($token.$name.'-'.$filter->GetCurrentFilter(), $content ,600);
-            }
-            
-        }
+        $name = $draw . '_' . $start . '_' . $length . '_' . $search;
+
+        $content = $this->cache->GetCache($name);        
         if( $content == null )
-            $content = $fallback();
-        
+        {
+            $content = $fallback($draw,$start,$length, $search);
+            $this->cache->AddCache($name, 600, $content );
+        }                            
         return $content;
     }
     public function GetLogout()
     {
-        $auth = new Auth(null,null,null,$this->templates);
-        $auth->Logout();
-        
+        $auth = new Auth(null,null,null,$this->templates,$this->db);
+        $auth->Logout();        
     }
     public function GetJsonFromCache( $type, $draw, $start, $length, $search )
     {
-        $filter = new Filter();
         $playerCacheStatus = __c()->get('table_players');
-        return __c()->get(sprintf("%s_%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter() ));            
+        $name = $draw . '_' . $start . '_' . $length . '_' . $search . '_' . $type . '_' . $playerCacheStatus;        
+        return $this->cache->GetCache($name);        
     }
     public function AddJsonToCache( $type, $draw, $start, $length, $search, $content )
     {
-        $filter = new Filter();
         $playerCacheStatus = __c()->get('table_players');
-        __c()->set( sprintf("%s_%s_%s_%s_%s_%s_%s_%s", $type, $draw, $start, $length, $search, $playerCacheStatus, $this->tz->GetTimeZone() ,$filter->GetCurrentFilter()), $content, 60000);
+        $name = $draw . '_' . $start . '_' . $length . '_' . $search . '_' . $type . '_' . $playerCacheStatus;        
+        $this->cache->AddCache($name, 600, $content);
         return $content;
     }
     public function GetJsonWlPvP($request)
@@ -214,7 +178,7 @@ class IndexController
     }
     public function GetJsonPlayerList($serverid)
     {
-        $servers = new Servers();        
+        $servers = $this->servers;
         return json_encode($servers->GetOnlinePlayers( $serverid ), JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES);
     }
     public function GetJsonMissions($request)
@@ -233,7 +197,7 @@ class IndexController
     {    
         $this->CheckAuth();
         
-        $servers = new Servers();  
+        $servers = $this->servers;
         return $this->templates->render('servers', ['servers' => $servers->GetServers()]);  
         
     }
@@ -249,7 +213,7 @@ class IndexController
     {
         if( $request->isPost() )
         {
-            $filter = new Filter();
+            $filter = new Filter($this->db);
             $id = $filter->GetFilterId( 
                 $request->post('servers'), 
                 $request->post('difficulties') 
@@ -266,7 +230,7 @@ class IndexController
 
         if( $request->isPost() )
         {
-            $players = new Players( $request->getBody() );
+            $players = new Players( $request->getBody(), $this->db );
             $players->UpdatePlayersOnline();
         }
         
@@ -278,7 +242,7 @@ class IndexController
         
         if( $request->isPost() )
         {
-            $servers = new Servers();
+            $servers = $this->servers;
             $servers->UpdateServers( 
                 $request->post('servers'), 
                 $request->post('ishidden') );
@@ -288,7 +252,7 @@ class IndexController
     
     public function CheckAuth()
     {
-        $auth = new Auth();
+        $auth = new Auth(null,null,null,null,$this->db);
         
         if( !$auth->IsLoggedIn() )
         {
@@ -327,7 +291,7 @@ class IndexController
     } 
     public function GetConfirm( $token )
     {
-        $auth = new Auth();
+        $auth = new Auth(null,null,null,null,$this->db);
         if( $auth->ConfirmEmail( $token ) )
         {
             return $this->templates->render('message', ['message' => 'Email confirmed! You can login now.']);       
@@ -343,7 +307,7 @@ class IndexController
             return "TOKEN FAIL";
         if( isset($json)  )
         {                    
-            $event = new MissionEvent( $json );        
+            $event = new MissionEvent( $json, $this->db );        
             if( $event )
             {
                 if( $event->SaveToDB() )
@@ -367,7 +331,7 @@ class IndexController
         {
             $email = $request->post('email');
             $password = $request->post('password');
-            $auth = new Auth($email, $password, null, $this->templates);  
+            $auth = new Auth($email, $password, null, $this->templates, $this->db);  
             $addResult = $auth->AddServerOwner();
             if( $addResult == 'OK')
             {
@@ -393,7 +357,7 @@ class IndexController
             if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
                 $authToken = $_COOKIE['authtoken'];
             
-            $auth = new Auth($email, $password, $authToken, $this->templates);  
+            $auth = new Auth($email, $password, $authToken, $this->templates, $this->db);  
             if( $auth->Login( $request->post('remember')) )
             {                                   
                 return $this->GetIndex();

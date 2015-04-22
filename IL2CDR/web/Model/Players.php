@@ -14,10 +14,10 @@ class Players
     private $players;
     private $db;
     private $cache;
-    function __construct($json)        
+    function __construct($json, $db)        
     {
         $this->players = json_decode( $json );        
-        $this->db = new MySQL();
+        $this->db = $db;
         $this->cache = new Cache();
     }
     
@@ -91,8 +91,8 @@ class Players
                         'Country' => $row->Country
                         );
                 }            
-                $result->close();
-                $this->db->nextresult();
+                //$result->close();
+                
                 $this->cache->AddCache($cacheid, 60, $table );
 
                 return $table;

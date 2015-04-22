@@ -13,9 +13,9 @@ require_once 'Filter.php';
 class Servers
 {
     private $db;
-    function __construct()
+    function __construct($db)
     {
-        $this->db = new MySQL();
+        $this->db = $db;
     }
     public function UpdateServers( $idlist, $ishiddenlist )
     {
@@ -52,8 +52,8 @@ class Servers
                     $difficulties[] = $obj->Difficulty;
                 }
             }
-            $this->db->nextresult();
         }
+        
         return $difficulties;    
     }
     
@@ -76,8 +76,8 @@ class Servers
                     $servers[] = $server;
                 }
             }
-            $this->db->nextresult();
         }
+        
         return $servers;
     }
     
@@ -108,7 +108,7 @@ class Servers
                         );
                 }
             }
-            $this->db->nextresult();
+            
         }
         return $players;
     }
@@ -118,7 +118,7 @@ class Servers
         if( !$this->db->IsConnected )
             return array();        
         
-        $filter = new Filter();
+        $filter = new Filter($this->db);
         $filteredservers = $filter->GetFilteredServers();
         
         $result = $this->db->callproc( 'GetVisibleServers');
@@ -135,7 +135,7 @@ class Servers
                     $servers[] = $server;
                 }
             }
-            $this->db->nextresult();
+            
         }
         return $servers;
     }
@@ -161,7 +161,7 @@ class Servers
                     $servers[] = $server;
                 }
             }
-            $this->db->nextresult();
+            
         }
         return $servers;
         

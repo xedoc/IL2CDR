@@ -187,16 +187,16 @@ namespace IL2CDR.Model
         /// <returns>NameValueCollection with parameter name/value pairs</returns>
         public NameValueCollection RawCommand(string line)
         {
-            lock( lockConnection )
+            LastErrorDescription = "Communication error";
+
+            if (isStopped)
+                return new NameValueCollection();
+
+            if (netStream == null || !netStream.CanWrite)
+                Start();
+
+            lock (lockConnection)
             {
-                LastErrorDescription = "Communication error";
-
-                if (isStopped)
-                    return new NameValueCollection();
-
-                if (netStream == null || !netStream.CanWrite)
-                    Start();
-
                 if (netStream.CanWrite)
                 {
                     Byte[] sendBytes = Encoding.UTF8.GetBytes(String.Concat(line));
@@ -208,18 +208,29 @@ namespace IL2CDR.Model
                 else
                 {
                     Disconnect();
-                    return null;
+                    return new NameValueCollection();
                 }
-                
-                var writeTask = Task.Factory.StartNew<NameValueCollection>(() =>
+            }  
+            var writeTask = Task.Factory.StartNew<NameValueCollection>((obj) =>
+            {
+                lock (lockConnection)
                 {
-                    if (netStream.CanRead)
+                    var rcon = obj as RconConnection;
+                    if (rcon == null || 
+                        rcon.connection == null || 
+                        rcon.netStream == null)
+                        return new NameValueCollection();
+
+                    if (rcon.netStream.CanRead)
                     {
-                        while (!netStream.DataAvailable)
+                        while (!rcon.netStream.DataAvailable)
                             Thread.Sleep(1);
 
-                        byte[] bytes = new byte[connection.ReceiveBufferSize];
-                        Util.Try(() => netStream.Read(bytes, 0, (int)connection.ReceiveBufferSize), false);
+                        if (rcon.connection.ReceiveBufferSize <= 0)
+                            return new NameValueCollection();
+
+                        byte[] bytes = new byte[rcon.connection.ReceiveBufferSize];
+                        Util.Try(() => rcon.netStream.Read(bytes, 0, (int)rcon.connection.ReceiveBufferSize), false);
                         UInt16 length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
                         string response = null;
                         if (length > 2)
@@ -243,16 +254,17 @@ namespace IL2CDR.Model
                     }
                     else
                     {
-                        Disconnect();
-                        Start();
+                        rcon.Disconnect();
+                        rcon.Start();
                     }
                     return new NameValueCollection();
-                });
-                if (writeTask.Wait(1000))
-                    return writeTask.Result;
-                else
-                    return new NameValueCollection();
-            }
+                }
+            }, this);
+
+            if (writeTask.Wait(3000))
+                return writeTask.Result;
+            else
+                return new NameValueCollection();
         }
         /// <summary>
         /// Authorizes user on rcon server with user/password taken from the startup.cfg
@@ -260,7 +272,10 @@ namespace IL2CDR.Model
         private void Authenticate()
         {
             var result = RawCommand(String.Format("auth {0} {1}", Config.Login, Config.Password));
-            Log.WriteInfo("Rcon authentication: {0}", GetResult(result["STATUS"]) );
+            if( result != null && result.Count > 0 )
+                Log.WriteInfo("Rcon authentication: {0}", GetResult(result["STATUS"]) );
+            else
+                Log.WriteInfo("Rcon authentication failed!");
         }
 
         private string GetResult(string result)

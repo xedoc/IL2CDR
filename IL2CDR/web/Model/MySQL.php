@@ -47,6 +47,7 @@ class MySQL implements iDatabase
         {
             $this->SetTimeZone();       
             $result = $this->my->query($query);
+            $this->nextresult();
             if( $result && isset($result->num_rows) && $result->num_rows <= 0 )
             {
                 $this->nextresult();
@@ -73,20 +74,8 @@ class MySQL implements iDatabase
  
         $this->TouchCache( $proc );
         $result = $this->query( sprintf("CALL %s(%s)", $proc, $this->GetProcParams( $params )));
-
-        if( $result && isset($result->num_rows) && $result->num_rows <= 0 )
-        {
-            $this->nextresult();
-            return false;
-        }
-        else if( !$result )
-            return false;
-        
-        //$this->my->store_result();
-        //if( $result )
-        //    $this->my->store_result();
-        //$this->nextresult();
-        if( !$result )
+        $this->nextresult();
+        if( $this->my->errno )
         {
             echo $this->my->error;
         }
@@ -104,6 +93,11 @@ class MySQL implements iDatabase
             return;
         
         $this->execute( sprintf("SET %s", $this->GetSetParams( $params ) ));
+        $this->nextresult();
+        if( $this->my->errno )
+        {
+            echo $this->my->error;
+        }
     }
     
     public function SetTimeZone()
@@ -122,7 +116,7 @@ class MySQL implements iDatabase
                 $this->config["mysql_db"]);        
         
 
-            if (!mysqli_connect_errno()) { 
+            if (!$this->my->connect_errno ) { 
                 $this->IsConnected = true;
                 
             }

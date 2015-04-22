@@ -14,9 +14,9 @@ class MissionEvent
     private $db;
     private $events;
     private $text;
-    function __construct($text)
+    function __construct($text, $db)
     {
-        $this->db = new MySQL();
+        $this->db = $db;
         try
         {
             $this->events = json_decode( $text );

@@ -11,9 +11,9 @@
 class Filter
 {
     private $db;
-    function __construct()
+    function __construct($db)
     {
-        $this->db = new MySQL();
+        $this->db = $db;
     }
     public function GetCurrentFilter()
     {
@@ -79,7 +79,7 @@ class Filter
         {
             $row = $result->fetch_object();
             setcookie( "filter", $row->FilterId, time()+60*60*24*9000, '/');
-            $this->db->nextresult();
+            
         }
         else
         {

@@ -22,9 +22,9 @@ class Auth
     public $CurrentUser;
     public $StatToken;
 
-    function __construct($email = null, $password = null, $authToken = null, $templates = null)
+    function __construct($email = null, $password = null, $authToken = null, $templates = null, $db)
     {
-        $this->db = new MySQL();
+        $this->db = $db;
         $this->email = $email;
         $this->password = $password;
         $this->authToken = $authToken;
@@ -50,8 +50,7 @@ class Auth
         {
             if( isset($obj->result ))
             {
-                //$result->close();
-                $this->db->nextresult();
+                
                 return $obj->result;
             }
         }
@@ -77,8 +76,7 @@ class Auth
             {
                 if( $obj->result == 'DUP')
                 {
-                    //$result->close();
-                    $this->db->nextresult();                
+                                    
                     return 'User already exist!';
                 }
                 else
@@ -90,13 +88,11 @@ class Auth
                     $m = new Mailer();                    
                     $m->Send($this->email, 'Email Confirmation', $body);
                     
-                    //$result->close();
-                    $this->db->nextresult();
+                    
                     return 'OK';
                 }
             }
-            //$result->close();
-            $this->db->nextresult();
+            
         }
 
         return "Unknown error";
@@ -131,13 +127,11 @@ class Auth
                     $this->CurrentUser = $obj->Email;
                     $this->StatToken = $obj->Token;
                     $cache->AddCache( 'isauth' . $token, 86400, true );
-                    //$result->close();
-                    $this->db->nextresult();                    
+                                        
                     return true;
                 }
             }
-            //$result->close();
-            $this->db->nextresult();
+            
         }             
         return false;
     }
@@ -158,14 +152,12 @@ class Auth
                      else
                          setcookie( "authtoken", $obj->AuthToken, time()+60*60*24*9000, '/');
                      
-                     //$result->close();
-                     $this->db->nextresult();
+                     
                      return true;
                  }
                  
              }
-             //$result->close();
-             $this->db->nextresult();
+             
          }
         
         return false;        

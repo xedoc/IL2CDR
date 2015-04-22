@@ -14,9 +14,9 @@ require_once 'Filter.php';
 class TopScore
 {
     private $db;
-    function __construct()
+    function __construct($db)
     {
-    	$this->db = new MySQL();
+    	$this->db = $db;
     }
     private function GetCacheKey( $toptype,$draw,$start,$length, $search )
     {
@@ -111,10 +111,6 @@ class TopScore
                     "DT_RowId" => "mis" . $i,                
                 );
             });
-            //'0' => sprintf("<p>%s</p> <p class=\"text-muted xsmall\">%s - %s</p>", $row->ServerName,$row->MissionStartTime,empty($row->MissionEndTime) ? 'Not finished' : $row->MissionEndTime),
-            //'1' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C1PlanesScore,$row->C1GroundScore, $c1class, $c1total),
-            //'2' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C2PlanesScore,$row->C2GroundScore, $c2class, $c2total),
-            //'3' => sprintf("<div class=\"icon-plane\">%s</div><div class=\"icon-ground\">%s</div><div class=\"icon-total %s\">%s</div>",$row->C2PlanesScore,$row->C2GroundScore, $c2class, $c2total),
     }
     public function GetWLPvP($draw, $start, $length, $search)
     {
@@ -153,7 +149,7 @@ class TopScore
         if( !$this->db->IsConnected )
             return $default;
         
-        $filter = new Filter();
+        $filter = new Filter($this->db);
         $params = array(
             'Filter' => $this->db->EaQ($filter->GetCurrentFilter()),       
             );
@@ -164,6 +160,7 @@ class TopScore
             $count = $result->num_rows;
             if( $count <= 0 )
             {
+                
                 return $default;                
             }
              
@@ -180,8 +177,7 @@ class TopScore
                 $i++;
                 $table->data[] = $obj;
             }            
-            $result->close();
-            $this->db->nextresult();
+            
             $json = $table->GetJSON();
 
             return $json;
