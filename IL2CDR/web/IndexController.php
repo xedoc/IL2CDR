@@ -33,55 +33,44 @@ class IndexController
     {
         $this->db = new MySQL();
     	$this->templates = $templates;               
-        $this->auth = new Auth(null, null, null, null, $this->db);
+        $this->auth = new Auth(null, null, null, $templates, $this->db);
         $this->datacache = new Cache();
         $this->top = new TopScore($this->db);
         $this->tz = new TZ();        
         $this->servers = new Servers($this->db);
         $this->cache = new Cache();
-        $data = $this->datacache->GetCache( 'start_page');
-        if( isset($data) && !empty($data) )
-        {
-            $this->templates->addData($data);
-        }
+        $servers = $this->servers;
+           
+            
+        $playersbyserver = $servers->GetPlayerCountByServer();
+            
+        $plbyserv = array_values($playersbyserver);
+        if( count($plbyserv) > 0 )
+            $firstserver = $plbyserv[0];
         else
-        {
-            $servers = $this->servers;
-            $onpage = 10;
-            $missions = json_decode( $this->top->GetMissions(1,0,10,null));
-            $totalWL =  json_decode($this->top->GetTotalWL(1,0,$onpage,null));
-            $playersbyserver = $servers->GetPlayerCountByServer();
+            $firstserver = new Server('','');
             
-            $plbyserv = array_values($playersbyserver);
-            if( count($plbyserv) > 0 )
-                $firstserver = $plbyserv[0];
-            else
-                $firstserver = new Server('','');
+        if( count($playersbyserver) > 0 )
+            $serverplayers = $servers->GetOnlinePlayers($firstserver->Id);
+        else
+            $serverplayers = array();
             
-            if( count($playersbyserver) > 0 )
-                $serverplayers = $servers->GetOnlinePlayers($firstserver->Id);
-            else
-                $serverplayers = array();
+        $data = [ 
+            'isloggedin' => $this->auth->IsLoggedIn(),     
+            'currentuser' => $this->auth->CurrentUser,
+            'stattoken' => $this->auth->StatToken,
+            'playersCount' => 0,
+            'missionCount' => 0,
+            'firstserverid' => $firstserver->Id,
+            'allservers' => $servers->GetVisibleServers(),
+            'playersbyserver' => $playersbyserver,     
+            'serverplayers' => $serverplayers,
+            'difficulties' => $servers->GetDifficulties(),
+            'tz' => $this->tz->GetTimeZone(),
+            ];
+
+        $this->templates->addData($data); 
             
-            $data = [ 'isloggedin' => $this->auth->IsLoggedIn(),     
-                'firstserverid' => $firstserver->Id,
-                'allservers' => $servers->GetVisibleServers(),
-                'playersbyserver' => $playersbyserver,     
-                'serverplayers' => $serverplayers,
-                'currentuser' => $this->auth->CurrentUser,
-                'difficulties' => $servers->GetDifficulties(),
-                'stattoken' => $this->auth->StatToken,
-                'table_wlpvp' => json_decode( $this->top->GetWLPvP(1,0,$onpage,null) ),
-                'table_wlpve' => json_decode( $this->top->GetWLPvE(1,0,$onpage,null) ),
-                'table_wltotal' => $totalWL,
-                'table_missions' => $missions,
-                'playersCount' => $totalWL->recordsTotal,
-                'missionCount' => $missions->recordsTotal,
-                'tz' => $this->tz->GetTimeZone(),
-                ];
-            $this->datacache->AddCache('start_page', 60, $data );
-            $this->templates->addData($data); 
-        }
         
     }
 
@@ -252,7 +241,7 @@ class IndexController
     
     public function CheckAuth()
     {
-        $auth = new Auth(null,null,null,null,$this->db);
+        $auth = new Auth(null,null,null,$this->templates,$this->db);
         
         if( !$auth->IsLoggedIn() )
         {
@@ -263,6 +252,18 @@ class IndexController
     
     public function GetMissions()
     {
+        $missions = $this->cache->GetCache( 'missions_cache');
+        
+        if( !$missions )
+        {
+            $missions = json_decode( $this->top->GetMissions(1,0,10,null));
+            $this->cache->AddCache('missions_cache', 600, $missions);            
+        }
+        
+        $data['missionCount'] = $missions->recordsTotal;
+        $data['table_missions'] = $missions;
+        $this->templates->addData($data);
+
         return  $this->Get10minutesCache('missions');
     }
     public function GetIndex( )
@@ -271,14 +272,29 @@ class IndexController
     }
     public function GetWLPvP()
     {
+        $wl = json_decode( $this->top->GetWLPvP(1,0,10,null) );
+        $data['playersCount'] = $wl->recordsTotal;
+        $data['table_wlpvp'] = $wl;
+        $this->templates->addData($data);
         return $this->Get10minutesCache('wlpvp');
+        
     }
     public function GetWLPvE()
     {
+        $wl = json_decode( $this->top->GetWLPvE(1,0,10,null) );
+        $data['playersCount'] = $wl->recordsTotal;
+        $data['table_wlpve'] = $wl;
+        $this->templates->addData($data);
+        
         return $this->Get10minutesCache('wlpve');
     }
     public function GetWL( )
     {
+        $wl = json_decode($this->top->GetTotalWL(1,0,10,null));
+        $data['playersCount'] = $wl->recordsTotal;
+        $data['table_wltotal'] = $wl;
+        $this->templates->addData($data);
+        
         return $this->Get10minutesCache('wl');
     }
     public function GetSnipers( )
@@ -291,7 +307,7 @@ class IndexController
     } 
     public function GetConfirm( $token )
     {
-        $auth = new Auth(null,null,null,null,$this->db);
+        $auth = new Auth(null,null,null,$this->templates,$this->db);
         if( $auth->ConfirmEmail( $token ) )
         {
             return $this->templates->render('message', ['message' => 'Email confirmed! You can login now.']);       
@@ -350,17 +366,23 @@ class IndexController
     {
         if( $request->isPost() )
         {
-            $email = $request->post('email');
-            $password = $request->post('password');
-            $authToken = null;
+            $this->auth->email = $request->post('email');
+            $this->auth->password = $request->post('password');
+            $this->auth->authToken = null;
             
             if( isset($_COOKIE['authtoken']) && !empty($_COOKIE['authtoken'])  )
-                $authToken = $_COOKIE['authtoken'];
+                 $this->auth->authToken = $_COOKIE['authtoken'];
+                      
             
-            $auth = new Auth($email, $password, $authToken, $this->templates, $this->db);  
-            if( $auth->Login( $request->post('remember')) )
-            {                                   
-                return $this->GetIndex();
+            
+            if( $this->auth->Login( $request->post('remember')) )
+            {     
+                
+                $data['currentuser'] = $this->auth->CurrentUser;
+                $data['stattoken'] = $this->auth->StatToken;
+                $data['isloggedin'] = $this->auth->IsLoggedIn();
+                $this->templates->addData($data);
+                return "";
             }
         }
         

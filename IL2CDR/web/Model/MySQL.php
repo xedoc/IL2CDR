@@ -36,7 +36,11 @@ class MySQL implements iDatabase
         if( $this->IsConnected )
         {
             $this->my->real_query( $query );
-            //$this->my->store_result();
+            $this->nextresult();
+            if( $this->my->errno )
+            {
+                echo $this->my->error;
+            }
         }
         
     }
@@ -52,15 +56,12 @@ class MySQL implements iDatabase
             {
                 $this->nextresult();
                 return false;
-                //$this->my->store_result();
             }
-            else if( !$result )
-                return false;
-        }
         
-        if( !$result )
-        {
-            echo $this->my->error;
+            if( $this->my->errno )
+            {
+                echo $this->my->error;
+            }
         }
         
         return $result;

@@ -58,6 +58,7 @@ namespace IL2CDR.Scripts
 
             dataService.Start();
             History = dataService.MissionHistory;
+
             //var sorties = from SortieStart in dataService.MissionHistory.Where(o => o is MissionLogEventPlaneSpawn)
             //                  .Select(o => o as MissionLogEventPlaneSpawn)
             //                  .Select(o => new { o.Player.SortieId, o.EventTime, o.Player.NickName, o.Player.Plane.Bullets })

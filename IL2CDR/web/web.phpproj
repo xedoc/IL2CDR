@@ -19,6 +19,7 @@
     <Compile Include="config.php">
       <Publishable>False</Publishable>
     </Compile>
+    <Compile Include="css.php" />
     <Compile Include="index.php" />
     <Compile Include="IndexController.php" />
     <Compile Include="Model\Auth.php" />
@@ -448,8 +449,11 @@
     <Folder Include="templates\svg\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\bootstrap-select.min.css" />
     <Content Include="css\bootstrap.css" />
     <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\dataTables.bootstrap.css" />
+    <Content Include="css\dataTables.scroller.css" />
     <Content Include="css\stats.css" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />

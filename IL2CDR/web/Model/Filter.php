@@ -22,7 +22,7 @@ class Filter
             return  $_COOKIE['filter'];
         }
         else
-            return 'null';
+            return null;
     }
     public function GetFilteredServers()
     {
@@ -30,7 +30,7 @@ class Filter
             return array();
             
         $params = array(
-            'Filter' => $this->db->EaQ($this->GetCurrentFilter()),       
+            'Filter' => $this->db->EaQ($this->GetCurrentFilter()) == '' ? 'NULL' :  $this->db->EaQ($this->GetCurrentFilter()),       
             );
         $this->db->setvars( $params );
         $result = $this->db->callproc('GetFilteredServers');

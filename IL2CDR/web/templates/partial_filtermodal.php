@@ -13,12 +13,12 @@
                       <?php $this->insert('partial_serverlist') ?>
                   </select>                 
              </div>
-             <div class="form-group">
+<!--             <div class="form-group">
                 <label for="servernamefilter">Difficulty:</label>
-                  <select name="difficulties[]" class="selectpicker"  multiple data-selected-text-format="count">
+                  <select disabled="disabled" name="difficulties[]" class="selectpicker"  multiple data-selected-text-format="count">
                       <?php $this->insert('partial_serverdifficulty') ?>
                   </select>                 
-             </div>
+             </div>-->
              <button type="submit" class="btn btn-primary">Apply</button>
           </form>
       </div>

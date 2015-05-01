@@ -4,18 +4,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="cache-control" content="max-age=0" />
-    <meta http-equiv="cache-control" content="no-cache" />
-    <meta http-equiv="expires" content="0" />
-    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
-    <meta http-equiv="pragma" content="no-cache" />
-
     <title><?=$this->e($title)?></title>
-    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
+    <style>
+        @import "/css.php";
+    </style>
+    <!--<link rel="stylesheet" href="css.php" type="text/css" />-->
+<!--    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/f2c75b7247b/integration/bootstrap/3/dataTables.bootstrap.css"/>
     <link rel="stylesheet" href="/css/stats.css" type="text/css" />
     <link rel="stylesheet" href="//cdn.datatables.net/scroller/1.2.2/css/dataTables.scroller.css" type="text/css" />
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/css/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.4/css/bootstrap-select.min.css" />-->
 
 <?php $this->insert('partial_jsconfig') ?>
 

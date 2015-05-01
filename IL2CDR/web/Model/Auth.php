@@ -15,7 +15,7 @@ require_once 'Cache.php';
 class Auth
 {
     private $db;
-    private $email, $password, $authToken;
+    public $email, $password, $authToken;
     public $confirmtoken;
     private $templates;
 
@@ -29,6 +29,7 @@ class Auth
         $this->password = $password;
         $this->authToken = $authToken;
         $this->templates = $templates;
+
     }
     public function Logout()
     {
@@ -115,7 +116,12 @@ class Auth
         }
         
         if( $cache->GetCache( 'isauth' . $token) )
+        {
+            $this->CurrentUser = $cache->GetCache( 'email' . $token );
+            $this->StatToken = $cache->GetCache( 'token' . $token );
+            $this->SetTemplate();
             return true;
+        }
                 
         $result = $this->db->query( sprintf('CALL Login(%s,%s,%s)', $this->db->EaQ($this->email), $this->db->EaQ($this->password), $this->db->EaQ($token) ));            
         if( $result )
@@ -126,14 +132,23 @@ class Auth
                 {
                     $this->CurrentUser = $obj->Email;
                     $this->StatToken = $obj->Token;
-                    $cache->AddCache( 'isauth' . $token, 86400, true );
-                                        
+                    $cache->AddCache( 'isauth' . $token, 86400, true );   
+                    $cache->AddCache( 'email' . $token,  86400, $this->CurrentUser );
+                    $cache->AddCache( 'token' . $token, 86400, $this->StatToken  );
+                    $this->SetTemplate();
                     return true;
                 }
             }
             
         }             
         return false;
+    }
+    private function SetTemplate()
+    {
+        $data['currentuser'] = $this->CurrentUser;
+        $data['stattoken'] = $this->StatToken;
+        $data['isloggedin'] = true;
+        $this->templates->addData($data);
     }
     public function Login($remember)
     {
@@ -152,7 +167,9 @@ class Auth
                      else
                          setcookie( "authtoken", $obj->AuthToken, time()+60*60*24*9000, '/');
                      
-                     
+                     $this->CurrentUser = $obj->Email;
+                     $this->StatToken = $obj->Token;
+                     $this->SetTemplate();
                      return true;
                  }
                  
