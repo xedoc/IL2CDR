@@ -213,52 +213,61 @@ namespace IL2CDR.Model
             }  
             var writeTask = Task.Factory.StartNew<NameValueCollection>((obj) =>
             {
-                lock (lockConnection)
+                try
                 {
-                    var rcon = obj as RconConnection;
-                    if (rcon == null || 
-                        rcon.connection == null || 
-                        rcon.netStream == null)
-                        return new NameValueCollection();
-
-                    if (rcon.netStream.CanRead)
+                    lock (lockConnection)
                     {
-                        while (!rcon.netStream.DataAvailable)
-                            Thread.Sleep(1);
-
-                        if (rcon.connection.ReceiveBufferSize <= 0)
+                        var rcon = obj as RconConnection;
+                        if (rcon == null || 
+                            rcon.connection == null || 
+                            rcon.netStream == null)
                             return new NameValueCollection();
 
-                        byte[] bytes = new byte[rcon.connection.ReceiveBufferSize];
-                        Util.Try(() => rcon.netStream.Read(bytes, 0, (int)rcon.connection.ReceiveBufferSize), false);
-                        UInt16 length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
-                        string response = null;
-                        if (length > 2)
-                            response = Encoding.UTF8.GetString(bytes.Skip(2).Take((int)length - 1).ToArray());
-
-                        if (!String.IsNullOrWhiteSpace(response))
+                        if (rcon.netStream.CanRead)
                         {
-                            var result = HttpUtility.ParseQueryString(response);
-                            string errorText;
-                            LastErrorDescription = String.Empty;
-                            
-                            if( errorCodes.TryGetValue(result["STATUS"], out errorText) )
-                                LastErrorDescription = errorText;
+                            while (!rcon.netStream.DataAvailable)
+                                Thread.Sleep(1);
 
-                            return result;
+                            if (rcon.connection.ReceiveBufferSize <= 0)
+                                return new NameValueCollection();
+
+                            byte[] bytes = new byte[rcon.connection.ReceiveBufferSize];
+                            Util.Try(() => rcon.netStream.Read(bytes, 0, (int)rcon.connection.ReceiveBufferSize), false);
+                            UInt16 length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
+                            string response = null;
+                            if (length > 2)
+                                response = Encoding.UTF8.GetString(bytes.Skip(2).Take((int)length - 1).ToArray());
+
+                            if (!String.IsNullOrWhiteSpace(response))
+                            {
+                                var result = HttpUtility.ParseQueryString(response);
+                                string errorText;
+                                LastErrorDescription = String.Empty;
+                            
+                                if( errorCodes.TryGetValue(result["STATUS"], out errorText) )
+                                    LastErrorDescription = errorText;
+
+                                return result;
+                            }
+                            else
+                            {
+                                return new NameValueCollection();
+                            }
                         }
                         else
                         {
-                            return new NameValueCollection();
+                            rcon.Disconnect();
+                            rcon.Start();
                         }
+                        return new NameValueCollection();
                     }
-                    else
-                    {
-                        rcon.Disconnect();
-                        rcon.Start();
-                    }
+                }
+                catch(Exception e)
+                {
+                    Log.WriteError("{0}\n{1}", e.Message, e.StackTrace);
                     return new NameValueCollection();
                 }
+
             }, this);
 
             if (writeTask.Wait(3000))
