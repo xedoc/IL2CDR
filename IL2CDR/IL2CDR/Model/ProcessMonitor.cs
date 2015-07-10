@@ -7,6 +7,7 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
+using IL2CDR.Model;
 
 namespace IL2CDR.Model
 {
@@ -19,7 +20,7 @@ namespace IL2CDR.Model
 
         public ObservableCollection<ProcessItem> RunningProcesses { get; set; }
         public Action<ProcessItem> AddProcess { get; set; }
-        public Action<uint> RemoveProcess { get; set; }
+        public Action<int> RemoveProcess { get; set; }
         public ProcessMonitor()
         {
             startWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStartTrace");
@@ -36,7 +37,7 @@ namespace IL2CDR.Model
             RunningProcesses = new ObservableCollection<ProcessItem>(
                 Process.GetProcesses().Where(p => p.ProcessName.Equals(noextName, StringComparison.InvariantCultureIgnoreCase))
                 .DistinctBy( p => p.MainModule )
-                .Select( p => new ProcessItem( (uint)p.Id, p.ProcessName, Path.GetDirectoryName(p.MainModule.FileName)))
+                .Select( p => new ProcessItem( p.Id, p.ProcessName, Path.GetDirectoryName(p.MainModule.FileName), p.CommandLine()))
                 );
             Initialize();
 
@@ -50,16 +51,16 @@ namespace IL2CDR.Model
 
 
         }
-        public void Remove(uint id)
+        public void Remove(int id)
         {
-            RunningProcesses.RemoveAll(p => p.ProcessId == id);
+            RunningProcesses.RemoveAll(p => p.Id == id);
         }
         void stopWatcher_EventArrived(object sender, EventArrivedEventArgs e)
         {
             lock( lockProcesses )
             {
                 if( RemoveProcess != null )
-                    RemoveProcess((uint)e.NewEvent["ProcessID"]);
+                    RemoveProcess((int)((uint)e.NewEvent["ProcessID"]));
             }
         }
 
@@ -81,12 +82,13 @@ namespace IL2CDR.Model
             if( obj == null )    
                 return null;
 
-            var id = (UInt32)obj["ProcessID"];
+            var id = (uint)obj["ProcessID"];
             var name =  obj["ProcessName"] as string;
             var process = Process.GetProcessById((int)id);
             var fileName = Path.GetDirectoryName( process.MainModule.FileName );
+            var commandLine = process.CommandLine();
 
-            return new ProcessItem((uint)id, name, fileName);
+            return new ProcessItem((int)id, name, fileName, commandLine);
         }
 
         public void Start()
@@ -110,14 +112,17 @@ namespace IL2CDR.Model
     }
     public class ProcessItem
     {
-        public ProcessItem( UInt32 id, string name,string processPath )
+        public ProcessItem( int id, string name,string processPath, string commandLine )
         {
-            ProcessId = id;
-            ProcessName = name;
-            ProcessPath = processPath;
+            Id = id;
+            Name = name;
+            Path = processPath;
+            CommandLine = commandLine;
+            
         }
-        public UInt32 ProcessId { get; set; }
-        public string ProcessName { get;set; }
-        public string ProcessPath { get; set; }
+        public int Id { get; set; }
+        public string Name { get;set; }
+        public string Path { get; set; }
+        public string CommandLine { get; set; }
     }
 }

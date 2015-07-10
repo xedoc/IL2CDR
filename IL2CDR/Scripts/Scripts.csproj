@@ -44,6 +44,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scripts\AntiFreeze.cs" />
     <Compile Include="Scripts\LogParser.cs" />
     <Compile Include="Scripts\GlobalStatistics.cs" />
     <Compile Include="Scripts\LocalStatistics.cs" />

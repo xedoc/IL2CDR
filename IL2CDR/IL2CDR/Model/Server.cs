@@ -28,7 +28,7 @@ namespace IL2CDR.Model
         private Timer timerPlayerList;
         public Server(RconConnection rcon, ProcessItem process)
         {
-            Name = String.Format(@"PID: {0} {1}\DServer.exe", process.ProcessId, process.ProcessPath);
+            Name = String.Format(@"PID: {0} {1}\DServer.exe", process.Id, process.Path);
             Process = process;
             Rcon = rcon;
             MissionLogService = new MissionLogDataService(this);

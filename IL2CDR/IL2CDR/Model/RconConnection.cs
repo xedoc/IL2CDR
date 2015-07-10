@@ -166,10 +166,9 @@ namespace IL2CDR.Model
                     Util.Try(() => {
                         connection = new TcpClient(Config.RconIP.ToString(), Config.RconPort);
                         netStream = connection.GetStream();
-                    });
+                    },false);
                     IsConnected = true;
-                }).Wait(2000);
-                
+                }).Wait(2000);                
             }
         }
         private void Disconnect()

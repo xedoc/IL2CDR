@@ -55,6 +55,42 @@ namespace IL2CDR.Model
                 return loadedScripts.Select(s => s.Script).ToList();
             } 
         }
+
+        public void RunRconConnectedScripts(Server server)
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
+                script.OnRconConnected(server);
+            }
+        }
+        public void RunServerStopScripts(Server server)
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
+                script.OnServerStop(server);
+            }
+        }
+
+        public void RunServerStartScripts(Server server)
+        {
+            var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
+            foreach (IActionScript script in actScripts)
+            {
+                if (!(script as IScriptConfig).Config.IsEnabled)
+                    continue;
+
+                script.OnServerStart(server);
+            }
+        }
+
         public void RunServerLogStartScripts(Server server)
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);
@@ -66,6 +102,7 @@ namespace IL2CDR.Model
                 script.OnServerLogStart(server);
             }
         }
+
         public void RunStartupMethod()
         {
             var actScripts = Scripts.Where(s => s is IActionScript && s is IScriptConfig);

@@ -132,10 +132,23 @@ namespace IL2CDR.Model
         /// <summary>
         /// Online player list was changed
         /// </summary>
-        /// <param name="players"></param>
-        
+        /// <param name="players"></param>       
         virtual public void OnPlayerListChange( Server server, List<Player> players ){ }
-
+        /// <summary>
+        /// Server started (rcon isn't connected yet)
+        /// </summary>
+        /// <param name="server">Server object</param>
+        virtual public void OnServerStart(Server server) { }
+        /// <summary>
+        /// Rcon connected, got server name
+        /// </summary>
+        /// <param name="server">Server object</param>
+        virtual public void OnRconConnected(Server server) { }
+        /// <summary>
+        /// Server stopped
+        /// </summary>
+        /// <param name="server">Serve robject</param>
+        virtual public void OnServerStop(Server server) { }
 
         /// <summary>
         /// Default config 

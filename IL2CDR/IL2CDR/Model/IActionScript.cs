@@ -34,5 +34,9 @@ namespace IL2CDR.Model
         void OnServerLogStart(Server server);
         void OnButtonClick(string buttonName);
         void OnPlayerListChange(Server server, List<Player> players);
+        void OnServerStart(Server server);
+        void OnServerStop(Server server);
+        void OnRconConnected(Server server);
     }
+
 }

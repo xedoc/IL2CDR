@@ -121,6 +121,10 @@
       <Link>ScriptExamples\WebRcon.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Scripts\Scripts\AntiFreeze.cs">
+      <Link>Scripts\AntiFreeze.cs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Control\ScrollingTextBox.cs" />
     <Compile Include="Design\DesignMissionLogDataService.cs" />
     <Compile Include="Interactiviy\PasswordBoxAssistant.cs" />
@@ -163,6 +167,7 @@
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\PlayersCollection.cs" />
     <Compile Include="Model\ProcessMonitor.cs" />
+    <Compile Include="Model\ProcessUtils.cs" />
     <Compile Include="Model\RconConnection.cs" />
     <Compile Include="Model\Re.cs" />
     <Compile Include="Model\ScriptConfig.cs" />

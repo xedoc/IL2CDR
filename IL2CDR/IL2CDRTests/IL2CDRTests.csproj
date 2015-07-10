@@ -61,6 +61,7 @@
     <Compile Include="Model\AreaTests.cs" />
     <Compile Include="Model\HitsSourceConverterTests.cs" />
     <Compile Include="Model\WebClientBaseTests.cs" />
+    <Compile Include="Scripts\AntiFreezeTests.cs" />
     <Compile Include="Scripts\Data.cs" />
     <Compile Include="Model\MissionLogEventTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,12 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace IL2CDR.Model
 {
     public class DServerManager : IStopStart
     {
         private object lockDservers = new object();
+        private ActionManager actionManager;
         private ProcessMonitor dserverProcMonitor;
         public DServerManager()
         {
@@ -25,6 +27,8 @@ namespace IL2CDR.Model
                 RemoveServer(id);
             };
             dserverProcMonitor.Start();
+            actionManager = (Application.Current as App)
+                .Return(x => x.ActionManager, new ActionManager(new ScriptManager()));
         }
         public ObservableCollection<Server> Servers { get; set; }
 
@@ -39,17 +43,17 @@ namespace IL2CDR.Model
 
         private Server GetServer( ProcessItem process )
         {
-            var baseDir = Directory.GetParent(Directory.GetParent( process.ProcessPath ).FullName);
+            var baseDir = Directory.GetParent(Directory.GetParent( process.Path ).FullName);
             var config = new IL2StartupConfig( String.Concat(baseDir, @"\data\startup.cfg"));
             var rcon = new RconConnection( config );
             var server = new Server(rcon, process);
             return new Server(rcon, process);
         }
-        private void RemoveServer( uint processId)
+        private void RemoveServer( int processId)
         {
             lock( lockDservers )
             {
-                var server = Servers.FirstOrDefault(ds => ds != null && ds.Process != null && ds.Process.ProcessId == processId);
+                var server = Servers.FirstOrDefault(ds => ds != null && ds.Process != null && ds.Process.Id == processId);
                 if( server != null )
                 {
                     server.MissionLogService.Stop();
@@ -66,18 +70,23 @@ namespace IL2CDR.Model
             var existingDServer = Servers.FirstOrDefault(s => s.Rcon.Config.GameRootFolder.Equals(server.Rcon.Config.GameRootFolder));
             if( existingDServer != null )
             {
-                var process = Process.GetProcessById((int)existingDServer.Process.ProcessId);
+                var process = Process.GetProcessById((int)existingDServer.Process.Id);
                 //Previous DServer process didn't exit correctly
                 if( process != null)
                 {
                     process.Kill();
-                    RemoveServer(existingDServer.Process.ProcessId);
+                    RemoveServer(existingDServer.Process.Id);
+                    actionManager.RunServerStopScript(server);
                 }
             }
             UI.Dispatch(() =>
             {
                 lock (lockDservers)
+                {
                     Servers.Add(server);
+                    actionManager.RunServerStartScripts(server);
+                }
+                
             });
             Task.Factory.StartNew((obj) => {
                 var srv = (obj as Server);

@@ -37,5 +37,20 @@ namespace IL2CDR.Model
         {
             scriptManager.ProcessPlayerListChange(server, players);
         }
+
+        public void RunServerStartScripts( Server server)
+        {
+            scriptManager.RunServerStartScripts(server);
+        }
+
+        public void RunServerStopScript( Server server)
+        {
+            scriptManager.RunServerStopScripts(server);
+        }
+
+        public void RunRconConnectedScripts( Server server )
+        {
+            scriptManager.RunRconConnectedScripts(server);
+        }
     }
 }
