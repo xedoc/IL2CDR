@@ -3,67 +3,69 @@ using System.Windows.Controls;
 
 namespace IL2CDR.Interactivity
 {
-    public static class PasswordBoxAssistant
-    {
-        public static readonly DependencyProperty BoundPassword =
-            DependencyProperty.RegisterAttached("BoundPassword", typeof(string), typeof(PasswordBoxAssistant), new PropertyMetadata(null, OnBoundPasswordChanged));
+	public static class PasswordBoxAssistant
+	{
+		public static readonly DependencyProperty BoundPassword =
+			DependencyProperty.RegisterAttached("BoundPassword", typeof(string), typeof(PasswordBoxAssistant),
+				new PropertyMetadata(null, OnBoundPasswordChanged));
 
-        private static readonly DependencyProperty UpdatingPassword =
-            DependencyProperty.RegisterAttached("UpdatingPassword", typeof(bool), typeof(PasswordBoxAssistant), new PropertyMetadata(false));
-        
-        private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            PasswordBox box = d as PasswordBox;
+		private static readonly DependencyProperty UpdatingPassword =
+			DependencyProperty.RegisterAttached("UpdatingPassword", typeof(bool), typeof(PasswordBoxAssistant),
+				new PropertyMetadata(false));
 
-            // only handle this event when the property is attached to a PasswordBox
-            // and when the BindPassword attached property has been set to true
-            if (d == null )
-            {
-                return;
-            }
+		private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var box = d as PasswordBox;
 
-            // avoid recursive updating by ignoring the box's changed event
-            box.PasswordChanged -= HandlePasswordChanged;
+			// only handle this event when the property is attached to a PasswordBox
+			// and when the BindPassword attached property has been set to true
+			if (d == null) {
+				return;
+			}
 
-            string newPassword = (string)e.NewValue;
+			// avoid recursive updating by ignoring the box's changed event
+			box.PasswordChanged -= HandlePasswordChanged;
 
-            if (!GetUpdatingPassword(box))
-            {
-                box.Password = newPassword;
-            }
+			var newPassword = (string) e.NewValue;
 
-            box.PasswordChanged += HandlePasswordChanged;
-        }
+			if (!GetUpdatingPassword(box)) {
+				box.Password = newPassword;
+			}
 
-        private static void HandlePasswordChanged(object sender, RoutedEventArgs e)
-        {
-            PasswordBox box = sender as PasswordBox;
+			box.PasswordChanged += HandlePasswordChanged;
+		}
 
-            // set a flag to indicate that we're updating the password
-            SetUpdatingPassword(box, true);
-            // push the new password into the BoundPassword property
-            SetBoundPassword(box, box.Password);
-            SetUpdatingPassword(box, false);
-        }
+		private static void HandlePasswordChanged(object sender, RoutedEventArgs e)
+		{
+			var box = sender as PasswordBox;
 
-        public static string GetBoundPassword(DependencyObject dp)
-        {
-            return (string)dp.GetValue(BoundPassword);
-        }
+			// set a flag to indicate that we're updating the password
+			SetUpdatingPassword(box, true);
+			// push the new password into the BoundPassword property
+			if (box != null) {
+				SetBoundPassword(box, box.Password);
+				SetUpdatingPassword(box, false);
+			}
+		}
 
-        public static void SetBoundPassword(DependencyObject dp, string value)
-        {
-            dp.SetValue(BoundPassword, value);
-        }
+		public static string GetBoundPassword(DependencyObject dp)
+		{
+			return (string) dp.GetValue(BoundPassword);
+		}
 
-        private static bool GetUpdatingPassword(DependencyObject dp)
-        {
-            return (bool)dp.GetValue(UpdatingPassword);
-        }
+		public static void SetBoundPassword(DependencyObject dp, string value)
+		{
+			dp.SetValue(BoundPassword, value);
+		}
 
-        private static void SetUpdatingPassword(DependencyObject dp, bool value)
-        {
-            dp.SetValue(UpdatingPassword, value);
-        }
-    }
+		private static bool GetUpdatingPassword(DependencyObject dp)
+		{
+			return (bool) dp.GetValue(UpdatingPassword);
+		}
+
+		private static void SetUpdatingPassword(DependencyObject dp, bool value)
+		{
+			dp.SetValue(UpdatingPassword, value);
+		}
+	}
 }

@@ -1,201 +1,208 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace IL2CDR.Model
 {
-    public class IL2StartupConfig
-    {
-        private const string reParameter = @"[\s|\t|=|""]+(.*?)[\r\n|""]+";
-        private const string reSection = @"\[KEY[\s|\t|=]*{0}(.*?)[\n|\r]*\[END";
-        private const string defaultChatLogfolder = "";
-        private const string defaultMissionTextLogFolder = "";
-        private string configFilePath;
-        private string configContent;
+	public class IL2StartupConfig
+	{
+		private const string RE_PARAMETER = @"[\s|\t|=|""]+(.*?)[\r\n|""]+";
+		private const string RE_SECTION = @"\[KEY[\s|\t|=]*{0}(.*?)[\n|\r]*\[END";
+		private const string DEFAULT_CHAT_LOGFOLDER = "";
+		private const string DEFAULT_MISSION_TEXT_LOG_FOLDER = "";
 
-        public string MissionTextLogFolder { get; set; }
-        public string ChatLogFolder { get; set; }
-        public string GameRootFolder { get; set; }
+		private readonly string configFilePath;
+		private string configContent;
 
-        public bool IsMissionTextLogEnabled { get; set; }
-        public bool IsChatLogEnabled { get; set; }
+		public string MissionTextLogFolder { get; set; }
+		public string ChatLogFolder { get; set; }
+		public string GameRootFolder { get; set; }
 
-        public bool IsRconEnabled { get; set; }
-        public IPAddress RconIP { get; set; }
-        public int RconPort { get; set; }
-        
-        public string Login { get; set;  }
-        public string Password { get; set; }
+		public bool IsMissionTextLogEnabled { get; set; }
+		public bool IsChatLogEnabled { get; set; }
 
-        public bool IsConfigReady { get; set; }
+		public bool IsRconEnabled { get; set; }
+		public IPAddress RconIP { get; set; }
+		public int RconPort { get; set; }
 
-        public IL2StartupConfig(string configFilePath)
-        {
-            this.configFilePath = configFilePath;
+		public string Login { get; set; }
+		public string Password { get; set; }
 
-            Initialize();
-        }
-        private void Initialize()
-        {
-            ReadConfig();
-            if (!IsMissionTextLogEnabled || !IsChatLogEnabled || !IsRconEnabled ||
-                 RconPort <= 0 || RconPort > 65535 ||
-                 RconIP == null ||
-                 RconIP.Equals(default(IPAddress))
-                 )
-            {
-                IsConfigReady = false;
-                EnableRequiredOptions();
-            }
-            else
-            {
-                IsConfigReady = true;
-            }
-        }
-        public void ReadConfig()
-        {
-            if (String.IsNullOrWhiteSpace(configFilePath) ||
-                !File.Exists(configFilePath))
-                return;
+		public bool IsConfigReady { get; set; }
 
-            Util.Try(() => {
-                configContent = File.ReadAllText(configFilePath);
+		public IL2StartupConfig(string configFilePath)
+		{
+			this.configFilePath = configFilePath;
 
-                GameRootFolder = Directory.GetParent(Path.GetDirectoryName(configFilePath)).FullName;
-                
-                MissionTextLogFolder = BuildDataFolder( GetString( "text_log_folder" ));
-                ChatLogFolder = BuildDataFolder( GetString("chatlog_folder"));
+			this.Initialize();
+		}
 
-                IsMissionTextLogEnabled = GetBool("chatlog");
-                IsChatLogEnabled = GetBool("mission_text_log");
-                Login = GetString("login");
-                Password = GetString("password");
-                IsRconEnabled = GetBool("rcon_start");
-                RconIP = GetIPAddress("rcon_ip");
-                RconPort = GetInt("rcon_port");
-            });
-        }
+		private void Initialize()
+		{
+			this.ReadConfig();
+			if (!this.IsMissionTextLogEnabled || !this.IsChatLogEnabled || !this.IsRconEnabled || this.RconPort <= 0 ||
+				this.RconPort > 65535 || this.RconIP == null || this.RconIP.Equals(default(IPAddress))
+			) {
+				this.IsConfigReady = false;
+				this.EnableRequiredOptions();
+			} else {
+				this.IsConfigReady = true;
+			}
+		}
 
-        private string BuildDataFolder( string relativeDataFolder )
-        {
-            if (String.IsNullOrWhiteSpace(relativeDataFolder))
-                return Path.GetDirectoryName(configFilePath);
-            else if (!relativeDataFolder.Contains(":"))
-                return Path.Combine(  Path.GetDirectoryName(configFilePath), relativeDataFolder);
-            else
-                return Path.GetDirectoryName(configFilePath);
+		public void ReadConfig()
+		{
+			if (string.IsNullOrWhiteSpace(this.configFilePath) ||
+				!File.Exists(this.configFilePath)) {
+				return;
+			}
 
-        }
+			Util.Try(() => {
+				this.configContent = File.ReadAllText(this.configFilePath);
 
-        public void EnableRequiredOptions()
-        {
-            Backup();
+				this.GameRootFolder = Directory.GetParent(Path.GetDirectoryName(this.configFilePath)).FullName;
 
-            var boolFields = new string[] {"chatlog", "mission_text_log", "rcon_start"};
-            foreach (var field in boolFields)
-                SetBool("system", field, true);
+				this.MissionTextLogFolder = this.BuildDataFolder(this.GetString("text_log_folder"));
+				this.ChatLogFolder = this.BuildDataFolder(this.GetString("chatlog_folder"));
 
-            if (RconIP == null || RconIP.Equals(default(IPAddress)))
-                SetString("system", "rcon_ip", "127.0.0.1");
-            
-            if (RconPort <= 0 || RconPort > 65535)
-            {
-                int minPort = 8800;
-                int maxPort = 8891;
-                for (; minPort < maxPort;minPort ++ )
-                {
-                    Net.TestTCPPort("localhost", minPort, (entry, e) => {
-                        if (e == null && entry.AddressList.Count() == 0)
-                        {
-                            SetInt("system", "rcon_port", minPort);
-                            minPort = maxPort;
-                        }
-                    });
-                }
-            }
+				this.IsMissionTextLogEnabled = this.GetBool("chatlog");
+				this.IsChatLogEnabled = this.GetBool("mission_text_log");
+				this.Login = this.GetString("login");
+				this.Password = this.GetString("password");
+				this.IsRconEnabled = this.GetBool("rcon_start");
+				this.RconIP = this.GetIPAddress("rcon_ip");
+				this.RconPort = this.GetInt("rcon_port");
+			});
+		}
 
-            ReadConfig();
-        }
+		private string BuildDataFolder(string relativeDataFolder)
+		{
+			if (string.IsNullOrWhiteSpace(relativeDataFolder)) {
+				return Path.GetDirectoryName(this.configFilePath);
+			} else if (!relativeDataFolder.Contains(":")) {
+				return Path.Combine(Path.GetDirectoryName(this.configFilePath), relativeDataFolder);
+			} else {
+				return Path.GetDirectoryName(this.configFilePath);
+			}
+		}
 
-        private void SetBool(string section, string name, bool value)
-        {
-            SetValue(section, name, value ? "1" : "0");
-        }
-        private void SetInt(string section, string name, int value)
-        {
-            SetValue(section, name, value.ToString());
-        }
-        private void SetIPAddress(string section, string name, IPAddress ip)
-        {
-            SetValue(section, name, String.Concat("\"", ip.ToString(), "\""));
-        }
-        private void SetString( string section, string name, string value)
-        {
-            SetValue(section, name, String.Concat("\"", value, "\""));
-        }
-        private void SetValue(string section, string name, string value)
-        {
-            var sectionContent = Re.GetSubString(configContent, String.Format(reSection,section));
-            if (String.IsNullOrWhiteSpace(sectionContent))
-                return;
+		public void EnableRequiredOptions()
+		{
+			this.Backup();
 
-            var replacement = Regex.Replace(sectionContent, String.Concat(@"[\s|\t]*",name, reParameter), Environment.NewLine);
-            replacement = String.Concat(replacement, String.Format("{2}\t{0} = {1}", name, value, Environment.NewLine));
-            configContent = configContent.Replace(sectionContent, replacement);
+			var boolFields = new string[] {"chatlog", "mission_text_log", "rcon_start"};
+			foreach (var field in boolFields) {
+				this.SetBool("system", field, true);
+			}
 
-            Util.Try(() => File.WriteAllText(configFilePath, configContent));
-        }
-        private int GetInt(string name)
-        {
-            int result = 0;
-            var textParam = GetString(name);
-            if (String.IsNullOrWhiteSpace(textParam))
-                return 0;
+			if (this.RconIP == null || this.RconIP.Equals(default(IPAddress))) {
+				this.SetString("system", "rcon_ip", "127.0.0.1");
+			}
 
-            int.TryParse(textParam, out result);
-            return result;            
-        }
-        private IPAddress GetIPAddress( string name )
-        {
-            IPAddress ipAddress = null;
-            var textParam = GetString(name);
-            if (String.IsNullOrWhiteSpace(textParam))
-                return null;
+			if (this.RconPort <= 0 || this.RconPort > 65535) {
+				var minPort = 8800;
+				var maxPort = 8891;
+				for (; minPort < maxPort; minPort++) {
+					Net.TestTCPPort("localhost", minPort, (entry, e) => {
+						if (e == null && !entry.AddressList.Any()) {
+							this.SetInt("system", "rcon_port", minPort);
+							minPort = maxPort;
+						}
+					});
+				}
+			}
 
-            IPAddress.TryParse(textParam, out ipAddress);
+			this.ReadConfig();
+		}
 
-            return ipAddress;
-        }
-        private bool GetBool(string name )
-        {
-            var textParam = GetString(name);
-            if (String.IsNullOrWhiteSpace(textParam))
-                return false;
+		private void SetBool(string section, string name, bool value)
+		{
+			this.SetValue(section, name, value ? "1" : "0");
+		}
 
-            return !(textParam.Equals("0") || textParam.Equals("false", StringComparison.InvariantCultureIgnoreCase));
+		private void SetInt(string section, string name, int value)
+		{
+			this.SetValue(section, name, value.ToString());
+		}
 
-        }
-        private string GetString(string name)
-        {
-            if (String.IsNullOrWhiteSpace(name) || 
-                String.IsNullOrWhiteSpace(configContent))
-                return String.Empty;
-            else
-                return Re.GetSubString(configContent, String.Concat(name, reParameter)).With(x => x.Trim());
-        }
+		private void SetIPAddress(string section, string name, IPAddress ip)
+		{
+			this.SetValue(section, name, string.Concat("\"", ip.ToString(), "\""));
+		}
 
-        public void Backup()
-        {
-            var original = String.Concat(configFilePath);
-            var backup = String.Concat(configFilePath, ".bak");
-            if (!File.Exists(backup) && File.Exists(original))
-                Util.Try(() => File.Copy(original, backup, true));
-        }
-    }
+		private void SetString(string section, string name, string value)
+		{
+			this.SetValue(section, name, string.Concat("\"", value, "\""));
+		}
+
+		private void SetValue(string section, string name, string value)
+		{
+			var sectionContent = Re.GetSubString(this.configContent, string.Format(RE_SECTION, section));
+			if (string.IsNullOrWhiteSpace(sectionContent)) {
+				return;
+			}
+
+			var replacement = Regex.Replace(sectionContent, string.Concat(@"[\s|\t]*", name, RE_PARAMETER),
+				Environment.NewLine);
+			replacement = string.Concat(replacement, string.Format("{2}\t{0} = {1}", name, value, Environment.NewLine));
+			this.configContent = this.configContent.Replace(sectionContent, replacement);
+
+			Util.Try(() => File.WriteAllText(this.configFilePath, this.configContent));
+		}
+
+		private int GetInt(string name)
+		{
+			var textParam = this.GetString(name);
+			if (string.IsNullOrWhiteSpace(textParam)) {
+				return 0;
+			}
+
+			int.TryParse(textParam, out var result);
+			return result;
+		}
+
+		private IPAddress GetIPAddress(string name)
+		{
+			var textParam = this.GetString(name);
+			if (string.IsNullOrWhiteSpace(textParam)) {
+				return null;
+			}
+
+			IPAddress.TryParse(textParam, out var ipAddress);
+
+			return ipAddress;
+		}
+
+		private bool GetBool(string name)
+		{
+			var textParam = this.GetString(name);
+			if (string.IsNullOrWhiteSpace(textParam)) {
+				return false;
+			}
+
+			return !(textParam.Equals("0") || textParam.Equals("false", StringComparison.InvariantCultureIgnoreCase));
+		}
+
+		private string GetString(string name)
+		{
+			if (string.IsNullOrWhiteSpace(name) ||
+				string.IsNullOrWhiteSpace(this.configContent)) {
+				return string.Empty;
+			} else {
+				return Re.GetSubString(this.configContent, string.Concat(name, RE_PARAMETER)).With(x => x.Trim());
+			}
+		}
+
+		public void Backup()
+		{
+			var original = this.configFilePath;
+
+			var backup = string.Concat(this.configFilePath, ".bak");
+			if (!File.Exists(backup) && File.Exists(original)) {
+				Util.Try(() => File.Copy(original, backup, true));
+			}
+		}
+	}
 }

@@ -1,86 +1,98 @@
 ﻿<UserControl
-             xmlns:my="clr-namespace:IL2CDR.Model"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:Interactivity="clr-namespace:IL2CDR.Interactivity"
-             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" 
-             xmlns:ViewModel="clr-namespace:IL2CDR.ViewModel" x:Class="IL2CDR.ScriptConfigField" 
-             mc:Ignorable="d"     
-             Name="configField"
-             Style="{DynamicResource SettingsFieldStyle}"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <d:DataContext>
-                <my:ConfigField IsVisible="True" Label="Password" Name="password" Value="test" Type="{x:Static my:FieldType.Button}" Watermark="Enter mysql password" />
-            </d:DataContext>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Skins/MainSkin.xaml" />
-                <ResourceDictionary Source="Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="SettingsFieldStyle" TargetType="{x:Type UserControl}">
-                <Style.Triggers>
-                    <!--Button-->
-                    <DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Button}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <DockPanel VerticalAlignment="Top">
-                                        <Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}" HorizontalAlignment="Left" />
-                                        <Button Content="{Binding Path=DataContext.Value, Mode=OneWay, ElementName=configField}" Command="{Binding ScriptButtonClick}" CommandParameter="{Binding Path=DataContext.Name, Mode=OneWay, ElementName=configField}" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="15,6">
-                                            <Button.DataContext>
-                                                <ViewModel:MainViewModel/>
-                                            </Button.DataContext>
-                                        </Button>
-                                    </DockPanel>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                    <!--Text-->
-                    <DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Text}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <DockPanel VerticalAlignment="Top">
-                                        <Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}" HorizontalAlignment="Left" />
-                                        <TextBox  Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="{Binding Watermark}"/>
-                                    </DockPanel>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                    <!--Password-->
-                    <DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Password}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <DockPanel VerticalAlignment="Top">
-                                        <Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}" HorizontalAlignment="Left" />
-                                        <PasswordBox Interactivity:PasswordBoxAssistant.BoundPassword="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Controls:TextBoxHelper.ClearTextButton="True" Controls:PasswordBoxHelper.CapsLockIcon="True" Controls:TextBoxHelper.Watermark="{Binding Watermark}"/>
-                                    </DockPanel>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                    <!--Flag-->
-                    <DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Flag}">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <DockPanel VerticalAlignment="Top">
-                                        <CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Label, Mode=OneWay}" Margin="150,0,0,0"/>
-                                    </DockPanel>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
+	xmlns:my="clr-namespace:IL2CDR.Model"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:Interactivity="clr-namespace:IL2CDR.Interactivity"
+	xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+	xmlns:ViewModel="clr-namespace:IL2CDR.ViewModel" x:Class="IL2CDR.ScriptConfigField"
+	mc:Ignorable="d"
+	Name="configField"
+	Style="{DynamicResource SettingsFieldStyle}"
+	d:DesignHeight="300" d:DesignWidth="300">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<d:DataContext>
+				<my:ConfigField IsVisible="True" Label="Password" Name="password" Value="test"
+								Type="{x:Static my:FieldType.Button}" Watermark="Enter mysql password" />
+			</d:DataContext>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Skins/MainSkin.xaml" />
+				<ResourceDictionary Source="Resources/Icons.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<Style x:Key="SettingsFieldStyle" TargetType="{x:Type UserControl}">
+				<Style.Triggers>
+					<!--Button-->
+					<DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Button}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<DockPanel VerticalAlignment="Top">
+										<Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}"
+												HorizontalAlignment="Left" />
+										<Button Content="{Binding Path=DataContext.Value, Mode=OneWay, ElementName=configField}"
+												Command="{Binding ScriptButtonClick}"
+												CommandParameter="{Binding Path=DataContext.Name, Mode=OneWay, ElementName=configField}"
+												HorizontalAlignment="Left" VerticalAlignment="Center" Padding="15,6">
+											<Button.DataContext>
+												<ViewModel:MainViewModel />
+											</Button.DataContext>
+										</Button>
+									</DockPanel>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+					<!--Text-->
+					<DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Text}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<DockPanel VerticalAlignment="Top">
+										<Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}"
+												HorizontalAlignment="Left" />
+										<TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+												Controls:TextBoxHelper.ClearTextButton="True" Controls:TextBoxHelper.Watermark="{Binding Watermark}" />
+									</DockPanel>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+					<!--Password-->
+					<DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Password}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<DockPanel VerticalAlignment="Top">
+										<Label MinWidth="150" HorizontalContentAlignment="Right" Content="{Binding Label, Mode=OneWay}"
+												HorizontalAlignment="Left" />
+										<PasswordBox
+											Interactivity:PasswordBoxAssistant.BoundPassword="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+											Controls:TextBoxHelper.ClearTextButton="True" Controls:PasswordBoxHelper.CapsLockIcon="True"
+											Controls:TextBoxHelper.Watermark="{Binding Watermark}" />
+									</DockPanel>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+					<!--Flag-->
+					<DataTrigger Binding="{Binding Type, Mode=OneWay}" Value="{x:Static my:FieldType.Flag}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate>
+									<DockPanel VerticalAlignment="Top">
+										<CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+												Content="{Binding Label, Mode=OneWay}" Margin="150,0,0,0" />
+									</DockPanel>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+				</Style.Triggers>
 
-            </Style>
-        </ResourceDictionary>
+			</Style>
+		</ResourceDictionary>
 
-    </UserControl.Resources>
+	</UserControl.Resources>
 </UserControl>

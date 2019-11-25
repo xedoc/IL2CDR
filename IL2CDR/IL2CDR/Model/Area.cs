@@ -7,60 +7,63 @@ using System.Windows.Media.Media3D;
 
 namespace IL2CDR.Model
 {
-    public class Area
-    {
-        private double minX, minY, maxX, maxY;
+	public class Area
+	{
+		private double minX, minY, maxX, maxY;
 
-        public Area(Vector3D[] boundaries )
-        {
-            SetBoundaries(boundaries);
-        }
-        public Area( int id, Country country, bool isEnabled )
-        {
-            this.Id = id;
-            this.Country = country;
-            this.IsEnabled = isEnabled;
-            this.Boundaries = new Vector3D[] { };
-        }
+		public Area(Vector3D[] boundaries)
+		{
+			this.SetBoundaries(boundaries);
+		}
 
-        public int Coalition { get;set; }
-        public Country Country { get; set; }
-        public int Id { get; set; }
-        public Vector3D[] Boundaries { get; set; }
-        public bool IsEnabled { get; set; }
+		public Area(int id, Country country, bool isEnabled)
+		{
+			this.Id = id;
+			this.Country = country;
+			this.IsEnabled = isEnabled;
+			this.Boundaries = new Vector3D[] { };
+		}
 
-        public void SetBoundaries(Vector3D[] boundaries)
-        {
-            minX = boundaries.Min(v => v.X);
-            minY = boundaries.Min(v => v.Z);
-            maxX = boundaries.Max(v => v.X);
-            maxY = boundaries.Max(v => v.Z);
-            this.Boundaries = new Vector3D[boundaries.Length];
-            boundaries.CopyTo(this.Boundaries, 0);
-        }
+		public int Coalition { get; set; }
+		public Country Country { get; set; }
+		public int Id { get; set; }
+		public Vector3D[] Boundaries { get; set; }
+		public bool IsEnabled { get; set; }
 
-        public bool InBounds( Vector3D point )
-        {
-            if (Boundaries.Length <= 0)
-                return false;
+		public void SetBoundaries(Vector3D[] boundaries)
+		{
+			this.minX = boundaries.Min(v => v.X);
+			this.minY = boundaries.Min(v => v.Z);
+			this.maxX = boundaries.Max(v => v.X);
+			this.maxY = boundaries.Max(v => v.Z);
+			this.Boundaries = new Vector3D[boundaries.Length];
+			boundaries.CopyTo(this.Boundaries, 0);
+		}
 
-            if( point.X < minX || 
-                point.X > maxX ||
-                point.Z < minY ||
-                point.Z > maxY )
-                return false;
+		public bool InBounds(Vector3D point)
+		{
+			if (this.Boundaries.Length <= 0) {
+				return false;
+			}
 
-            int length = Boundaries.Length;
-            bool result = false;
-            for (int i = 0, j = length - 1; i < length; j = i++)
-            {
-                if (((Boundaries[i].Z > point.Z) != (Boundaries[j].Z > point.Z)) &&
-                 (point.X < (Boundaries[j].X - Boundaries[i].X) * (point.Z - Boundaries[i].Z) / 
-                 (Boundaries[j].Z - Boundaries[i].Z) + Boundaries[i].X))
-                    result = !result;
-            }
-            return result;
-        }
+			if (point.X < this.minX ||
+				point.X > this.maxX ||
+				point.Z < this.minY ||
+				point.Z > this.maxY) {
+				return false;
+			}
 
-    }
+			var length = this.Boundaries.Length;
+			var result = false;
+			for (int i = 0, j = length - 1; i < length; j = i++) {
+				if (this.Boundaries[i].Z > point.Z != this.Boundaries[j].Z > point.Z &&
+					point.X < (this.Boundaries[j].X - this.Boundaries[i].X) * (point.Z - this.Boundaries[i].Z) /
+					(this.Boundaries[j].Z - this.Boundaries[i].Z) + this.Boundaries[i].X) {
+					result = !result;
+				}
+			}
+
+			return result;
+		}
+	}
 }

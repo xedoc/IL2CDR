@@ -1,128 +1,122 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management;
-using System.Text;
-using System.Threading.Tasks;
-using IL2CDR.Model;
 
 namespace IL2CDR.Model
 {
+	public class ProcessMonitor : IStopStart
+	{
+		private readonly object lockProcesses = new object();
+		private readonly ManagementEventWatcher startWatcher;
+		private readonly ManagementEventWatcher stopWatcher;
 
-    public class ProcessMonitor : IStopStart
-    {
-        private object lockProcesses = new object();
-        private ManagementEventWatcher startWatcher;
-        private ManagementEventWatcher stopWatcher;
+		public ObservableCollection<ProcessItem> RunningProcesses { get; set; }
+		public Action<ProcessItem> AddProcess { get; set; }
+		public Action<int> RemoveProcess { get; set; }
 
-        public ObservableCollection<ProcessItem> RunningProcesses { get; set; }
-        public Action<ProcessItem> AddProcess { get; set; }
-        public Action<int> RemoveProcess { get; set; }
-        public ProcessMonitor()
-        {
-            startWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStartTrace");
-            stopWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStopTrace");
-            RunningProcesses = new ObservableCollection<ProcessItem>();
-            Initialize();
-        }
-        public ProcessMonitor (string processName)
-	    {
-            startWatcher = new ManagementEventWatcher(String.Format(@"Select * From Win32_ProcessStartTrace WHERE ProcessName LIKE ""{0}""", processName));
-            stopWatcher = new ManagementEventWatcher(String.Format(@"Select * From Win32_ProcessStopTrace WHERE ProcessName LIKE ""{0}""", processName));
+		public ProcessMonitor()
+		{
+			this.startWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStartTrace");
+			this.stopWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStopTrace");
+			this.RunningProcesses = new ObservableCollection<ProcessItem>();
+			this.Initialize();
+		}
 
-            var noextName = Path.GetFileNameWithoutExtension(processName);
-            RunningProcesses = new ObservableCollection<ProcessItem>(
-                Process.GetProcesses().Where(p => p.ProcessName.Equals(noextName, StringComparison.InvariantCultureIgnoreCase))
-                .DistinctBy( p => p.MainModule )
-                .Select( p => new ProcessItem( p.Id, p.ProcessName, Path.GetDirectoryName(p.MainModule.FileName), p.CommandLine()))
-                );
-            Initialize();
+		public ProcessMonitor(string processName)
+		{
+			this.startWatcher = new ManagementEventWatcher($@"Select * From Win32_ProcessStartTrace WHERE ProcessName LIKE ""{processName}""");
+			this.stopWatcher = new ManagementEventWatcher( $@"Select * From Win32_ProcessStopTrace WHERE ProcessName LIKE ""{processName}""");
 
-        }
+			var noextName = Path.GetFileNameWithoutExtension(processName);
+			this.RunningProcesses = new ObservableCollection<ProcessItem>(
+				Process.GetProcesses()
+					.Where(p => p.ProcessName.Equals(noextName, StringComparison.InvariantCultureIgnoreCase) && p.MainModule != null)
+					.DistinctBy(p => p.MainModule)
+					.Select(p => new ProcessItem(p.Id, p.ProcessName, Path.GetDirectoryName(p.MainModule?.FileName), p.CommandLine()))
+			);
+			this.Initialize();
+		}
 
-        private void Initialize()
-        {
+		private void Initialize()
+		{
+			this.startWatcher.EventArrived += this.startWatcher_EventArrived;
+			this.stopWatcher.EventArrived += this.stopWatcher_EventArrived;
+		}
 
-            startWatcher.EventArrived += startWatcher_EventArrived;
-            stopWatcher.EventArrived += stopWatcher_EventArrived;
+		public void Remove(int id)
+		{
+			this.RunningProcesses.RemoveAll(p => p.Id == id);
+		}
 
+		private void stopWatcher_EventArrived(object sender, EventArrivedEventArgs e)
+		{
+			lock (this.lockProcesses) {
+				this.RemoveProcess?.Invoke((int) (uint) e.NewEvent["ProcessID"]);
+			}
+		}
 
-        }
-        public void Remove(int id)
-        {
-            RunningProcesses.RemoveAll(p => p.Id == id);
-        }
-        void stopWatcher_EventArrived(object sender, EventArrivedEventArgs e)
-        {
-            lock( lockProcesses )
-            {
-                if( RemoveProcess != null )
-                    RemoveProcess((int)((uint)e.NewEvent["ProcessID"]));
-            }
-        }
+		private void startWatcher_EventArrived(object sender, EventArrivedEventArgs e)
+		{
+			lock (this.lockProcesses) {
+				var process = this.GetProcessDetails(e.NewEvent);
+				this.AddProcess?.Invoke(process);
 
-        void startWatcher_EventArrived(object sender, EventArrivedEventArgs e)
-        {
-            lock (lockProcesses)
-            {
-                var process = GetProcessDetails(e.NewEvent);
-                if (AddProcess != null)
-                    AddProcess(process);
+				if (process != null) {
+					this.RunningProcesses.Add(process);
+				}
+			}
+		}
 
-                if( process != null )
-                    RunningProcesses.Add(process);
-            }
-        }
+		private ProcessItem GetProcessDetails(ManagementBaseObject obj)
+		{
+			if (obj == null) {
+				return null;
+			}
 
-        private ProcessItem GetProcessDetails( ManagementBaseObject obj )
-        {
-            if( obj == null )    
-                return null;
+			var id = (uint) obj["ProcessID"];
+			var name = obj["ProcessName"] as string;
+			var process = Process.GetProcessById((int) id);
+			var fileName = Path.GetDirectoryName(process.MainModule?.FileName);
+			var commandLine = process.CommandLine();
 
-            var id = (uint)obj["ProcessID"];
-            var name =  obj["ProcessName"] as string;
-            var process = Process.GetProcessById((int)id);
-            var fileName = Path.GetDirectoryName( process.MainModule.FileName );
-            var commandLine = process.CommandLine();
+			return new ProcessItem((int) id, name, fileName, commandLine);
+		}
 
-            return new ProcessItem((int)id, name, fileName, commandLine);
-        }
+		public void Start()
+		{
+			this.startWatcher.Start();
+			this.stopWatcher.Start();
+		}
 
-        public void Start()
-        {
+		public void Stop()
+		{
+			this.startWatcher.Stop();
+			this.stopWatcher.Stop();
+		}
 
-            startWatcher.Start();
-            stopWatcher.Start();
-        }
+		public void Restart()
+		{
+			this.Stop();
+			this.Start();
+		}
+	}
 
-        public void Stop()
-        {
-            startWatcher.Stop();
-            stopWatcher.Stop();
-        }
+	public class ProcessItem
+	{
+		public ProcessItem(int id, string name, string processPath, string commandLine)
+		{
+			this.Id = id;
+			this.Name = name;
+			this.Path = processPath;
+			this.CommandLine = commandLine;
+		}
 
-        public void Restart()
-        {
-            Stop();
-            Start();
-        }
-    }
-    public class ProcessItem
-    {
-        public ProcessItem( int id, string name,string processPath, string commandLine )
-        {
-            Id = id;
-            Name = name;
-            Path = processPath;
-            CommandLine = commandLine;
-            
-        }
-        public int Id { get; set; }
-        public string Name { get;set; }
-        public string Path { get; set; }
-        public string CommandLine { get; set; }
-    }
+		public int Id { get; set; }
+		public string Name { get; set; }
+		public string Path { get; set; }
+		public string CommandLine { get; set; }
+	}
 }

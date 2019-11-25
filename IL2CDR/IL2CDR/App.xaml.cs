@@ -11,115 +11,104 @@ using IL2CDR.Properties;
 
 namespace IL2CDR
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
-    {
-        //IStopStart services
-        public DServerManager DServerManager { get; set; }
-        public MissionLogDataService MissionLogDataService { get; set; }
+	/// <summary>
+	/// Interaction logic for App.xaml
+	/// </summary>
+	public partial class App : Application
+	{
+		//IStopStart services
+		public DServerManager DServerManager { get; set; }
+		public MissionLogDataService MissionLogDataService { get; set; }
 
-        public ScriptManager ScriptManager { get; set; }
-        public ActionManager ActionManager { get; set; }
-        public AppLogDataService AppLogDataService { get; set; }
-        public SettingsManager SettingsManager { get; set; }
-        public IL2StartupConfig StartupConfig { get; set; }
+		public ScriptManager ScriptManager { get; set; }
+		public ActionManager ActionManager { get; set; }
+		public AppLogDataService AppLogDataService { get; set; }
+		public SettingsManager SettingsManager { get; set; }
+		public IL2StartupConfig StartupConfig { get; set; }
 
-        static App()
-        {
-            DispatcherHelper.Initialize();
-        }
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            AppLogDataService = new AppLogDataService();
-            Log.WriteInfo("Application is starting...");
+		static App()
+		{
+			DispatcherHelper.Initialize();
+		}
 
-            SettingsManager = new SettingsManager();
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			this.AppLogDataService = new AppLogDataService();
+			Log.WriteInfo("Application is starting...");
 
-            Regex.CacheSize = 0;
-            WebRequest.DefaultWebProxy = null;
-            var rootDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\IL2CDR";
-            AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
+			this.SettingsManager = new SettingsManager();
 
-            CreateDataFolders(rootDataFolder);
-            CopyDataFolders(rootDataFolder);
+			Regex.CacheSize = 0;
+			WebRequest.DefaultWebProxy = null;
+			var rootDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\IL2CDR";
+			AppDomain.CurrentDomain.SetData("DataDirectory", rootDataFolder);
 
-            NativeMethods.SetProcessDPIAware();
-            Net.DemandTCPPermission();
-            if (RenderCapability.Tier == 0)
-                Timeline.DesiredFrameRateProperty.OverrideMetadata(
-                    typeof(Timeline),
-                    new FrameworkPropertyMetadata { DefaultValue = 20 });
+			this.CreateDataFolders(rootDataFolder);
+			this.CopyDataFolders(rootDataFolder);
 
-            ScriptManager = new ScriptManager();
-            ScriptManager.LoadScripts();
-            ActionManager = new ActionManager(ScriptManager);
+			NativeMethods.SetProcessDPIAware();
+			Net.DemandTCPPermission();
+			if (RenderCapability.Tier == 0) {
+				Timeline.DesiredFrameRateProperty.OverrideMetadata(
+					typeof(Timeline),
+					new FrameworkPropertyMetadata {DefaultValue = 20});
+			}
 
-            DServerManager = new DServerManager();
+			this.ScriptManager = new ScriptManager();
+			this.ScriptManager.LoadScripts();
+			this.ActionManager = new ActionManager(this.ScriptManager);
 
-            ScriptManager.Start();
-            DServerManager.Start();
+			this.DServerManager = new DServerManager();
 
-        }
-        protected override void OnExit(ExitEventArgs e)
-        {
-            IStopStart[] stopServices = { DServerManager, ScriptManager };
-            foreach (var service in stopServices)
-                service.Stop();
-        }
+			this.ScriptManager.Start();
+			this.DServerManager.Start();
+		}
 
-        private void CopyDataFolders(string destinationDir)
-        {
+		protected override void OnExit(ExitEventArgs e)
+		{
+			IStopStart[] stopServices = {this.DServerManager, this.ScriptManager};
+			foreach (var service in stopServices) {
+				service.Stop();
+			}
+		}
 
-            var copyFolders = new Tuple<string, string>[] {
-                new Tuple<string,string>(@".\Scripts", @"\Scripts\"),
-            };
+		private void CopyDataFolders(string destinationDir)
+		{
+			var copyFolders = new Tuple<string, string>[] {
+				new Tuple<string, string>(@".\Scripts", @"\Scripts\"),
+			};
 
-            try
-            {
-                foreach (var copyPair in copyFolders)
-                {
-                    if (!Directory.Exists(destinationDir + copyPair.Item2))
-                        Directory.CreateDirectory(destinationDir + copyPair.Item2);
+			try {
+				foreach (var copyPair in copyFolders) {
+					if (!Directory.Exists(destinationDir + copyPair.Item2)) {
+						Directory.CreateDirectory(destinationDir + copyPair.Item2);
+					}
 
-                    var sourceFiles = Directory.GetFiles(copyPair.Item1);
-                    foreach (var file in sourceFiles)
-                    {
-                        File.Copy(file, destinationDir + copyPair.Item2 + Path.GetFileName(file), true);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.WriteError("Data file copy error: {0}", e.Message);
+					var sourceFiles = Directory.GetFiles(copyPair.Item1);
+					foreach (var file in sourceFiles) {
+						File.Copy(file, destinationDir + copyPair.Item2 + Path.GetFileName(file), true);
+					}
+				}
+			} catch (Exception e) {
+				Log.WriteError("Data file copy error: {0}", e.Message);
+			}
+		}
 
-            }
+		private void CreateDataFolders(string rootDataFolder)
+		{
+			var appDataFolders = new string[] {
+				@"\Scripts",
+			};
 
-
-        }
-        private void CreateDataFolders(string rootDataFolder)
-        {
-            var appDataFolders = new string[] {
-                @"\Scripts", 
-            };
-
-            foreach (var folder in appDataFolders)
-            {
-                if (!Directory.Exists(rootDataFolder + folder))
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(rootDataFolder + folder);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.WriteError(@"Can't create data directory {0}: {1}", folder, e.Message);
-                    }
-                }
-
-            }
-        }
-
-    }
+			foreach (var folder in appDataFolders) {
+				if (!Directory.Exists(rootDataFolder + folder)) {
+					try {
+						Directory.CreateDirectory(rootDataFolder + folder);
+					} catch (Exception e) {
+						Log.WriteError(@"Can't create data directory {0}: {1}", folder, e.Message);
+					}
+				}
+			}
+		}
+	}
 }
