@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Xml.Serialization;
 using IL2CDR.Properties;
 
@@ -97,6 +98,7 @@ namespace IL2CDR.Model
 			}
 		}
 
+
 		/// <summary>
 		/// The <see cref="IsMissionLogCleanupEnabled" /> property's name.
 		/// </summary>
@@ -150,5 +152,25 @@ namespace IL2CDR.Model
 				this.RaisePropertyChanged(IsMissionLogMonitorEnabledPropertyName);
 			}
 		}
+
+
+		private int _applicationLogBufferSize;
+
+		[XmlAttribute]
+		public int ApplicationLogBufferSize {
+			get => this._applicationLogBufferSize;
+
+			set {
+				if (this._applicationLogBufferSize == value) {
+					return;
+				}
+
+				this._applicationLogBufferSize = value;
+				this.RaisePropertyChanged(nameof(ApplicationLogBufferSize));
+			}
+		}
+
+
+
 	}
 }

@@ -8,7 +8,7 @@ namespace IL2CDR.Model
 {
 	public class IL2StartupConfig
 	{
-		private const string RE_PARAMETER = @"[\s|\t|=|""]+(.*?)[\r\n|""]+";
+		private const string RE_PARAMETER = @"[\s|\t|=|""]+(.*?)[\r\n|""]+"; // <-- TODO: Buggy! Does not support empty string ("") as parameter value! 
 		private const string RE_SECTION = @"\[KEY[\s|\t|=]*{0}(.*?)[\n|\r]*\[END";
 		private const string DEFAULT_CHAT_LOGFOLDER = "";
 		private const string DEFAULT_MISSION_TEXT_LOG_FOLDER = "";

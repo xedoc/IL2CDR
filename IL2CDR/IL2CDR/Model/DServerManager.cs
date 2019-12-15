@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using IL2CDR.Properties;
 
 namespace IL2CDR.Model
 {
@@ -43,7 +44,7 @@ namespace IL2CDR.Model
 			var config = new IL2StartupConfig(string.Concat(baseDir, @"\data\startup.cfg"));
 			var rcon = new RconConnection(config);
 			var server = new Server(rcon, process);
-			return new Server(rcon, process);
+			return server;
 		}
 
 		private void RemoveServer(int processId)
@@ -64,15 +65,18 @@ namespace IL2CDR.Model
 
 		private void AddServer(Server server)
 		{
-			var existingDServer = this.Servers.FirstOrDefault(s =>
-				s.Rcon.Config.GameRootFolder.Equals(server.Rcon.Config.GameRootFolder));
+			var existingDServer = this.Servers.FirstOrDefault(s => s.Rcon.Config.GameRootFolder == server.Rcon.Config.GameRootFolder);
 			if (existingDServer != null) {
-				var process = Process.GetProcessById((int) existingDServer.Process.Id);
-				//Previous DServer process didn't exit correctly
-				if (process != null) {
-					process.Kill();
-					this.RemoveServer(existingDServer.Process.Id);
-					this.actionManager.RunServerStopScript(server);
+				try {
+					var process = Process.GetProcessById((int) existingDServer.Process.Id);
+					//Previous DServer process didn't exit correctly
+					if (process != null) {
+						process.Kill();
+						this.RemoveServer(existingDServer.Process.Id);
+						this.actionManager.RunServerStopScript(server);
+					}
+				} catch (Exception ex) {
+					// -- ignore the error 
 				}
 			}
 
@@ -82,6 +86,20 @@ namespace IL2CDR.Model
 					this.actionManager.RunServerStartScripts(server);
 				}
 			});
+
+			// -- set appropriate attributes: (taken out of the async block)
+
+			server.ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, server.Name);
+
+			if (Settings.Default.Config.IsMissionLogMonitorEnabled) {
+				Log.WriteInfo("Starting MissionLogService for the server {0}", server.Name);
+				server.MissionLogService.Start();
+			} else {
+				Log.WriteInfo("MissionLogService for the server {0} is NOT started! MissionLogMonitor is DISABLED in the application Settings.", server.Name);
+			}
+			
+
+			/*
 			Task.Factory.StartNew((obj) => {
 				if (!(obj is Server srv)) {
 					return;
@@ -89,16 +107,9 @@ namespace IL2CDR.Model
 
 				srv.IsConfigSet = srv.Rcon.Config.IsConfigReady;
 				srv.Login();
-			}, server, TaskCreationOptions.LongRunning).ContinueWith((task, obj) => {
-				if (!(obj is Server srv)) {
-					return;
-				}
-
-				srv.ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, srv.Name);
-				Log.WriteInfo("Start server monitor for server {0}", srv.Name);
-				srv.MissionLogService.Start();
 				srv.IsRconConnected = true;
-			}, server);
+			},  server, TaskCreationOptions.LongRunning);
+			*/
 		}
 
 		public Server this[string key] => this.GetServerById(key);

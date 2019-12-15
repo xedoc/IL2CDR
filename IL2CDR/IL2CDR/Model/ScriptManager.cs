@@ -26,35 +26,20 @@ namespace IL2CDR.Model
 				{EventType.MissionStart, (script, data) => { script.OnMissionStart(data as MissionLogEventStart); }},
 				{EventType.Hit, (script, data) => { script.OnHit(data as MissionLogEventHit); }},
 				{EventType.Damage, (script, data) => { script.OnDamage(data as MissionLogEventDamage); }},
-				{EventType.Kill, (script, data) => { script.OnKill(data as MissionLogEventKill); }}, {
-					EventType.PlayerAmmo,
-					(script, data) => { script.OnPlayerMissionEnd(data as MissionLogEventPlayerAmmo); }
-				},
+				{EventType.Kill, (script, data) => { script.OnKill(data as MissionLogEventKill); }},
+				{EventType.PlayerAmmo, (script, data) => { script.OnPlayerMissionEnd(data as MissionLogEventPlayerAmmo); }},
 				{EventType.TakeOff, (script, data) => { script.OnTakeOff(data as MissionLogEventTakeOff); }},
 				{EventType.Landing, (script, data) => { script.OnLanding(data as MissionLogEventLanding); }},
-				{EventType.MissionEnd, (script, data) => { script.OnMissionEnd(data as MissionLogEventMissionEnd); }}, {
-					EventType.ObjectiveCompleted,
-					(script, data) => { script.OnObjectiveCompleted(data as MissionLogEventObjectiveCompleted); }
-				}, {
-					EventType.AirfieldInfo,
-					(script, data) => { script.OnAirfieldInfo(data as MissionLogEventAirfieldInfo); }
-				}, {
-					EventType.PlaneSpawn,
-					(script, data) => { script.OnPlayerPlaneSpawn(data as MissionLogEventPlaneSpawn); }
-				}, {
-					EventType.GroupInit,
-					(script, data) => { script.OnGroupInitInfo(data as MissionLogEventGroupInitInfo); }
-				}, {
-					EventType.GameObjectSpawn,
-					(script, data) => { script.OnGameObjectSpawn(data as MissionLogEventGameObjectSpawn); }
-				}, {
-					EventType.InfluenceAreaInfo,
-					(script, data) => { script.OnInfluenceAreaInfo(data as MissionLogEventInfluenceAreaInfo); }
-				}, {
-					EventType.InfluenceAreaBoundary,
-					(script, data) => { script.OnInfluenceAreaBoundary(data as MissionLogEventInfluenceAreaBoundary); }
-				},
-				//{ EventType.Version, (script,data) => {script.OnVersion(data as MissionLogEventVersion);}},
+				{EventType.MissionEnd, (script, data) => { script.OnMissionEnd(data as MissionLogEventMissionEnd); }},
+				{EventType.ObjectiveCompleted,
+					(script, data) => { script.OnObjectiveCompleted(data as MissionLogEventObjectiveCompleted); }},
+				{EventType.AirfieldInfo, (script, data) => { script.OnAirfieldInfo(data as MissionLogEventAirfieldInfo); }},
+				{EventType.PlaneSpawn, (script, data) => { script.OnPlayerPlaneSpawn(data as MissionLogEventPlaneSpawn); }},
+				{EventType.GroupInit, (script, data) => { script.OnGroupInitInfo(data as MissionLogEventGroupInitInfo); }},
+				{EventType.GameObjectSpawn, (script, data) => { script.OnGameObjectSpawn(data as MissionLogEventGameObjectSpawn); }},
+				{EventType.InfluenceAreaInfo, (script, data) => { script.OnInfluenceAreaInfo(data as MissionLogEventInfluenceAreaInfo); }},
+				{EventType.InfluenceAreaBoundary, (script, data) => { script.OnInfluenceAreaBoundary(data as MissionLogEventInfluenceAreaBoundary); }},
+				{ EventType.Version, (script,data) => {script.OnVersion(data as MissionLogEventVersion);}},
 				{EventType.Join, (script, data) => { script.OnPlayerJoin(data as MissionLogEventPlayerJoin); }},
 				{EventType.Leave, (script, data) => { script.OnPlayerLeave(data as MissionLogEventPlayerLeave); }},
 			};

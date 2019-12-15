@@ -81,6 +81,7 @@ namespace IL2CDR.Model
 			this.MissionLogFolder = missionLogFolder;
 			this.server = new Server("LogParser", true, true);
 			this.missionHistory = new List<object>();
+			// <--> intentionally NOT calling this.Initialize()? This constructor is called from script "LogParser" only to process historical logs. 
 		}
 
 		public void Initialize()
@@ -265,6 +266,8 @@ namespace IL2CDR.Model
 
 			this.ReadMissionHistory();
 
+
+			Log.WriteInfo("Starting MissionLogDataService.TextFileTracker for server '{0}' on directory '{1}'", this.server.Name, this.tracker?.Folder);
 			this.tracker?.Start();
 		}
 

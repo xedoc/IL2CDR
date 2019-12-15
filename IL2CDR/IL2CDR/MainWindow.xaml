@@ -217,7 +217,12 @@
 							<TextBox Margin="5,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
 									Text="{Binding Config.MissionLogCleanupInterval, Mode=TwoWay}" />
 							<Label>days</Label>
-						</DockPanel>
+						</DockPanel>	
+					    <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+                            <TextBox Margin="0,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="50"
+									Text="{Binding Config.ApplicationLogBufferSize, Mode=TwoWay}" />
+					        <Label>Max number of lines in Log window</Label>
+                        </DockPanel>
 					</StackPanel>
 
 

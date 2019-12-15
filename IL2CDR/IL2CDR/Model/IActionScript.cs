@@ -4,7 +4,14 @@ namespace IL2CDR.Model
 {
 	public interface IActionScript
 	{
-		//void OnVersion(MissionLogEventVersion data);
+		/// <summary>
+		/// Called for "Version" line in eventlog. This "Version line" is printed on top of every eventlog TXT file,
+		/// which is created every 30 seconds. Thus, this event can be treated also as "HeartBeat" event... 
+		/// </summary>
+		/// <param name="data"></param>
+		void OnVersion(MissionLogEventVersion data);
+
+
 		void OnInfluenceAreaBoundary(MissionLogEventInfluenceAreaBoundary data);
 		void OnInfluenceAreaInfo(MissionLogEventInfluenceAreaInfo data);
 		void OnGameObjectSpawn(MissionLogEventGameObjectSpawn data);

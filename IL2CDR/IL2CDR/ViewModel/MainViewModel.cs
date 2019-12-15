@@ -8,6 +8,8 @@ using IL2CDR.Model;
 using IL2CDR.Properties;
 using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace IL2CDR.ViewModel
@@ -37,6 +39,7 @@ namespace IL2CDR.ViewModel
 			}
 
 			this.Config = Settings.Default.Config;
+			this.Config.PropertyChanged += this.Config_OnChanged; 
 
 			if (Application.Current is App app) {
 				this.dserverManager = app.DServerManager;
@@ -57,10 +60,17 @@ namespace IL2CDR.ViewModel
 			}
 		}
 
-		private void DServers_CollectionChanged(object sender,
-			System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		private void DServers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			this.UpdateServerList();
+		}
+
+
+		private void Config_OnChanged(object sender, PropertyChangedEventArgs eventArgs)
+		{
+			if (Application.Current is App app) {
+				app.AppLogDataService.MaxNumberOfLines = this.Config.ApplicationLogBufferSize; 
+			}
 		}
 
 		private void UpdateServerList()
@@ -75,22 +85,24 @@ namespace IL2CDR.ViewModel
 			});
 		}
 
-		private void messages_CollectionChanged(object sender,
-			System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		private void messages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			e.NewItems.Do(x => {
-				var newLines = new string[x.Count + 1];
-				newLines[0] = string.Empty;
-				x.CopyTo(newLines, 1);
-				UI.Dispatch(() => this.LogMessages += string.Join(Environment.NewLine, newLines));
-			});
+			//e.NewItems.Do(x => {
+			//	var newLines = new string[x.Count + 1];
+			//	newLines[0] = string.Empty;
+			//	x.CopyTo(newLines, 1);
+			//	UI.Dispatch(() => this.LogMessages += string.Join(Environment.NewLine, newLines));
+			//});
+
+			var ocLogLines = sender as ObservableCollection<string>;
+			if (ocLogLines != null) {
+				this.LogMessages = string.Join(Environment.NewLine, ocLogLines); 
+			}
+			
 		}
 
 
-		/// <summary>
-		/// The <see cref="CurrentScriptSettings" /> property's name.
-		/// </summary>
-		public const string CURRENT_SCRIPT_SETTINGS_PROPERTY_NAME = "CurrentScriptSettings";
+
 
 		private ScriptConfig _currentScriptSettings = null;
 
@@ -109,7 +121,7 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._currentScriptSettings = value;
-				this.RaisePropertyChanged(CURRENT_SCRIPT_SETTINGS_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.CurrentScriptSettings));
 			}
 		}
 
@@ -128,10 +140,7 @@ namespace IL2CDR.ViewModel
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="ServerListMessage" /> property's name.
-		/// </summary>
-		public const string SERVER_LIST_MESSAGE_PROPERTY_NAME = "ServerListMessage";
+
 
 		private string _serverListMessage = null;
 
@@ -150,14 +159,11 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._serverListMessage = value;
-				this.RaisePropertyChanged(SERVER_LIST_MESSAGE_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.ServerListMessage));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsServerListMessageVisible" /> property's name.
-		/// </summary>
-		public const string IS_SERVER_LIST_MESSAGE_VISIBLE_PROPERTY_NAME = "IsServerListMessageVisible";
+
 
 		private bool _isServerListMessageVisible = false;
 
@@ -176,14 +182,11 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._isServerListMessageVisible = value;
-				this.RaisePropertyChanged(IS_SERVER_LIST_MESSAGE_VISIBLE_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.IsServerListMessageVisible));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsWindowReopen" /> property's name.
-		/// </summary>
-		public const string IS_WINDOW_REOPEN_PROPERTY_NAME = "IsWindowReopen";
+
 
 		private bool _isWindowReopen = false;
 
@@ -202,7 +205,7 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._isWindowReopen = value;
-				this.RaisePropertyChanged(IS_WINDOW_REOPEN_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.IsWindowReopen));
 			}
 		}
 
@@ -228,10 +231,7 @@ namespace IL2CDR.ViewModel
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Config" /> property's name.
-		/// </summary>
-		public const string CONFIG_PROPERTY_NAME = "Config";
+
 
 		private Config _config = null;
 
@@ -250,15 +250,11 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._config = value;
-				this.RaisePropertyChanged(CONFIG_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.Config));
 			}
 		}
 
 
-		/// <summary>
-		/// The <see cref="LogMessages" /> property's name.
-		/// </summary>
-		public const string LOG_MESSAGES_PROPERTY_NAME = "LogMessages";
 
 		private string _logMessages = null;
 
@@ -277,7 +273,7 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._logMessages = value;
-				this.RaisePropertyChanged(LOG_MESSAGES_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.LogMessages));
 			}
 		}
 
@@ -308,15 +304,21 @@ namespace IL2CDR.ViewModel
 				return this._enableMissionLogMonitor
 						?? (this._enableMissionLogMonitor = new RelayCommand(
 							() => {
-								var missionLogService = (Application.Current as App)?.MissionLogDataService;
-								if (missionLogService == null) {
+								var allMissionLogServerServices = this.dserverManager?.Servers?
+																		.Select(server => server.MissionLogService)
+																		.Where(mlds => mlds != null)
+																		.ToList(); 
+
+
+								//var missionLogService = (Application.Current as App)?.MissionLogDataService;
+								if (allMissionLogServerServices == null) {
 									return;
 								}
 
 								if (!this.Config.IsMissionLogMonitorEnabled) {
-									missionLogService.Stop();
+									allMissionLogServerServices.ForEach(mlds => mlds.Stop());
 								} else {
-									missionLogService.Start();
+									allMissionLogServerServices.ForEach(mlds => mlds.Start());
 								}
 							}));
 			}
@@ -358,10 +360,6 @@ namespace IL2CDR.ViewModel
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="ServerList" /> property's name.
-		/// </summary>
-		public const string SERVER_LIST_PROPERTY_NAME = "ServerList";
 
 		private ObservableCollection<Server> _serverList = null;
 
@@ -380,7 +378,7 @@ namespace IL2CDR.ViewModel
 				}
 
 				this._serverList = value;
-				this.RaisePropertyChanged(SERVER_LIST_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.ServerList));
 			}
 		}
 

@@ -33,10 +33,19 @@ namespace IL2CDR
 
 		protected override void OnStartup(StartupEventArgs e)
 		{
-			this.AppLogDataService = new AppLogDataService();
-			Log.WriteInfo("Application is starting...");
+			var appConfig = Settings.Default.Config;
+
+			// -- initialization of the default Config value for Log truncation: 
+			if (appConfig.ApplicationLogBufferSize == 0) {
+				appConfig.ApplicationLogBufferSize = 500;
+			}
 
 			this.SettingsManager = new SettingsManager();
+
+			this.AppLogDataService = new AppLogDataService() { MaxNumberOfLines = Math.Max(appConfig.ApplicationLogBufferSize, 100) };
+
+			Log.WriteInfo("Application is starting...");
+
 
 			Regex.CacheSize = 0;
 			WebRequest.DefaultWebProxy = null;

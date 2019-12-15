@@ -13,7 +13,7 @@ namespace IL2CDR.Model
 		private FileSystemWatcher watcher;
 		private readonly Dictionary<string, long> filePositions;
 		private ConcurrentQueue<string> logLinesQueue;
-		private readonly string folder;
+		public string Folder { get; }
 		private readonly string mask;
 
 		public Func<string, bool> Preprocess { get; set; }
@@ -24,18 +24,18 @@ namespace IL2CDR.Model
 
 		public TextFileTracker(string folder, string mask)
 		{
-			this.folder = folder;
+			this.Folder = folder;
 			this.mask = mask;
 			this.filePositions = new Dictionary<string, long>();
 		}
 
 		public void SetupFolderWatcher()
 		{
-			if (string.IsNullOrWhiteSpace(this.folder)) {
+			if (string.IsNullOrWhiteSpace(this.Folder)) {
 				return;
 			}
 
-			this.watcher = new FileSystemWatcher(this.folder, this.mask) {
+			this.watcher = new FileSystemWatcher(this.Folder, this.mask) {
 				NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName
 			};
 			this.watcher.Changed += this.watcher_Changed;
