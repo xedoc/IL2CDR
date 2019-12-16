@@ -17,6 +17,13 @@ namespace IL2CDR.Model
 		public Action<ProcessItem> AddProcess { get; set; }
 		public Action<int> RemoveProcess { get; set; }
 
+
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
+
+
 		public ProcessMonitor()
 		{
 			this.startWatcher = new ManagementEventWatcher("Select * From Win32_ProcessStartTrace");
@@ -87,6 +94,7 @@ namespace IL2CDR.Model
 
 		public void Start()
 		{
+			this.IsRunning = true; 
 			this.startWatcher.Start();
 			this.stopWatcher.Start();
 		}
@@ -95,6 +103,7 @@ namespace IL2CDR.Model
 		{
 			this.startWatcher.Stop();
 			this.stopWatcher.Stop();
+			this.IsRunning = false; 
 		}
 
 		public void Restart()

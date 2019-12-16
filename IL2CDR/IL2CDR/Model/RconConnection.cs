@@ -15,7 +15,7 @@ namespace IL2CDR.Model
 		private readonly object lockConnection = new object();
 		private TcpClient connection;
 		private NetworkStream netStream;
-		private bool isStopped;
+		//private bool isStopped;
 		private readonly object cmdLock = new object();
 
 		private readonly Dictionary<string, string> errorCodes = new Dictionary<string, string>() {
@@ -29,6 +29,13 @@ namespace IL2CDR.Model
 			{"8", "This user isn't allowed to execute a command"},
 			{"9", "Invalid user"}
 		};
+
+
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
+
 
 		public RconConnection(IL2StartupConfig config)
 		{
@@ -61,10 +68,6 @@ namespace IL2CDR.Model
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Config" /> property's name.
-		/// </summary>
-		public const string CONFIG_PROPERTY_NAME = "Config";
 
 		private IL2StartupConfig _config = null;
 
@@ -83,14 +86,10 @@ namespace IL2CDR.Model
 				}
 
 				this._config = value;
-				this.RaisePropertyChanged(CONFIG_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.Config));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsConnected" /> property's name.
-		/// </summary>
-		public const string IsConnectedPropertyName = "IsConnected";
 
 		private bool _isConnected = false;
 
@@ -109,14 +108,11 @@ namespace IL2CDR.Model
 				}
 
 				this._isConnected = value;
-				this.RaisePropertyChanged(IsConnectedPropertyName);
+				this.RaisePropertyChanged(nameof(this.IsConnected));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsAuthorized" /> property's name.
-		/// </summary>
-		public const string IsAuthorizedPropertyName = "IsAuthorized";
+
 
 		private bool _isAuthorized = false;
 
@@ -135,7 +131,7 @@ namespace IL2CDR.Model
 				}
 
 				this._isAuthorized = value;
-				this.RaisePropertyChanged(IsAuthorizedPropertyName);
+				this.RaisePropertyChanged(nameof(this.IsAuthorized));
 			}
 		}
 
@@ -169,7 +165,7 @@ namespace IL2CDR.Model
 		{
 			this.LastErrorDescription = "Communication error";
 
-			if (this.isStopped) {
+			if (!this.IsRunning) {
 				return new NameValueCollection();
 			}
 
@@ -299,37 +295,41 @@ namespace IL2CDR.Model
 			lock (this.cmdLock) {
 				var result = new List<Player>();
 				var rconResult = this.RawCommand("getplayerlist");
-				if (rconResult["STATUS"] == "1") {
-					var playerList = rconResult["playerList"];
-					if (!string.IsNullOrEmpty(playerList)) {
-						var table = playerList.Split('|').Skip(1).ToArray();
-						if (table.Length > 0) {
-							result = new List<Player>(
-								table.Select(line => line.Split(','))
-											  .Select(x => {
-															if (x.Length == 6 &&
-																int.TryParse(x[0], out var cid) &&
-																Guid.TryParse(HttpUtility.UrlDecode(x[5]), out var nickGuid) &&
-																Guid.TryParse(HttpUtility.UrlDecode(x[4]), out var userGuid) &&
-																int.TryParse(x[2], out var ping) &&
-																Enum.TryParse<PlayerStatus>(x[1], out var status)) {
-																return new Player() {
-																	ClientId = cid,
-																	IsOnline = true,
-																	LoginId = userGuid,
-																	NickId = nickGuid,
-																	NickName = x[3],
-																	Ping = ping,
-																	Status = status,
-																};
-															} else {
-																return null;
-															}
-														}
-												)
-								);
-						}
-					}
+				if (rconResult["STATUS"] != "1") {
+					return result;
+				}
+
+				var playerList = rconResult["playerList"];
+				if (string.IsNullOrEmpty(playerList)) {
+					return result;
+				}
+
+				var table = playerList.Split('|').Skip(1).ToArray();
+				if (table.Length > 0) {
+					result = new List<Player>(
+						table.Select(line => line.Split(','))
+							.Select(x => {
+									if (x.Length == 6 &&
+										int.TryParse(x[0], out var cid) &&
+										Guid.TryParse(HttpUtility.UrlDecode(x[5]), out var nickGuid) &&
+										Guid.TryParse(HttpUtility.UrlDecode(x[4]), out var userGuid) &&
+										int.TryParse(x[2], out var ping) &&
+										Enum.TryParse<PlayerStatus>(x[1], out var status)) {
+										return new Player() {
+											ClientId = cid,
+											IsOnline = true,
+											LoginId = userGuid,
+											NickId = nickGuid,
+											NickName = x[3],
+											Ping = ping,
+											Status = status,
+										};
+									} else {
+										return null;
+									}
+								}
+							)
+					);
 				}
 
 				return result;
@@ -417,19 +417,30 @@ namespace IL2CDR.Model
 
 		public void Start()
 		{
-			this.isStopped = false;
+			if (this.IsRunning) {   // <-- "Idempotent check" -- not to start this service multiple times. 
+				return;
+			}
+
 			this.Connect();
 			this.Authenticate();
+			this.IsRunning = true;
 		}
 
 		public void Stop()
 		{
+			if (!this.IsRunning) {		// <-- "Idempotent check" -- not to stop this service multiple times. 
+				return; 
+			}
+
+			this.IsRunning = false;
 			this.Disconnect();
-			this.isStopped = true;
+			//this.isStopped = true;
 		}
 
 		public void Restart()
 		{
+			this.Stop();
+			this.Start();
 		}
 	}
 

@@ -17,10 +17,6 @@ namespace IL2CDR.Model
 			this.ScriptConfigs = new List<ScriptConfig>();
 		}
 
-		/// <summary>
-		/// The <see cref="ScriptConfigs" /> property's name.
-		/// </summary>
-		public const string ScriptConfigsPropertyName = "ScriptConfigs";
 
 		private List<ScriptConfig> _scriptConfigs = null;
 
@@ -40,14 +36,10 @@ namespace IL2CDR.Model
 				}
 
 				this._scriptConfigs = value;
-				this.RaisePropertyChanged(ScriptConfigsPropertyName);
+				this.RaisePropertyChanged(nameof(this.ScriptConfigs));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsChatMonitorEnabled" /> property's name.
-		/// </summary>
-		public const string IsChatMonitorEnabledPropertyName = "IsChatMonitorEnabled";
 
 		private bool _isChatMonitorEnabled = true;
 
@@ -67,14 +59,10 @@ namespace IL2CDR.Model
 				}
 
 				this._isChatMonitorEnabled = value;
-				this.RaisePropertyChanged(IsChatMonitorEnabledPropertyName);
+				this.RaisePropertyChanged(nameof(this.IsChatMonitorEnabled));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="MissionLogCleanupInterval" /> property's name.
-		/// </summary>
-		public const string MissionLogCleanupIntervalPropertyName = "MissionLogCleanupInterval";
 
 		private int _missionLogCleanupInterval = 5;
 
@@ -94,15 +82,10 @@ namespace IL2CDR.Model
 				}
 
 				this._missionLogCleanupInterval = value;
-				this.RaisePropertyChanged(MissionLogCleanupIntervalPropertyName);
+				this.RaisePropertyChanged(nameof(this.MissionLogCleanupInterval));
 			}
 		}
 
-
-		/// <summary>
-		/// The <see cref="IsMissionLogCleanupEnabled" /> property's name.
-		/// </summary>
-		public const string IsMissionLogCleanupEnabledPropertyName = "IsMissionLogCleanupEnabled";
 
 		private bool _isMissionLogCleanupEnabled = false;
 
@@ -122,14 +105,10 @@ namespace IL2CDR.Model
 				}
 
 				this._isMissionLogCleanupEnabled = value;
-				this.RaisePropertyChanged(IsMissionLogCleanupEnabledPropertyName);
+				this.RaisePropertyChanged(nameof(this.IsMissionLogCleanupEnabled));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsMissionLogMonitorEnabled" /> property's name.
-		/// </summary>
-		public const string IsMissionLogMonitorEnabledPropertyName = "IsMissionLogMonitorEnabled";
 
 		private bool _isMissionLogMonitorEnabled = true;
 
@@ -149,9 +128,34 @@ namespace IL2CDR.Model
 				}
 
 				this._isMissionLogMonitorEnabled = value;
-				this.RaisePropertyChanged(IsMissionLogMonitorEnabledPropertyName);
+				this.RaisePropertyChanged(nameof(this.IsMissionLogMonitorEnabled));
 			}
 		}
+
+
+		private bool _isRConEnabled = true;
+
+		/// <summary>
+		/// Sets and gets the IsRConEnabled property -- whether this application should connect to the DServer via RCon. 
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsRConEnabled
+		{
+			get => this._isRConEnabled;
+
+			set
+			{
+				if (this._isRConEnabled == value) {
+					return;
+				}
+
+				this._isRConEnabled = value;
+				this.RaisePropertyChanged(nameof(this.IsRConEnabled));
+			}
+		}
+
+
 
 
 		private int _applicationLogBufferSize;
@@ -169,6 +173,7 @@ namespace IL2CDR.Model
 				this.RaisePropertyChanged(nameof(ApplicationLogBufferSize));
 			}
 		}
+
 
 
 

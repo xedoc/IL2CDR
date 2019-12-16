@@ -46,6 +46,10 @@ namespace IL2CDR.Model
 
 
 
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
 
 
 		public ScriptManager()
@@ -361,6 +365,7 @@ namespace IL2CDR.Model
 
 		public void Start()
 		{
+			this.IsRunning = true; 
 			this.RunStartupMethod();
 		}
 
@@ -368,6 +373,7 @@ namespace IL2CDR.Model
 		{
 			this.RunShutdownMethod();
 			this.tracker?.Stop();
+			this.IsRunning = false; 
 		}
 
 		public void Restart()

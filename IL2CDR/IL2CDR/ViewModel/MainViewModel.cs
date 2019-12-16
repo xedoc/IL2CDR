@@ -85,19 +85,30 @@ namespace IL2CDR.ViewModel
 			});
 		}
 
+
+		private Task messagesRefresherTask;
+		private int ignoredCalls = 0;
+		private int executedCalls = 0; 
+
 		private void messages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			//e.NewItems.Do(x => {
-			//	var newLines = new string[x.Count + 1];
-			//	newLines[0] = string.Empty;
-			//	x.CopyTo(newLines, 1);
-			//	UI.Dispatch(() => this.LogMessages += string.Join(Environment.NewLine, newLines));
-			//});
+			// -- THROTTLING of events -- fire "ScrollingTextBox" refresh only once per 500ms: 
 
-			var ocLogLines = sender as ObservableCollection<string>;
-			if (ocLogLines != null) {
-				this.LogMessages = string.Join(Environment.NewLine, ocLogLines); 
+			if (this.messagesRefresherTask != null && !this.messagesRefresherTask.IsCompleted) {
+				this.ignoredCalls++;
+				return;		// <-- refresher task is stil "running", so the refresh is scheduled in a "near" future... don't do anything now. 
 			}
+
+			this.messagesRefresherTask = Task.Factory.StartNew(async () => {
+				await Task.Delay(500);
+				UI.Dispatch(() => {
+					this.executedCalls++; 
+					var ocLogLines = sender as ObservableCollection<string>;
+					if (ocLogLines != null) {
+						this.LogMessages = string.Join(Environment.NewLine, ocLogLines);
+					}
+				});
+			});
 			
 		}
 
@@ -277,52 +288,69 @@ namespace IL2CDR.ViewModel
 			}
 		}
 
-		private RelayCommand _enableChatLogMonitor;
+		//private RelayCommand _enableChatLogMonitor;
+
+		///// <summary>
+		///// Gets the EnableChatLogMonitor.
+		///// </summary>
+		//public RelayCommand EnableChatLogMonitor
+		//{
+		//	get
+		//	{
+		//		return this._enableChatLogMonitor
+		//				?? (this._enableChatLogMonitor = new RelayCommand(
+		//					() => { }));
+		//	}
+		//}
+
+		private RelayCommand _refreshEnabledDisabledStateOfServerComponentsCommand;
 
 		/// <summary>
-		/// Gets the EnableChatLogMonitor.
+		/// Gets the RefreshEnabledDisabledStateOfServerComponentsCommand.
 		/// </summary>
-		public RelayCommand EnableChatLogMonitor
+		public RelayCommand RefreshEnabledDisabledStateOfServerComponentsCommand
 		{
 			get
 			{
-				return this._enableChatLogMonitor
-						?? (this._enableChatLogMonitor = new RelayCommand(
-							() => { }));
+				if (this._refreshEnabledDisabledStateOfServerComponentsCommand == null) {
+					this._refreshEnabledDisabledStateOfServerComponentsCommand = new RelayCommand(
+						() => {
+							var allServers = this.dserverManager?.Servers?.Where(srv => srv != null).ToList();
+
+							if (allServers == null) {
+								return;
+							}
+
+							// -- i) MissionLogMonitor
+							if (this.Config.IsMissionLogMonitorEnabled) {
+								allServers.ForEach(server => server.MissionLogService?.Start());
+							} else {
+								allServers.ForEach(server => server.MissionLogService?.Stop());
+							}
+
+							// -- ii) ChatLogMonitor
+							if (this.Config.IsChatMonitorEnabled) {
+								// ??? where is ChatLogMonitor service? 
+							} else {
+								// ??? where is ChatLogMonitor service? 
+							}
+
+							// -- iii) RCon connection: 
+							if (this.Config.IsRConEnabled) {
+								allServers.ForEach(server => server.Rcon?.Start());
+							} else {
+								allServers.ForEach(server => server.Rcon?.Stop());
+							}
+						});
+				}
+
+				return this._refreshEnabledDisabledStateOfServerComponentsCommand;
 			}
 		}
 
-		private RelayCommand _enableMissionLogMonitor;
-
-		/// <summary>
-		/// Gets the EnableMissionLogMonitor.
-		/// </summary>
-		public RelayCommand EnableMissionLogMonitor
-		{
-			get
-			{
-				return this._enableMissionLogMonitor
-						?? (this._enableMissionLogMonitor = new RelayCommand(
-							() => {
-								var allMissionLogServerServices = this.dserverManager?.Servers?
-																		.Select(server => server.MissionLogService)
-																		.Where(mlds => mlds != null)
-																		.ToList(); 
 
 
-								//var missionLogService = (Application.Current as App)?.MissionLogDataService;
-								if (allMissionLogServerServices == null) {
-									return;
-								}
 
-								if (!this.Config.IsMissionLogMonitorEnabled) {
-									allMissionLogServerServices.ForEach(mlds => mlds.Stop());
-								} else {
-									allMissionLogServerServices.ForEach(mlds => mlds.Start());
-								}
-							}));
-			}
-		}
 
 		private RelayCommand<string> _scriptCheck;
 
@@ -335,11 +363,11 @@ namespace IL2CDR.ViewModel
 			{
 				return this._scriptCheck
 						?? (this._scriptCheck = new RelayCommand<string>(
-							(scriptFile) => {
-								if (this.scriptManager != null) {
-									this.scriptManager.SwitchScript(scriptFile);
-								}
-							}));
+														(scriptFile) => {
+															this.scriptManager?.SwitchScript(scriptFile);
+														}
+												)
+						   );
 			}
 		}
 

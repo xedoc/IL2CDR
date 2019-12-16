@@ -68,6 +68,14 @@ namespace IL2CDR.Model
 		public DateTime MissionStartDateTime { get; set; }
 		public string MissionLogFolder { get; set; }
 
+
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
+
+
+
 		public MissionLogDataService(Server server)
 		{
 			this.server = server;
@@ -236,6 +244,10 @@ namespace IL2CDR.Model
 
 		public void Start()
 		{
+			if (this.IsRunning) {	// <-- "Idempotent check" -- not to start this service multiple times. 
+				return;			
+			}
+
 			if (string.IsNullOrWhiteSpace(this.MissionLogFolder)) {
 				Log.WriteInfo("No mission folder specified!");
 				return;
@@ -256,7 +268,7 @@ namespace IL2CDR.Model
 				var scriptManager = new ScriptManager();
 				scriptManager.LoadScripts();
 				scriptManager.Start();
-				this.actionManager = new ActionManager(new ScriptManager());
+				this.actionManager = new ActionManager(scriptManager);
 			}
 
 			this.server.OnPlayerListChange = (players, srv) => {
@@ -269,11 +281,18 @@ namespace IL2CDR.Model
 
 			Log.WriteInfo("Starting MissionLogDataService.TextFileTracker for server '{0}' on directory '{1}'", this.server.Name, this.tracker?.Folder);
 			this.tracker?.Start();
+
+			this.IsRunning = true;
 		}
 
 		public void Stop()
 		{
+			if (!this.IsRunning) {      // <-- "Idempotent check" -- not to stop this service multiple times. 
+				return;
+			}
+
 			this.tracker.Stop();
+			this.IsRunning = false; 
 		}
 
 		public void Restart()

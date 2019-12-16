@@ -22,6 +22,13 @@ namespace IL2CDR.Model
 		public Action<string> OnChanged { get; set; }
 		public string CurrentFileName { get; set; }
 
+
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
+
+
 		public TextFileTracker(string folder, string mask)
 		{
 			this.Folder = folder;
@@ -117,6 +124,7 @@ namespace IL2CDR.Model
 
 		public void Start()
 		{
+			this.IsRunning = true; 
 			this.logLinesQueue = new ConcurrentQueue<string>();
 			this.filePositions.Clear();
 			this.SetupFolderWatcher();
@@ -127,6 +135,8 @@ namespace IL2CDR.Model
 			if (this.watcher != null) {
 				this.watcher.EnableRaisingEvents = false;
 			}
+
+			this.IsRunning = false; 
 		}
 
 		public void Restart()

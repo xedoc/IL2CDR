@@ -17,6 +17,12 @@ namespace IL2CDR.Model
 		private readonly ActionManager actionManager;
 		private readonly ProcessMonitor dserverProcMonitor;
 
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
+
+
 		public DServerManager()
 		{
 			this.dserverProcMonitor = new ProcessMonitor("DServer.exe");
@@ -32,9 +38,10 @@ namespace IL2CDR.Model
 
 		public void Start()
 		{
+			this.IsRunning = true; 
 			this.dserverProcMonitor.Start();
-			foreach (var server in this.dserverProcMonitor.RunningProcesses.ToList()) {
-				this.AddServer(this.GetServer(server));
+			foreach (var serverProcessItem in this.dserverProcMonitor.RunningProcesses.ToList()) {
+				this.AddServer(this.GetServer(serverProcessItem));
 			}
 		}
 
@@ -129,6 +136,8 @@ namespace IL2CDR.Model
 				Util.Try(() => server.Rcon.Stop());
 				server.MissionLogService.Stop();
 			}
+
+			this.IsRunning = false; 
 		}
 
 		public void Restart()

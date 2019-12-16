@@ -204,13 +204,17 @@
 			<TabItem Header="Settings">
 				<Border Style="{StaticResource TabItemBorder}">
 					<StackPanel Orientation="Vertical">
-						<CheckBox Focusable="False" Command="{Binding EnableMissionLogMonitor}"
+						<CheckBox Focusable="False" Command="{Binding RefreshEnabledDisabledStateOfServerComponentsCommand}"
 								IsChecked="{Binding Config.IsMissionLogMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,10">
 							Enable mission log monitoring
 						</CheckBox>
-						<CheckBox Focusable="False" Command="{Binding EnableChatLogMonitor}"
+						<CheckBox Focusable="False" Command="{Binding RefreshEnabledDisabledStateOfServerComponentsCommand}"
 								IsChecked="{Binding Config.IsChatMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,5">
 							Enable chat log monitoring
+						</CheckBox>
+						<CheckBox Focusable="False" Command="{Binding RefreshEnabledDisabledStateOfServerComponentsCommand}"
+								IsChecked="{Binding Config.IsRConEnabled, Mode=TwoWay}" Margin="0,0,0,10">
+							Enable RCon connection
 						</CheckBox>
 						<DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
 							<CheckBox Focusable="False">Delete mission logs older than</CheckBox>
@@ -232,7 +236,7 @@
 			<TabItem Header="Log">
 				<Border Style="{StaticResource TabItemBorder}">
 					<Control:ScrollingTextBox HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible"
-											Text="{Binding LogMessages}" Foreground="White" />
+											Text="{Binding LogMessages,Delay=500}" Foreground="White" />
 				</Border>
 			</TabItem>
 		</TabControl>
