@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 
 namespace IL2CDR.Model
@@ -13,7 +16,49 @@ namespace IL2CDR.Model
 
 		[JsonIgnore] public IL2StartupConfig ServerConfig { get; set; }
 
-		[JsonIgnore] public RconConnection Rcon { get; set; }
+
+		[JsonIgnore]
+		public RconConnection Rcon
+		{
+			get => this._rcon; 
+			set
+			{
+				if (this._rcon == value) {
+					return;			// <-- nothing to do. 
+				}
+
+				// -- i) unassociate old instance: 
+				if (this._rcon != null) {
+					this._rcon.PropertyChanged -= this.OnRconPropertyChanged;
+					this._rcon = null; 
+				}
+
+
+				// -- ii) associate new instance
+				this._rcon = value;
+				this._rcon.PropertyChanged += this.OnRconPropertyChanged; 
+
+			}
+		}
+
+		private RconConnection _rcon;
+
+
+
+		/// <summary>
+		/// This is the proxy property to get, whether this server has a "valid configuration" (i.e., whether this.ServerConfig.IsConfigReady == true). 
+		/// </summary>
+		[JsonIgnore]
+		public bool IsConfigSet => this.ServerConfig.IsConfigReady;
+
+
+		/// <summary>
+		/// Proxy property, that gets the IsConnected status of the Rcon service of this server. 
+		/// </summary>
+		[JsonIgnore]
+		public bool IsRconConnected => this.Rcon.IsConnected;
+
+
 		[JsonIgnore] public MissionLogDataService MissionLogService { get; set; }
 		[JsonIgnore] public ProcessItem Process { get; set; }
 		[JsonIgnore] public Action<List<Player>, Server> OnPlayerListChange { get; set; }
@@ -78,6 +123,15 @@ namespace IL2CDR.Model
 			this.GameObjects = new GameObjectsCollection();
 			this.AirFields = new AirFieldCollection();
 			this.CoalitionIndexes = new List<CoalitionIndex>();
+		}
+
+
+		private void OnRconPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+		{
+			if (eventArgs != null && (eventArgs.PropertyName == nameof(this.Rcon.IsConnected) || eventArgs.PropertyName == nameof(this.Rcon.IsRunning)) ) {
+				this.RaisePropertyChanged(nameof(this.IsRconConnected));
+			}
+
 		}
 
 
@@ -346,18 +400,29 @@ namespace IL2CDR.Model
 		}
 
 
-		/// <summary>
-		/// This is the proxy property to get, whether this server has a "valid configuration" (i.e., whether this.ServerConfig.IsConfigReady == true). 
-		/// </summary>
-		[JsonIgnore]
-		public bool IsConfigSet => this.ServerConfig.IsConfigReady;
 
+		public RelayCommand SwitchRconOnOff
+		{
+			get
+			{
+				if (this._switchRconOnOff == null) {
+					this._switchRconOnOff = new RelayCommand(
+							() => {
+								if (this.Rcon.IsRunning) {
+									this.Rcon.Stop();
+								} else {
+									this.Rcon.Start();
+								}
+							}
+						);
+				}
 
-		/// <summary>
-		/// Proxy property, that gets the IsConnected status of the Rcon service of this server. 
-		/// </summary>
-		[JsonIgnore]
-		public bool IsRconConnected => this.Rcon.IsConnected;
+				return this._switchRconOnOff;
+			}
+		}
+
+		private RelayCommand _switchRconOnOff; 
+
 
 
 
@@ -397,5 +462,9 @@ namespace IL2CDR.Model
 				e.TargetPlayer?.AddDamage((object) e.AttackerPlayer ?? e.AttackerObject, e);
 			}
 		}
+
+
+
+
 	}
 }

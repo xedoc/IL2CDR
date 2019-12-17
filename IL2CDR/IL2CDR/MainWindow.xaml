@@ -82,8 +82,15 @@
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 									<StackPanel DataContext="{Binding}" Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Top">
+										
 										<Rectangle OpacityMask="{StaticResource ConnectIcon}" Width="26" Height="26" Margin="0"
-													Style="{StaticResource ConnectIconStyle}" />
+													Style="{StaticResource ConnectIconStyle}" >
+											<Rectangle.InputBindings>
+												<MouseBinding Gesture="LeftClick" Command="{Binding SwitchRconOnOff}"/>
+											</Rectangle.InputBindings>
+										</Rectangle>	
+										
+
 										<TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-26,-16,0,0" Foreground="#FF7D7D7D">rcon</TextBlock>
 										<Rectangle Style="{StaticResource SettingsIconStyle}" Width="26" Height="26" Margin="11,0,0,0"
 													OpacityMask="{StaticResource SettingsIcon}" />

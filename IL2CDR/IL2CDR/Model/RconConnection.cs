@@ -34,7 +34,48 @@ namespace IL2CDR.Model
 		/// <summary>
 		/// This property answers the question, whether this component is running or not.
 		/// </summary>
-		public bool IsRunning { get; private set; }
+		public bool IsRunning
+		{
+			get => this._isRunning;
+			private set
+			{
+				if (this._isRunning != value) {
+					this._isRunning = value;
+					this.RaisePropertyChanged(nameof(this.IsRunning));
+				}
+			}
+		}
+		/// <summary>
+		/// Backing-field for IsRunning property 
+		/// </summary>
+		private bool _isRunning = false;
+
+
+
+		
+
+		/// <summary>
+		/// Sets and gets the IsConnected property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public bool IsConnected
+		{
+			get => this._isConnected;
+
+			private set
+			{
+				if (this._isConnected != value) {
+					this._isConnected = value;
+					this.RaisePropertyChanged(nameof(this.IsConnected));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Backing-field for IsConnected property. 
+		/// </summary>
+		private bool _isConnected = false;
+
 
 
 		/// <summary>
@@ -103,27 +144,6 @@ namespace IL2CDR.Model
 		}
 
 
-		private bool _isConnected = false;
-
-		/// <summary>
-		/// Sets and gets the IsConnected property.
-		/// Changes to that property's value raise the PropertyChanged event. 
-		/// </summary>
-		public bool IsConnected
-		{
-			get => this._isConnected;
-
-			set
-			{
-				if (this._isConnected == value) {
-					return;
-				}
-
-				this._isConnected = value;
-				this.RaisePropertyChanged(nameof(this.IsConnected));
-			}
-		}
-
 
 
 		private bool _isAuthorized = false;
@@ -156,8 +176,36 @@ namespace IL2CDR.Model
 						this.netStream = this.connection.GetStream();
 					}, false);
 					this.IsConnected = true;
+					Log.WriteInfo("RCON connected...");
 				}).Wait(2000);
 			}
+		}
+
+
+		/// <summary>
+		/// Authorizes user on rcon server with user/password taken from the startup.cfg
+		/// </summary>
+		private bool Authenticate()
+		{
+			var login = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconLogin))
+				? this.Il2ServerConfig.RconLogin
+				: this.RconDefaultLogin;
+
+			var password = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconPassword))
+				? this.Il2ServerConfig.RconPassword
+				: this.RconDefaultPassword;
+
+
+			var command = $"auth {login} {password}";
+			var result = this.RawCommand(command);
+			if (result != null && result.Count > 0) {
+				Log.WriteInfo("RCON authentication: {0}", this.GetResult(result["STATUS"]));
+				return (result["STATUS"] == "1");
+			} else {
+				Log.WriteInfo("Rcon authentication failed!");
+				return false;
+			}
+
 		}
 
 		private void Disconnect()
@@ -171,6 +219,8 @@ namespace IL2CDR.Model
 				this.netStream = null;
 				this.connection = null;	
 			}
+
+			Log.WriteInfo("RCON disconnected!");
 		}
 
 		/// <summary>
@@ -264,31 +314,7 @@ namespace IL2CDR.Model
 			}
 		}
 
-		/// <summary>
-		/// Authorizes user on rcon server with user/password taken from the startup.cfg
-		/// </summary>
-		private bool Authenticate()
-		{
-			var login = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconLogin))
-				? this.Il2ServerConfig.RconLogin
-				: this.RconDefaultLogin;
 
-			var password = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconPassword))
-				? this.Il2ServerConfig.RconPassword
-				: this.RconDefaultPassword;
-
-
-			var command = $"auth {login} {password}";
-			var result = this.RawCommand(command);
-			if (result != null && result.Count > 0) {
-				Log.WriteInfo("Rcon authentication: {0}", this.GetResult(result["STATUS"]));
-				return (result["STATUS"] == "1"); 
-			} else {
-				Log.WriteInfo("Rcon authentication failed!");
-				return false; 
-			}
-			
-		}
 
 		private string GetResult(string result)
 		{
