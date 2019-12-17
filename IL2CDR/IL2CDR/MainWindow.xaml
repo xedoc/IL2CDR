@@ -223,10 +223,25 @@
 							<Label>days</Label>
 						</DockPanel>	
 					    <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                            <TextBox Margin="0,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="50"
-									Text="{Binding Config.ApplicationLogBufferSize, Mode=TwoWay}" />
-					        <Label>Max number of lines in Log window</Label>
+							<Label>Max number of lines in Log window: </Label>
+							<TextBox Margin="10,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="50"
+									Text="{Binding Config.ApplicationLogBufferSize, Mode=TwoWay}" HorizontalAlignment="Left" />
                         </DockPanel>
+
+						<DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+							<Label>(default) Rcon Login: </Label>
+							<TextBox Margin="10,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Width="100"
+									Text="{Binding Config.RconStaticLogin, Mode=TwoWay}" HorizontalAlignment="Left" />
+							<Label FontSize="8" VerticalAlignment="Center">(please restart application after modification to take effect)</Label>
+						</DockPanel>
+
+						<DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+							<Label>(default) Rcon Password:</Label>
+							<TextBox Margin="10,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Width="100"
+									Text="{Binding Config.RconStaticPassword, Mode=TwoWay}" HorizontalAlignment="Left" />
+							<Label FontSize="8" VerticalAlignment="Center">(please restart application after modification to take effect)</Label>
+						</DockPanel>
+
 					</StackPanel>
 
 

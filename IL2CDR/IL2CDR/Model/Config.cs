@@ -170,10 +170,23 @@ namespace IL2CDR.Model
 				}
 
 				this._applicationLogBufferSize = value;
-				this.RaisePropertyChanged(nameof(ApplicationLogBufferSize));
+				this.RaisePropertyChanged(nameof(this.ApplicationLogBufferSize));
 			}
 		}
 
+
+		/// <summary>
+		/// The configuration setting of the RconLogin -- this is a static value, which is used as a fallback when no login is found in the DServer's startup.cfg. 
+		/// </summary>
+		[XmlAttribute]
+		public string RconStaticLogin { get; set; }
+
+
+		/// <summary>
+		/// The configuration setting of the RconPassword -- this is a static value, which is used as a fallback when no login is found in the DServer's startup.cfg. 
+		/// </summary>
+		[XmlAttribute]
+		public string RconStaticPassword { get; set; }
 
 
 

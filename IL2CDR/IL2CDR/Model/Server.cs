@@ -10,6 +10,9 @@ namespace IL2CDR.Model
 	public class Server : NotifyPropertyChangeBase
 	{
 		private readonly object lockOnlinePlayers = new object();
+
+		[JsonIgnore] public IL2StartupConfig ServerConfig { get; set; }
+
 		[JsonIgnore] public RconConnection Rcon { get; set; }
 		[JsonIgnore] public MissionLogDataService MissionLogService { get; set; }
 		[JsonIgnore] public ProcessItem Process { get; set; }
@@ -19,25 +22,26 @@ namespace IL2CDR.Model
 
 		private Timer timerPlayerList;
 
-		public Server(RconConnection rcon, ProcessItem process)
+		public Server(IL2StartupConfig serverConfig, RconConnection rcon, ProcessItem process)
 		{
 			this.Name = $@"PID: {process.Id} {process.Path}\DServer.exe";
-			this.Process = process;
-			this.Rcon = rcon;
-			this.MissionLogService = new MissionLogDataService(this);
 			this.ServerId = default(Guid);
-			this.IsConfigSet = false;
-			this.IsRconConnected = false;
+			this.Process = process;
+			this.ServerConfig = serverConfig;
+			this.Rcon = rcon;
+
+			this.MissionLogService = new MissionLogDataService(this);
+
 			this.TimeZoneOffset = (int) TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).TotalMinutes;
 			this.Initialize();
 		}
 
+		[Obsolete("This constructor is WEIRD! Please do NOT use it!", false)]
 		public Server(string name, bool isConfigSet, bool isRconConnected)
 		{
 			this.Name = name;
 			this.ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, name);
-			this.IsConfigSet = isConfigSet;
-			this.IsRconConnected = isRconConnected;
+
 			this.Initialize();
 		}
 
@@ -159,10 +163,6 @@ namespace IL2CDR.Model
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="OnlinePlayers" /> property's name.
-		/// </summary>
-		public const string ONLINE_PLAYERS_PROPERTY_NAME = "OnlinePlayers";
 
 		private ObservableCollection<Player> _onlinePlayers = new ObservableCollection<Player>();
 
@@ -182,14 +182,10 @@ namespace IL2CDR.Model
 				}
 
 				this._onlinePlayers = value;
-				this.RaisePropertyChanged(ONLINE_PLAYERS_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.OnlinePlayers));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="CoalitionIndexes" /> property's name.
-		/// </summary>
-		public const string COALITION_INDEXES_PROPERTY_NAME = "CoalitionIndexes";
 
 		private List<CoalitionIndex> _coalitionIndexes;
 
@@ -209,14 +205,10 @@ namespace IL2CDR.Model
 				}
 
 				this._coalitionIndexes = value;
-				this.RaisePropertyChanged(COALITION_INDEXES_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.CoalitionIndexes));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="ServerId" /> property's name.
-		/// </summary>
-		public const string SERVER_ID_PROPERTY_NAME = "ServerId";
 
 		private Guid _serverId;
 
@@ -235,14 +227,10 @@ namespace IL2CDR.Model
 				}
 
 				this._serverId = value;
-				this.RaisePropertyChanged(SERVER_ID_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.ServerId));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="GameObjects" /> property's name.
-		/// </summary>
-		public const string GAME_OBJECTS_PROPERTY_NAME = "GameObjects";
 
 		private GameObjectsCollection _gameObjects;
 
@@ -262,14 +250,10 @@ namespace IL2CDR.Model
 				}
 
 				this._gameObjects = value;
-				this.RaisePropertyChanged(GAME_OBJECTS_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.GameObjects));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="AirFields" /> property's name.
-		/// </summary>
-		public const string AIR_FIELDS_PROPERTY_NAME = "AirFields";
 
 		private AirFieldCollection _airFields;
 
@@ -289,14 +273,10 @@ namespace IL2CDR.Model
 				}
 
 				this._airFields = value;
-				this.RaisePropertyChanged(AIR_FIELDS_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.AirFields));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Areas" /> property's name.
-		/// </summary>
-		public const string AREAS_PROPERTY_NAME = "Areas";
 
 		private AreaCollection _areas = new AreaCollection();
 
@@ -316,14 +296,10 @@ namespace IL2CDR.Model
 				}
 
 				this._areas = value;
-				this.RaisePropertyChanged(AREAS_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.Areas));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Players" /> property's name.
-		/// </summary>
-		public const string PLAYERS_PROPERTY_NAME = "Players";
 
 		private PlayersCollection _players;
 
@@ -343,14 +319,10 @@ namespace IL2CDR.Model
 				}
 
 				this._players = value;
-				this.RaisePropertyChanged(PLAYERS_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.Players));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="Name" /> property's name.
-		/// </summary>
-		public const string NAME_PROPERTY_NAME = "Name";
 
 		private string _name = null;
 
@@ -369,63 +341,25 @@ namespace IL2CDR.Model
 				}
 
 				this._name = value;
-				this.RaisePropertyChanged(NAME_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.Name));
 			}
 		}
 
-		/// <summary>
-		/// The <see cref="IsConfigSet" /> property's name.
-		/// </summary>
-		public const string IS_CONFIG_SET_PROPERTY_NAME = "IsConfigSet";
-
-		private bool _isConfigSet = false;
 
 		/// <summary>
-		/// Sets and gets the IsConfigSet property.
-		/// Changes to that property's value raise the PropertyChanged event. 
+		/// This is the proxy property to get, whether this server has a "valid configuration" (i.e., whether this.ServerConfig.IsConfigReady == true). 
 		/// </summary>
 		[JsonIgnore]
-		public bool IsConfigSet
-		{
-			get => this._isConfigSet;
+		public bool IsConfigSet => this.ServerConfig.IsConfigReady;
 
-			set
-			{
-				if (this._isConfigSet == value) {
-					return;
-				}
-
-				this._isConfigSet = value;
-				this.RaisePropertyChanged(IS_CONFIG_SET_PROPERTY_NAME);
-			}
-		}
 
 		/// <summary>
-		/// The <see cref="IsRconConnected" /> property's name.
-		/// </summary>
-		public const string IS_RCON_CONNECTED_PROPERTY_NAME = "IsRconConnected";
-
-		private bool _IsRconConnected = false;
-
-		/// <summary>
-		/// Sets and gets the IsRconConnected property.
-		/// Changes to that property's value raise the PropertyChanged event. 
+		/// Proxy property, that gets the IsConnected status of the Rcon service of this server. 
 		/// </summary>
 		[JsonIgnore]
-		public bool IsRconConnected
-		{
-			get => this._IsRconConnected;
+		public bool IsRconConnected => this.Rcon.IsConnected;
 
-			set
-			{
-				if (this._IsRconConnected == value) {
-					return;
-				}
 
-				this._IsRconConnected = value;
-				this.RaisePropertyChanged(IS_RCON_CONNECTED_PROPERTY_NAME);
-			}
-		}
 
 		public void DestroyObject(int id)
 		{

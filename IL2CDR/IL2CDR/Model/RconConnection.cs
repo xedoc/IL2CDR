@@ -37,15 +37,27 @@ namespace IL2CDR.Model
 		public bool IsRunning { get; private set; }
 
 
-		public RconConnection(IL2StartupConfig config)
-		{
-			this.Config = config;
-		}
+		/// <summary>
+		/// Static configuration of login used for authentication of the Rcon connection
+		/// </summary>
+		public string RconDefaultLogin { get; set; } = null;
 
 		/// <summary>
-		/// The <see cref="LastErrorDescription" /> property's name.
+		/// Static configuration of password used for authentication of the Rcon connection. 
 		/// </summary>
-		public const string LAST_ERROR_DESCRIPTION_PROPERTY_NAME = "LastErrorDescription";
+		public string RconDefaultPassword { get; set; } = null; 
+
+
+
+		/// <summary>
+		/// Constructor 
+		/// </summary>
+		/// <param name="il2ServerConfig"></param>
+		public RconConnection(IL2StartupConfig il2ServerConfig)
+		{
+			this.Il2ServerConfig = il2ServerConfig;
+		}
+
 
 		private string lastErrorDescription;
 
@@ -64,29 +76,29 @@ namespace IL2CDR.Model
 				}
 
 				this.lastErrorDescription = value;
-				this.RaisePropertyChanged(LAST_ERROR_DESCRIPTION_PROPERTY_NAME);
+				this.RaisePropertyChanged(nameof(this.LastErrorDescription));
 			}
 		}
 
 
-		private IL2StartupConfig _config = null;
+		private IL2StartupConfig _il2ServerConfig = null;
 
 		/// <summary>
-		/// Sets and gets the Config property.
+		/// Sets and gets the Il2ServerConfig property.
 		/// Changes to that property's value raise the PropertyChanged event. 
 		/// </summary>
-		public IL2StartupConfig Config
+		public IL2StartupConfig Il2ServerConfig
 		{
-			get => this._config;
+			get => this._il2ServerConfig;
 
 			set
 			{
-				if (this._config == value) {
+				if (this._il2ServerConfig == value) {
 					return;
 				}
 
-				this._config = value;
-				this.RaisePropertyChanged(nameof(this.Config));
+				this._il2ServerConfig = value;
+				this.RaisePropertyChanged(nameof(this.Il2ServerConfig));
 			}
 		}
 
@@ -137,10 +149,10 @@ namespace IL2CDR.Model
 
 		private void Connect()
 		{
-			if (this.Config.RconIP != null && this.Config.RconPort >= 1 || this.Config.RconPort <= 65535) {
+			if (this.Il2ServerConfig.RconIP != null && this.Il2ServerConfig.RconPort >= 1 || this.Il2ServerConfig.RconPort <= 65535) {
 				Task.Factory.StartNew(() => {
 					Util.Try(() => {
-						this.connection = new TcpClient(this.Config.RconIP.ToString(), this.Config.RconPort);
+						this.connection = new TcpClient(this.Il2ServerConfig.RconIP.ToString(), this.Il2ServerConfig.RconPort);
 						this.netStream = this.connection.GetStream();
 					}, false);
 					this.IsConnected = true;
@@ -150,9 +162,14 @@ namespace IL2CDR.Model
 
 		private void Disconnect()
 		{
+			this.IsConnected = false; 
 			if (this.connection != null) {
 				Util.Try(() => this.netStream.Close());
 				Util.Try(() => this.connection.Close());
+
+				// -- and clear the references, so the next attemp to connect has an "empty table"... 
+				this.netStream = null;
+				this.connection = null;	
 			}
 		}
 
@@ -165,12 +182,14 @@ namespace IL2CDR.Model
 		{
 			this.LastErrorDescription = "Communication error";
 
-			if (!this.IsRunning) {
+			//if (!this.IsRunning) {
+			if (!this.IsConnected) {
 				return new NameValueCollection();
 			}
 
 			if (this.netStream == null || !this.netStream.CanWrite) {
-				this.Start();
+				//this.Start();
+				this.Connect();	// -- if the TCP connection is not available/not usable, try to reconnect (not to start this manager, as it was written before). 
 			}
 
 			lock (this.lockConnection) {
@@ -248,14 +267,27 @@ namespace IL2CDR.Model
 		/// <summary>
 		/// Authorizes user on rcon server with user/password taken from the startup.cfg
 		/// </summary>
-		private void Authenticate()
+		private bool Authenticate()
 		{
-			var result = this.RawCommand($"auth {this.Config.Login} {this.Config.Password}");
+			var login = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconLogin))
+				? this.Il2ServerConfig.RconLogin
+				: this.RconDefaultLogin;
+
+			var password = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconPassword))
+				? this.Il2ServerConfig.RconPassword
+				: this.RconDefaultPassword;
+
+
+			var command = $"auth {login} {password}";
+			var result = this.RawCommand(command);
 			if (result != null && result.Count > 0) {
 				Log.WriteInfo("Rcon authentication: {0}", this.GetResult(result["STATUS"]));
+				return (result["STATUS"] == "1"); 
 			} else {
 				Log.WriteInfo("Rcon authentication failed!");
+				return false; 
 			}
+			
 		}
 
 		private string GetResult(string result)
@@ -422,8 +454,10 @@ namespace IL2CDR.Model
 			}
 
 			this.Connect();
-			this.Authenticate();
-			this.IsRunning = true;
+			var authenticationSuccessful = this.Authenticate();
+
+			// -- flag "IsRunning" will be set only if the connection & the authentication were successful. 
+			this.IsRunning = this.IsConnected && authenticationSuccessful;
 		}
 
 		public void Stop()

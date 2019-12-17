@@ -50,29 +50,35 @@ namespace IL2CDR.Model
 			var baseDir = Directory.GetParent(Directory.GetParent(process.Path).FullName);
 			var config = new IL2StartupConfig(string.Concat(baseDir, @"\data\startup.cfg"));
 			var rcon = new RconConnection(config);
-			var server = new Server(rcon, process);
+
+			var appSettings = Settings.Default.Config;
+			rcon.RconDefaultLogin = appSettings.RconStaticLogin;
+			rcon.RconDefaultPassword = appSettings.RconStaticPassword; 
+
+			var server = new Server(config, rcon, process);
 			return server;
 		}
 
 		private void RemoveServer(int processId)
 		{
 			lock (this.lockDservers) {
-				var server =
-					this.Servers.FirstOrDefault(ds => ds?.Process != null && ds.Process.Id == processId);
-				if (server != null) {
-					server.MissionLogService.Stop();
-					Util.Try(() => server.Rcon.Stop());
-					UI.Dispatch(() => {
-						this.Servers.Remove(server);
-						this.dserverProcMonitor.Remove(processId);
-					});
+				var server = this.Servers.FirstOrDefault(ds => ds?.Process != null && ds.Process.Id == processId);
+				if (server == null) {
+					return;
 				}
+
+				server.MissionLogService.Stop();
+				Util.Try(() => server.Rcon.Stop());
+				UI.Dispatch(() => {
+					this.Servers.Remove(server);
+					this.dserverProcMonitor.Remove(processId);
+				});
 			}
 		}
 
 		private void AddServer(Server server)
 		{
-			var existingDServer = this.Servers.FirstOrDefault(s => s.Rcon.Config.GameRootFolder == server.Rcon.Config.GameRootFolder);
+			var existingDServer = this.Servers.FirstOrDefault(s => s.Rcon.Il2ServerConfig.GameRootFolder == server.Rcon.Il2ServerConfig.GameRootFolder);
 			if (existingDServer != null) {
 				try {
 					var process = Process.GetProcessById((int) existingDServer.Process.Id);
@@ -98,13 +104,19 @@ namespace IL2CDR.Model
 
 			server.ServerId = GuidUtility.Create(GuidUtility.IsoOidNamespace, server.Name);
 
-			if (Settings.Default.Config.IsMissionLogMonitorEnabled) {
+			var appConfig = Settings.Default.Config;
+
+			if (appConfig.IsMissionLogMonitorEnabled) {
 				Log.WriteInfo("Starting MissionLogService for the server {0}", server.Name);
 				server.MissionLogService.Start();
 			} else {
 				Log.WriteInfo("MissionLogService for the server {0} is NOT started! MissionLogMonitor is DISABLED in the application Settings.", server.Name);
 			}
-			
+
+			if (appConfig.IsRConEnabled && this.IsRunning) {
+				server.Rcon.Start();
+			}
+
 
 			/*
 			Task.Factory.StartNew((obj) => {
@@ -112,8 +124,8 @@ namespace IL2CDR.Model
 					return;
 				}
 
-				srv.IsConfigSet = srv.Rcon.Config.IsConfigReady;
-				srv.Login();
+				srv.IsConfigSet = srv.Rcon.Il2ServerConfig.IsConfigReady;
+				srv.AccountLogin();
 				srv.IsRconConnected = true;
 			},  server, TaskCreationOptions.LongRunning);
 			*/

@@ -79,7 +79,7 @@ namespace IL2CDR.Model
 		public MissionLogDataService(Server server)
 		{
 			this.server = server;
-			this.MissionLogFolder = server.Rcon.Config.MissionTextLogFolder;
+			this.MissionLogFolder = server.Rcon.Il2ServerConfig.MissionTextLogFolder;
 			this.Initialize();
 		}
 

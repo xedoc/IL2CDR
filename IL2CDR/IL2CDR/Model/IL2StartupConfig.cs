@@ -27,8 +27,28 @@ namespace IL2CDR.Model
 		public IPAddress RconIP { get; set; }
 		public int RconPort { get; set; }
 
-		public string Login { get; set; }
-		public string Password { get; set; }
+		/// <summary>
+		/// Login of the DServer account (account on the Master server -- the account, which has associated Server Key licence).
+		/// </summary>
+		public string AccountLogin { get; set; }
+
+		/// <summary>
+		/// Password of the DServer account (with this password the DServer logins on the master server) 
+		/// </summary>
+		public string AccountPassword { get; set; }
+
+
+		/// <summary>
+		/// Login that should be used for Rcon connection authentication
+		/// </summary>
+		public string RconLogin { get; set; }
+
+		/// <summary>
+		/// The password to be used for the Rcon connection authentication
+		/// </summary>
+		public string RconPassword { get; set; }
+
+
 
 		public bool IsConfigReady { get; set; }
 
@@ -42,20 +62,18 @@ namespace IL2CDR.Model
 		private void Initialize()
 		{
 			this.ReadConfig();
+
 			if (!this.IsMissionTextLogEnabled || !this.IsChatLogEnabled || !this.IsRconEnabled || this.RconPort <= 0 ||
-				this.RconPort > 65535 || this.RconIP == null || this.RconIP.Equals(default(IPAddress))
-			) {
-				this.IsConfigReady = false;
-				this.EnableRequiredOptions();
-			} else {
-				this.IsConfigReady = true;
-			}
+				this.RconPort > 65535 || this.RconIP == null || this.RconIP.Equals(default(IPAddress))  ) {
+
+				this.EnableRequiredOptions();	// <-- inside this call is again an attempt to ReadConfig() (which may set the "IsConfigReady" to true. 
+			} 
 		}
 
 		public void ReadConfig()
 		{
-			if (string.IsNullOrWhiteSpace(this.configFilePath) ||
-				!File.Exists(this.configFilePath)) {
+			if (string.IsNullOrWhiteSpace(this.configFilePath) || !File.Exists(this.configFilePath)) {
+				this.IsConfigReady = false;
 				return;
 			}
 
@@ -69,11 +87,15 @@ namespace IL2CDR.Model
 
 				this.IsMissionTextLogEnabled = this.GetBool("chatlog");
 				this.IsChatLogEnabled = this.GetBool("mission_text_log");
-				this.Login = this.GetString("login");
-				this.Password = this.GetString("password");
+				this.AccountLogin = this.GetString("login");
+				this.AccountPassword = this.GetString("password");
+
+				this.RconLogin = this.GetString("rcon_login");
+				this.RconPassword = this.GetString("rcon_password");
 				this.IsRconEnabled = this.GetBool("rcon_start");
 				this.RconIP = this.GetIPAddress("rcon_ip");
 				this.RconPort = this.GetInt("rcon_port");
+				this.IsConfigReady = true;
 			});
 		}
 
