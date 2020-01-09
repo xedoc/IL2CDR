@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
-    public class Bot : GameObject
-    {
-        public Bot(GameObject obj, string editorName, string name)
-            : base(obj.Id, name)
-        {
-            NameInEdtor = editorName;
-            Name = name;
-        }
-        public string NameInEdtor { get; set; }
-    }
+	public class Bot : GameObject
+	{
+		public Bot(GameObject obj, string editorName, string name)
+			: base(obj.Id, name)
+		{
+			this.NameInEdtor = editorName;
+			this.Name = name;
+		}
+
+		public string NameInEdtor { get; set; }
+	}
 }

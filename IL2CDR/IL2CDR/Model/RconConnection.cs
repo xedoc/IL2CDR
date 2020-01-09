@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -11,465 +10,505 @@ using System.Web;
 
 namespace IL2CDR.Model
 {
-    public class RconConnection : NotifyPropertyChangeBase, IStopStart
-    {
-        private object lockConnection = new object();
-        private TcpClient connection;
-        private NetworkStream netStream;
-        private bool isStopped = false;
-        private object cmdLock = new object();
-        private Dictionary<string, string> errorCodes = new Dictionary<string, string>()
-        {
-            {"1", "OK"},
-            {"2", "Unknown result"},
-            {"3", "Unknown command"},
-            {"4", "Incorrect parameters count"},
-            {"5", "Receive buffer error"},
-            {"6", "Access denied! Authenticate first!"},
-            {"7", "Server is not running" },
-            {"8", "This user isn't allowed to execute a command"},
-            {"9", "Invalid user"}
-        };
-        
-        public RconConnection(IL2StartupConfig config)
-        {
-            Config = config;
-        }
+	public class RconConnection : NotifyPropertyChangeBase, IStopStart
+	{
+		private readonly object lockConnection = new object();
+		private TcpClient connection;
+		private NetworkStream netStream;
+		//private bool isStopped;
+		private readonly object cmdLock = new object();
 
-        /// <summary>
-        /// The <see cref="LastErrorDescription" /> property's name.
-        /// </summary>
-        public const string LastErrorDescriptionPropertyName = "LastErrorDescription";
+		private readonly Dictionary<string, string> errorCodes = new Dictionary<string, string>() {
+			{"1", "OK"},
+			{"2", "Unknown result"},
+			{"3", "Unknown command"},
+			{"4", "Incorrect parameters count"},
+			{"5", "Receive buffer error"},
+			{"6", "Access denied! Authenticate first!"},
+			{"7", "Server is not running"},
+			{"8", "This user isn't allowed to execute a command"},
+			{"9", "Invalid user"}
+		};
 
-        private string _lastErrorDescription;
 
-        /// <summary>
-        /// Sets and gets the LastErrorDescription property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string LastErrorDescription
-        {
-            get
-            {
-                return _lastErrorDescription;
-            }
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning
+		{
+			get => this._isRunning;
+			private set
+			{
+				if (this._isRunning != value) {
+					this._isRunning = value;
+					this.RaisePropertyChanged(nameof(this.IsRunning));
+				}
+			}
+		}
+		/// <summary>
+		/// Backing-field for IsRunning property 
+		/// </summary>
+		private bool _isRunning = false;
 
-            set
-            {
-                if (_lastErrorDescription == value)
-                {
-                    return;
-                }
 
-                _lastErrorDescription = value;
-                RaisePropertyChanged(LastErrorDescriptionPropertyName);
-            }
-        }
 
-        /// <summary>
-        /// The <see cref="Config" /> property's name.
-        /// </summary>
-        public const string ConfigPropertyName = "Config";
+		
 
-        private IL2StartupConfig _config = null;
+		/// <summary>
+		/// Sets and gets the IsConnected property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public bool IsConnected
+		{
+			get => this._isConnected;
 
-        /// <summary>
-        /// Sets and gets the Config property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public IL2StartupConfig Config
-        {
-            get
-            {
-                return _config;
-            }
+			private set
+			{
+				if (this._isConnected != value) {
+					this._isConnected = value;
+					this.RaisePropertyChanged(nameof(this.IsConnected));
+				}
+			}
+		}
 
-            set
-            {
-                if (_config == value)
-                {
-                    return;
-                }
+		/// <summary>
+		/// Backing-field for IsConnected property. 
+		/// </summary>
+		private bool _isConnected = false;
 
-                _config = value;
-                RaisePropertyChanged(ConfigPropertyName);
-            }
-        }
 
-        /// <summary>
-        /// The <see cref="IsConnected" /> property's name.
-        /// </summary>
-        public const string IsConnectedPropertyName = "IsConnected";
 
-        private bool _isConnected = false;
+		/// <summary>
+		/// Static configuration of login used for authentication of the Rcon connection
+		/// </summary>
+		public string RconDefaultLogin { get; set; } = null;
 
-        /// <summary>
-        /// Sets and gets the IsConnected property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public bool IsConnected
-        {
-            get
-            {
-                return _isConnected;
-            }
+		/// <summary>
+		/// Static configuration of password used for authentication of the Rcon connection. 
+		/// </summary>
+		public string RconDefaultPassword { get; set; } = null; 
 
-            set
-            {
-                if (_isConnected == value)
-                {
-                    return;
-                }
 
-                _isConnected = value;
-                RaisePropertyChanged(IsConnectedPropertyName);
-            }
-        }
 
-        /// <summary>
-        /// The <see cref="IsAuthorized" /> property's name.
-        /// </summary>
-        public const string IsAuthorizedPropertyName = "IsAuthorized";
+		/// <summary>
+		/// Constructor 
+		/// </summary>
+		/// <param name="il2ServerConfig"></param>
+		public RconConnection(IL2StartupConfig il2ServerConfig)
+		{
+			this.Il2ServerConfig = il2ServerConfig;
+		}
 
-        private bool _isAuthorized = false;
 
-        /// <summary>
-        /// Sets and gets the IsAuthorized property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public bool IsAuthorized
-        {
-            get
-            {
-                return _isAuthorized;
-            }
+		private string lastErrorDescription;
 
-            set
-            {
-                if (_isAuthorized == value)
-                {
-                    return;
-                }
+		/// <summary>
+		/// Sets and gets the LastErrorDescription property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public string LastErrorDescription
+		{
+			get => this.lastErrorDescription;
 
-                _isAuthorized = value;
-                RaisePropertyChanged(IsAuthorizedPropertyName);
-            }
-        }
+			set
+			{
+				if (this.lastErrorDescription == value) {
+					return;
+				}
 
-        private void Connect()
-        {
-            if( Config.RconIP != null && 
-                Config.RconPort >= 1 || 
-                Config.RconPort <= 65535 )
-            {
-                Task.Factory.StartNew(() => {
-                    Util.Try(() => {
-                        connection = new TcpClient(Config.RconIP.ToString(), Config.RconPort);
-                        netStream = connection.GetStream();
-                    },false);
-                    IsConnected = true;
-                }).Wait(2000);                
-            }
-        }
-        private void Disconnect()
-        {
-            if (connection != null)
-            {
-                Util.Try(() => netStream.Close());
-                Util.Try(() => connection.Close());
-            }
-        }
-        /// <summary>
-        /// Send raw command to server
-        /// </summary>
-        /// <param name="line">command</param>
-        /// <returns>NameValueCollection with parameter name/value pairs</returns>
-        public NameValueCollection RawCommand(string line)
-        {
-            LastErrorDescription = "Communication error";
+				this.lastErrorDescription = value;
+				this.RaisePropertyChanged(nameof(this.LastErrorDescription));
+			}
+		}
 
-            if (isStopped)
-                return new NameValueCollection();
 
-            if (netStream == null || !netStream.CanWrite)
-                Start();
+		private IL2StartupConfig _il2ServerConfig = null;
 
-            lock (lockConnection)
-            {
-                if (netStream.CanWrite)
-                {
-                    Byte[] sendBytes = Encoding.UTF8.GetBytes(String.Concat(line));
-                    Byte[] length = BitConverter.GetBytes((ushort)(line.Length + 1));
-                    Byte[] zero = { 0 };
-                    Byte[] packet = length.Concat(sendBytes).Concat(zero).ToArray();
-                    Util.Try(() => netStream.Write(packet, 0, packet.Length), false);
-                }
-                else
-                {
-                    Disconnect();
-                    return new NameValueCollection();
-                }
-            }  
-            var writeTask = Task.Factory.StartNew<NameValueCollection>((obj) =>
-            {
-                try
-                {
-                    lock (lockConnection)
-                    {
-                        var rcon = obj as RconConnection;
-                        if (rcon == null || 
-                            rcon.connection == null || 
-                            rcon.netStream == null)
-                            return new NameValueCollection();
+		/// <summary>
+		/// Sets and gets the Il2ServerConfig property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public IL2StartupConfig Il2ServerConfig
+		{
+			get => this._il2ServerConfig;
 
-                        if (rcon.netStream.CanRead)
-                        {
-                            while (!rcon.netStream.DataAvailable)
-                                Thread.Sleep(1);
+			set
+			{
+				if (this._il2ServerConfig == value) {
+					return;
+				}
 
-                            if (rcon.connection.ReceiveBufferSize <= 0)
-                                return new NameValueCollection();
+				this._il2ServerConfig = value;
+				this.RaisePropertyChanged(nameof(this.Il2ServerConfig));
+			}
+		}
 
-                            byte[] bytes = new byte[rcon.connection.ReceiveBufferSize];
-                            Util.Try(() => rcon.netStream.Read(bytes, 0, (int)rcon.connection.ReceiveBufferSize), false);
-                            UInt16 length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
-                            string response = null;
-                            if (length > 2)
-                                response = Encoding.UTF8.GetString(bytes.Skip(2).Take((int)length - 1).ToArray());
 
-                            if (!String.IsNullOrWhiteSpace(response))
-                            {
-                                var result = HttpUtility.ParseQueryString(response);
-                                string errorText;
-                                LastErrorDescription = String.Empty;
-                            
-                                if( errorCodes.TryGetValue(result["STATUS"], out errorText) )
-                                    LastErrorDescription = errorText;
 
-                                return result;
-                            }
-                            else
-                            {
-                                return new NameValueCollection();
-                            }
-                        }
-                        else
-                        {
-                            rcon.Disconnect();
-                            rcon.Start();
-                        }
-                        return new NameValueCollection();
-                    }
-                }
-                catch(Exception e)
-                {
-                    Log.WriteError("{0}\n{1}", e.Message, e.StackTrace);
-                    return new NameValueCollection();
-                }
 
-            }, this);
+		private bool _isAuthorized = false;
 
-            if (writeTask.Wait(3000))
-                return writeTask.Result;
-            else
-                return new NameValueCollection();
-        }
-        /// <summary>
-        /// Authorizes user on rcon server with user/password taken from the startup.cfg
-        /// </summary>
-        private void Authenticate()
-        {
-            var result = RawCommand(String.Format("auth {0} {1}", Config.Login, Config.Password));
-            if( result != null && result.Count > 0 )
-                Log.WriteInfo("Rcon authentication: {0}", GetResult(result["STATUS"]) );
-            else
-                Log.WriteInfo("Rcon authentication failed!");
-        }
+		/// <summary>
+		/// Sets and gets the IsAuthorized property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public bool IsAuthorized
+		{
+			get => this._isAuthorized;
 
-        private string GetResult(string result)
-        {
-            string code;
-            errorCodes.TryGetValue(result, out code);
-            return code ?? "UNKNOWN";
-        }
+			set
+			{
+				if (this._isAuthorized == value) {
+					return;
+				}
 
-        /// <summary>
-        /// Get server console text
-        /// </summary>
-        /// <returns>Console text</returns>
-        public string GetConsole()
-        {
-            return RawCommand("getconsole")["console"];
-        }
+				this._isAuthorized = value;
+				this.RaisePropertyChanged(nameof(this.IsAuthorized));
+			}
+		}
 
-        /// <summary>
-        /// Check if rcon user is authenticated
-        /// </summary>
-        /// <returns>true if authenticated, false if not</returns>
-        public bool AuthenticationStatus()
-        {
-            if( RawCommand("mystatus")["authed"] == "1" )
-                return true;
+		private void Connect()
+		{
+			if (this.Il2ServerConfig.RconIP != null && this.Il2ServerConfig.RconPort >= 1 || this.Il2ServerConfig.RconPort <= 65535) {
+				Task.Factory.StartNew(() => {
+					Util.Try(() => {
+						this.connection = new TcpClient(this.Il2ServerConfig.RconIP.ToString(), this.Il2ServerConfig.RconPort);
+						this.netStream = this.connection.GetStream();
+					}, false);
+					this.IsConnected = true;
+					Log.WriteInfo("RCON connected...");
+				}).Wait(2000);
+			}
+		}
 
-            return false;
-        }
-        /// <summary>
-        /// Request player list 
-        /// </summary>
-        /// <returns>List of Player objects</returns>
-        public List<Player> GetPlayerList()
-        {
-            lock(cmdLock)
-            {
-                List<Player> result = new List<Player>();
-                var rconResult = RawCommand("getplayerlist");
-                if (rconResult["STATUS"] == "1")
-                {
-                    var playerList = rconResult["playerList"];
-                    if (!String.IsNullOrEmpty(playerList))
-                    {
-                        var table = playerList.Split('|').Skip(1).ToArray();
-                        if (table.Length > 0)
-                        {
-                            result = new List<Player>(
-                                table.Select(line => line.Split(',')).Select(x =>
-                                {
-                                    int cid, ping;
-                                    Guid nickGuid, userGuid;
-                                    PlayerStatus status;
-                                    if (x.Length == 6 &&
-                                        int.TryParse(x[0], out cid) &&
-                                        Guid.TryParse(HttpUtility.UrlDecode(x[5]), out nickGuid) &&
-                                        Guid.TryParse(HttpUtility.UrlDecode(x[4]), out userGuid) &&
-                                        int.TryParse(x[2], out ping) &&
-                                        Enum.TryParse<PlayerStatus>(x[1], out status))
-                                    {
-                                        return new Player()
-                                        {
-                                            ClientId = cid,
-                                            IsOnline = true,
-                                            LoginId = userGuid,
-                                            NickId = nickGuid,
-                                            NickName = x[3],
-                                            Ping = ping,
-                                            Status = status,
-                                        };
-                                    }
-                                    else
-                                    {
-                                        return null;
-                                    }
-                                }));
-                        }
-                    }
-                }
-                return result;
-            }
-        }
 
-        /// <summary>
-        /// Check server status
-        /// </summary>
-        /// <returns>true if server alive</returns>
-        public bool GetServerStatus()
-        {
-            return RawCommand("serverstatus")["STATUS"] == "1";
-        }
-                
-        /// <summary>
-        /// Kick player
-        /// </summary>
-        /// <param name="id">nickname, client id or nick/user guid</param>
-        public void Kick(object id)
-        {
-            if( id is string || id is Guid || id is int )
-            {
-                RawCommand(String.Format("kick {0}", id.ToString()));
-            }
-        }
+		/// <summary>
+		/// Authorizes user on rcon server with user/password taken from the startup.cfg
+		/// </summary>
+		private bool Authenticate()
+		{
+			var login = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconLogin))
+				? this.Il2ServerConfig.RconLogin
+				: this.RconDefaultLogin;
 
-        /// <summary>
-        /// Ban player
-        /// </summary>
-        /// <param name="id">nickname, client id or nick/user guid</param>
-        public void Ban( object id )
-        {
-            if (id is string || id is Guid || id is int)
-            {
-                RawCommand(String.Format("ban {0}", id.ToString()));
-            }
-        }
+			var password = (!string.IsNullOrWhiteSpace(this.Il2ServerConfig.RconPassword))
+				? this.Il2ServerConfig.RconPassword
+				: this.RconDefaultPassword;
 
-        /// <summary>
-        /// Unban all players
-        /// </summary>
-        public void UnBanAll()
-        {
-            RawCommand("unbanall");
-        }
 
-        /// <summary>
-        /// Call named action in mision
-        /// </summary>
-        /// <param name="name">name of action</param>
-        public void ServerInput(string name)
-        {
-            RawCommand(String.Format("serverinput {0}", name));
-        }
+			var command = $"auth {login} {password}";
+			var result = this.RawCommand(command);
+			if (result != null && result.Count > 0) {
+				Log.WriteInfo("RCON authentication: {0}", this.GetResult(result["STATUS"]));
+				return (result["STATUS"] == "1");
+			} else {
+				Log.WriteInfo("Rcon authentication failed!");
+				return false;
+			}
 
-        /// <summary>
-        /// Send server stats immediately
-        /// </summary>
-        public void SendStats()
-        {
-            RawCommand("sendstatnow");
-        }
+		}
 
-        /// <summary>
-        /// Write chat log to file immediately
-        /// </summary>
-        public void FlushChatLog()
-        {
-            RawCommand("cutchatlog");
-        }
+		private void Disconnect()
+		{
+			this.IsConnected = false; 
+			if (this.connection != null) {
+				Util.Try(() => this.netStream.Close());
+				Util.Try(() => this.connection.Close());
 
-        /// <summary>
-        /// Send chat message
-        /// </summary>
-        /// <param name="roomType">where to send a message: all, player, coalition or country</param>
-        /// <param name="text">message text</param>
-        /// <param name="id">optional. Client id, country id, coalition id</param>
-        public void ChatMessage(RoomType roomType, string text, object id = null)
-        {
-            if( id == null )
-                id = -1;
+				// -- and clear the references, so the next attemp to connect has an "empty table"... 
+				this.netStream = null;
+				this.connection = null;	
+			}
 
-            RawCommand(String.Format("chatmsg {0} {1} {2}", (int)roomType, id, text ));
-        }
+			Log.WriteInfo("RCON disconnected!");
+		}
 
-        public void Start()
-        {
-            isStopped = false;
-            Connect();
-            Authenticate();
-        }
+		/// <summary>
+		/// Send raw command to server
+		/// </summary>
+		/// <param name="line">command</param>
+		/// <returns>NameValueCollection with parameter name/value pairs</returns>
+		public NameValueCollection RawCommand(string line)
+		{
+			this.LastErrorDescription = "Communication error";
 
-        public void Stop()
-        {
-            Disconnect();
-            isStopped = true;
-        }
+			//if (!this.IsRunning) {
+			if (!this.IsConnected) {
+				return new NameValueCollection();
+			}
 
-        public void Restart()
-        {
-            
-        }
-    }
-    public enum RoomType
-    {
-        All = 0,
-        Client = 1,
-        Coalition = 2,
-        Country = 3
-    }
+			if (this.netStream == null || !this.netStream.CanWrite) {
+				//this.Start();
+				this.Connect();	// -- if the TCP connection is not available/not usable, try to reconnect (not to start this manager, as it was written before). 
+			}
+
+			lock (this.lockConnection) {
+				if (this.netStream.CanWrite) {
+					var sendBytes = Encoding.UTF8.GetBytes(line);
+					var length = BitConverter.GetBytes((ushort) (line.Length + 1));
+					byte[] zero = {0};
+					var packet = length.Concat(sendBytes).Concat(zero).ToArray();
+					Util.Try(() => this.netStream.Write(packet, 0, packet.Length), false);
+				} else {
+					this.Disconnect();
+					return new NameValueCollection();
+				}
+			}
+
+			var writeTask = Task.Factory.StartNew((obj) => {
+				try {
+					lock (this.lockConnection) {
+						if (!(obj is RconConnection rcon) ||
+							rcon.connection == null ||
+							rcon.netStream == null) {
+							return new NameValueCollection();
+						}
+
+						if (rcon.netStream.CanRead) {
+							while (!rcon.netStream.DataAvailable) {
+								Thread.Sleep(1);
+							}
+
+							if (rcon.connection.ReceiveBufferSize <= 0) {
+								return new NameValueCollection();
+							}
+
+							var bytes = new byte[rcon.connection.ReceiveBufferSize];
+							Util.Try(() => rcon.netStream.Read(bytes, 0, rcon.connection.ReceiveBufferSize),
+								false);
+							var length = BitConverter.ToUInt16(bytes.Take(2).ToArray(), 0);
+							string response = null;
+							if (length > 2) {
+								response = Encoding.UTF8.GetString(bytes.Skip(2).Take(length - 1).ToArray());
+							}
+
+							if (!string.IsNullOrWhiteSpace(response)) {
+								var result = HttpUtility.ParseQueryString(response);
+								this.LastErrorDescription = string.Empty;
+
+								if (this.errorCodes.TryGetValue(result["STATUS"], out var errorText)) {
+									this.LastErrorDescription = errorText;
+								}
+
+								return result;
+							} else {
+								return new NameValueCollection();
+							}
+						} else {
+							rcon.Disconnect();
+							rcon.Start();
+						}
+
+						return new NameValueCollection();
+					}
+				} catch (Exception e) {
+					Log.WriteError("{0}\n{1}", e.Message, e.StackTrace);
+					return new NameValueCollection();
+				}
+			}, this);
+
+			if (writeTask.Wait(3000)) {
+				return writeTask.Result;
+			} else {
+				return new NameValueCollection();
+			}
+		}
+
+
+
+		private string GetResult(string result)
+		{
+			this.errorCodes.TryGetValue(result, out var code);
+			return code ?? "UNKNOWN";
+		}
+
+		/// <summary>
+		/// Get server console text
+		/// </summary>
+		/// <returns>Console text</returns>
+		public string GetConsole()
+		{
+			return this.RawCommand("getconsole")["console"];
+		}
+
+		/// <summary>
+		/// Check if rcon user is authenticated
+		/// </summary>
+		/// <returns>true if authenticated, false if not</returns>
+		public bool AuthenticationStatus()
+		{
+			if (this.RawCommand("mystatus")["authed"] == "1") {
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Request player list 
+		/// </summary>
+		/// <returns>List of Player objects</returns>
+		public List<Player> GetPlayerList()
+		{
+			lock (this.cmdLock) {
+				var result = new List<Player>();
+				var rconResult = this.RawCommand("getplayerlist");
+				if (rconResult["STATUS"] != "1") {
+					return result;
+				}
+
+				var playerList = rconResult["playerList"];
+				if (string.IsNullOrEmpty(playerList)) {
+					return result;
+				}
+
+				var table = playerList.Split('|').Skip(1).ToArray();
+				if (table.Length > 0) {
+					result = new List<Player>(
+						table.Select(line => line.Split(','))
+							.Select(x => {
+									if (x.Length == 6 &&
+										int.TryParse(x[0], out var cid) &&
+										Guid.TryParse(HttpUtility.UrlDecode(x[5]), out var nickGuid) &&
+										Guid.TryParse(HttpUtility.UrlDecode(x[4]), out var userGuid) &&
+										int.TryParse(x[2], out var ping) &&
+										Enum.TryParse<PlayerStatus>(x[1], out var status)) {
+										return new Player() {
+											ClientId = cid,
+											IsOnline = true,
+											LoginId = userGuid,
+											NickId = nickGuid,
+											NickName = x[3],
+											Ping = ping,
+											Status = status,
+										};
+									} else {
+										return null;
+									}
+								}
+							)
+					);
+				}
+
+				return result;
+			}
+		}
+
+		/// <summary>
+		/// Check server status
+		/// </summary>
+		/// <returns>true if server alive</returns>
+		public bool GetServerStatus()
+		{
+			return this.RawCommand("serverstatus")["STATUS"] == "1";
+		}
+
+		/// <summary>
+		/// Kick player
+		/// </summary>
+		/// <param name="id">nickname, client id or nick/user guid</param>
+		public void Kick(object id)
+		{
+			if (id is string || id is Guid || id is int) {
+				this.RawCommand($"kick {id}");
+			}
+		}
+
+		/// <summary>
+		/// Ban player
+		/// </summary>
+		/// <param name="id">nickname, client id or nick/user guid</param>
+		public void Ban(object id)
+		{
+			if (id is string || id is Guid || id is int) {
+				this.RawCommand($"ban {id}");
+			}
+		}
+
+		/// <summary>
+		/// Unban all players
+		/// </summary>
+		public void UnBanAll()
+		{
+			this.RawCommand("unbanall");
+		}
+
+		/// <summary>
+		/// Call named action in mision
+		/// </summary>
+		/// <param name="name">name of action</param>
+		public void ServerInput(string name)
+		{
+			this.RawCommand($"serverinput {name}");
+		}
+
+		/// <summary>
+		/// Send server stats immediately
+		/// </summary>
+		public void SendStats()
+		{
+			this.RawCommand("sendstatnow");
+		}
+
+		/// <summary>
+		/// Write chat log to file immediately
+		/// </summary>
+		public void FlushChatLog()
+		{
+			this.RawCommand("cutchatlog");
+		}
+
+		/// <summary>
+		/// Send chat message
+		/// </summary>
+		/// <param name="roomType">where to send a message: all, player, coalition or country</param>
+		/// <param name="text">message text</param>
+		/// <param name="id">optional. Client id, country id, coalition id</param>
+		public void ChatMessage(RoomType roomType, string text, object id = null)
+		{
+			if (id == null) {
+				id = -1;
+			}
+
+			this.RawCommand($"chatmsg {(int) roomType} {id} {text}");
+		}
+
+		public void Start()
+		{
+			if (this.IsRunning) {   // <-- "Idempotent check" -- not to start this service multiple times. 
+				return;
+			}
+
+			this.Connect();
+			var authenticationSuccessful = this.Authenticate();
+
+			// -- flag "IsRunning" will be set only if the connection & the authentication were successful. 
+			this.IsRunning = this.IsConnected && authenticationSuccessful;
+		}
+
+		public void Stop()
+		{
+			if (!this.IsRunning) {		// <-- "Idempotent check" -- not to stop this service multiple times. 
+				return; 
+			}
+
+			this.IsRunning = false;
+			this.Disconnect();
+			//this.isStopped = true;
+		}
+
+		public void Restart()
+		{
+			this.Stop();
+			this.Start();
+		}
+	}
+
+	public enum RoomType
+	{
+		All = 0,
+		Client = 1,
+		Coalition = 2,
+		Country = 3
+	}
 }

@@ -1,190 +1,173 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace IL2CDR.Model
 {
-    [Serializable]
-    public class ScriptConfig : NotifyPropertyChangeBase
-    {
-        public ScriptConfig()
-        {
-            ConfigFields = new ConfigFieldList();
-        }
+	[Serializable]
+	public class ScriptConfig : NotifyPropertyChangeBase
+	{
+		public ScriptConfig()
+		{
+			this.ConfigFields = new ConfigFieldList();
+		}
 
-        public string GetString(string name)
-        {
-            return ConfigFields.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).With(x => x.Value as string);
-        }
-        public int GetInt(string name)
-        {
-            int intValue = 0;
-            var value = ConfigFields.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).With( x => x.Value).With( x => x.ToString());
-            int.TryParse(value, out intValue);
-            return intValue;
-        }
+		public string GetString(string name)
+		{
+			return this.ConfigFields
+				.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+				.With(x => x.Value as string);
+		}
 
-        public bool GetBool(string name )
-        {
-            return (bool)(ConfigFields.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)).With(x => x.Value));
-        }
-        /// <summary>
-        /// The <see cref="FileName" /> property's name.
-        /// </summary>
-        public const string FileNamePropertyName = "FileName";
+		public int GetInt(string name)
+		{
+			var value = this.ConfigFields
+				.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+				.With(x => x.Value).With(x => x.ToString());
+			int.TryParse(value, out var intValue);
+			return intValue;
+		}
 
-        private string _fileName = null;
+		public bool GetBool(string name)
+		{
+			return (bool) this.ConfigFields
+				.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+				.With(x => x.Value);
+		}
 
-        /// <summary>
-        /// Sets and gets the FileName property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public string FileName
-        {
-            get
-            {
-                return _fileName;
-            }
+		/// <summary>
+		/// The <see cref="FileName" /> property's name.
+		/// </summary>
+		public const string FILE_NAME_PROPERTY_NAME = "FileName";
 
-            set
-            {
-                if (_fileName == value)
-                {
-                    return;
-                }
+		private string _fileName = null;
 
-                _fileName = value;
-                RaisePropertyChanged(FileNamePropertyName);
-            }
-        }
+		/// <summary>
+		/// Sets and gets the FileName property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public string FileName
+		{
+			get => this._fileName;
 
-        /// <summary>
-        /// The <see cref="ConfigFields" /> property's name.
-        /// </summary>
-        public const string ConfigFieldsPropertyName = "ConfigFields";
+			set
+			{
+				if (this._fileName == value) {
+					return;
+				}
 
-        private ConfigFieldList _configFields = null;
+				this._fileName = value;
+				this.RaisePropertyChanged(FILE_NAME_PROPERTY_NAME);
+			}
+		}
 
-        /// <summary>
-        /// Sets and gets the Parameters property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlArray]
-        public ConfigFieldList ConfigFields
-        {
-            get
-            {
-                return _configFields;
-            }
+		/// <summary>
+		/// The <see cref="ConfigFields" /> property's name.
+		/// </summary>
+		public const string CONFIG_FIELDS_PROPERTY_NAME = "ConfigFields";
 
-            set
-            {
-                if (_configFields == value)
-                {
-                    return;
-                }
+		private ConfigFieldList _configFields = null;
 
-                _configFields = value;
-                RaisePropertyChanged(ConfigFieldsPropertyName);
-            }
-        }
+		/// <summary>
+		/// Sets and gets the Parameters property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlArray]
+		public ConfigFieldList ConfigFields
+		{
+			get => this._configFields;
 
-        /// <summary>
-        /// The <see cref="Title" /> property's name.
-        /// </summary>
-        public const string TitlePropertyName = "Title";
+			set
+			{
+				if (this._configFields == value) {
+					return;
+				}
 
-        private string _title = null;
+				this._configFields = value;
+				this.RaisePropertyChanged(CONFIG_FIELDS_PROPERTY_NAME);
+			}
+		}
 
-        /// <summary>
-        /// Sets and gets the Title property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public string Title
-        {
-            get
-            {
-                return _title;
-            }
+		/// <summary>
+		/// The <see cref="Title" /> property's name.
+		/// </summary>
+		public const string TITLE_PROPERTY_NAME = "Title";
 
-            set
-            {
-                if (_title == value)
-                {
-                    return;
-                }
+		private string _title = null;
 
-                _title = value;
-                RaisePropertyChanged(TitlePropertyName);
-            }
-        }
+		/// <summary>
+		/// Sets and gets the Title property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public string Title
+		{
+			get => this._title;
 
-        /// <summary>
-        /// The <see cref="Description" /> property's name.
-        /// </summary>
-        public const string DescriptionPropertyName = "Description";
+			set
+			{
+				if (this._title == value) {
+					return;
+				}
 
-        private string _description = null;
+				this._title = value;
+				this.RaisePropertyChanged(TITLE_PROPERTY_NAME);
+			}
+		}
 
-        /// <summary>
-        /// Sets and gets the Description property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public string Description
-        {
-            get
-            {
-                return _description;
-            }
+		/// <summary>
+		/// The <see cref="Description" /> property's name.
+		/// </summary>
+		public const string DESCRIPTION_PROPERTY_NAME = "Description";
 
-            set
-            {
-                if (_description == value)
-                {
-                    return;
-                }
+		private string _description = null;
 
-                _description = value;
-                RaisePropertyChanged(DescriptionPropertyName);
-            }
-        }
+		/// <summary>
+		/// Sets and gets the Description property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public string Description
+		{
+			get => this._description;
 
-        /// <summary>
-        /// The <see cref="IsEnabled" /> property's name.
-        /// </summary>
-        public const string IsEnabledPropertyName = "IsEnabled";
+			set
+			{
+				if (this._description == value) {
+					return;
+				}
 
-        private bool _isEnabled = true;
+				this._description = value;
+				this.RaisePropertyChanged(DESCRIPTION_PROPERTY_NAME);
+			}
+		}
 
-        /// <summary>
-        /// Sets and gets the IsEnabled property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public bool IsEnabled
-        {
-            get
-            {
-                return _isEnabled;
-            }
+		/// <summary>
+		/// The <see cref="IsEnabled" /> property's name.
+		/// </summary>
+		public const string IS_ENABLED_PROPERTY_NAME = "IsEnabled";
 
-            set
-            {
-                if (_isEnabled == value)
-                {
-                    return;
-                }
+		private bool _isEnabled = true;
 
-                _isEnabled = value;
-                RaisePropertyChanged(IsEnabledPropertyName);
-            }
-        }
-    }
+		/// <summary>
+		/// Sets and gets the IsEnabled property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsEnabled
+		{
+			get => this._isEnabled;
+
+			set
+			{
+				if (this._isEnabled == value) {
+					return;
+				}
+
+				this._isEnabled = value;
+				this.RaisePropertyChanged(IS_ENABLED_PROPERTY_NAME);
+			}
+		}
+	}
 }

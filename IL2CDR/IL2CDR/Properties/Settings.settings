@@ -1,8 +1,11 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IL2CDR.Properties" GeneratedClassName="Settings">
+
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)"
+              GeneratedClassNamespace="IL2CDR.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Config" Provider="IL2CDR.PortableSettingsProvider" Roaming="true" Type="IL2CDR.Model.Config" Scope="User">
+    <Setting Name="Config" Provider="IL2CDR.PortableSettingsProvider" Roaming="true" Type="IL2CDR.Model.Config"
+             Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

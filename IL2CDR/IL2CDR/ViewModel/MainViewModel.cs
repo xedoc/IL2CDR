@@ -8,419 +8,413 @@ using IL2CDR.Model;
 using IL2CDR.Properties;
 using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace IL2CDR.ViewModel
 {
-    /// <summary>
-    /// This class contains properties that the main View can data bind to.
-    /// <para>
-    /// See http://www.galasoft.ch/mvvm
-    /// </para>
-    /// </summary>
-    public class MainViewModel : ViewModelBase
-    {
-        private DServerManager dserverManager;
-        private ActionManager actionManager;
-        private ScriptManager scriptManager;
-        /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
-        /// </summary>
-        [PreferredConstructor]
-        public MainViewModel()
-        {
-            if( IsInDesignMode )
-            {
-                ServerList = new ObservableCollection<Server>(new List<Server>() { new Server("Xedoc playground", false, true) });
-                return;
-            }
-            Config = Properties.Settings.Default.Config;
-            
-            dserverManager = (Application.Current as App).DServerManager;
-            dserverManager.Servers.CollectionChanged += DServers_CollectionChanged;
-            dserverManager.With(x => x.Servers).Do( x => {
-                ServerList = x;
-                UpdateServerList();
-            });
+	/// <summary>
+	/// This class contains properties that the main View can data bind to.
+	/// <para>
+	/// See http://www.galasoft.ch/mvvm
+	/// </para>
+	/// </summary>
+	public class MainViewModel : ViewModelBase
+	{
+		private readonly DServerManager dserverManager;
+		private readonly ActionManager actionManager;
+		private readonly ScriptManager scriptManager;
 
-            scriptManager = (Application.Current as App).ScriptManager;
-            actionManager = (Application.Current as App).ActionManager;
+		/// <summary>
+		/// Initializes a new instance of the MainViewModel class.
+		/// </summary>
+		[PreferredConstructor]
+		public MainViewModel()
+		{
+			if (this.IsInDesignMode) {
+				this.ServerList = new ObservableCollection<Server>(new List<Server>()
+					{new Server("Xedoc playground", false, true)});
+				return;
+			}
 
-            CurrentScriptSettings = Config.ScriptConfigs.FirstOrDefault();
+			this.Config = Settings.Default.Config;
+			this.Config.PropertyChanged += this.Config_OnChanged; 
 
-            var messages = (Application.Current as App).AppLogDataService.LogMessages;
-            LogMessages = String.Join( Environment.NewLine, messages);
-            messages.CollectionChanged += messages_CollectionChanged;
-        }
+			if (Application.Current is App app) {
+				this.dserverManager = app.DServerManager;
+				this.dserverManager.Servers.CollectionChanged += this.DServers_CollectionChanged;
+				this.dserverManager.With(x => x.Servers).Do(x => {
+					this.ServerList = x;
+					this.UpdateServerList();
+				});
 
-        void DServers_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            UpdateServerList();
-        }
-        private void UpdateServerList()
-        {
-            UI.Dispatch(() =>
-            {
-                if (ServerList.Count == 0)
-                {
-                    IsServerListMessageVisible = true;
-                    ServerListMessage = "Run some DServer to start log monitoring...";
-                }
-                else
-                {
-                    IsServerListMessageVisible = false;
-                }
-            });
-        }
-        void messages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-                e.NewItems.Do( x => 
-                {
-                    var newLines = new string[x.Count + 1];
-                    newLines[0] = String.Empty;
-                    x.CopyTo(newLines, 1);
-                    UI.Dispatch(() => LogMessages += String.Join(Environment.NewLine, newLines));
-                });
-        }
+				this.scriptManager = app.ScriptManager;
+				this.actionManager = app.ActionManager;
+
+				this.CurrentScriptSettings = this.Config.ScriptConfigs.FirstOrDefault();
+
+				var messages = app.AppLogDataService.LogMessages;
+				this.LogMessages = string.Join(Environment.NewLine, messages);
+				messages.CollectionChanged += this.messages_CollectionChanged;
+			}
+		}
+
+		private void DServers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			this.UpdateServerList();
+		}
 
 
-        /// <summary>
-        /// The <see cref="CurrentScriptSettings" /> property's name.
-        /// </summary>
-        public const string CurrentScriptSettingsPropertyName = "CurrentScriptSettings";
+		private void Config_OnChanged(object sender, PropertyChangedEventArgs eventArgs)
+		{
+			if (Application.Current is App app) {
+				app.AppLogDataService.MaxNumberOfLines = this.Config.ApplicationLogBufferSize; 
+			}
+		}
 
-        private ScriptConfig _currentScriptSettings = null;
-
-        /// <summary>
-        /// Sets and gets the CurrentScriptSettings property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public ScriptConfig CurrentScriptSettings
-        {
-            get
-            {
-                return _currentScriptSettings;
-            }
-
-            set
-            {
-                if (_currentScriptSettings == value)
-                {
-                    return;
-                }
-
-                _currentScriptSettings = value;
-                RaisePropertyChanged(CurrentScriptSettingsPropertyName);
-            }
-        }
-
-        private RelayCommand<ScriptConfig> _scriptSelectionChanged;
-
-        /// <summary>
-        /// Gets the ScriptSelectionChanged.
-        /// </summary>
-        public RelayCommand<ScriptConfig> ScriptSelectionChanged
-        {
-            get
-            {
-                return _scriptSelectionChanged
-                    ?? (_scriptSelectionChanged = new RelayCommand<ScriptConfig>(
-                    (config) =>
-                    {
-                        CurrentScriptSettings.ConfigFields = config.ConfigFields;
-                    }));
-            }
-        }
-
-        /// <summary>
-        /// The <see cref="ServerListMessage" /> property's name.
-        /// </summary>
-        public const string ServerListMessagePropertyName = "ServerListMessage";
-
-        private string _serverListMessage = null;
-
-        /// <summary>
-        /// Sets and gets the ServerListMessage property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string ServerListMessage
-        {
-            get
-            {
-                return _serverListMessage;
-            }
-
-            set
-            {
-                if (_serverListMessage == value)
-                {
-                    return;
-                }
-
-                _serverListMessage = value;
-                RaisePropertyChanged(ServerListMessagePropertyName);
-            }
-        }
-        
-        /// <summary>
-        /// The <see cref="IsServerListMessageVisible" /> property's name.
-        /// </summary>
-        public const string IsServerListMessageVisiblePropertyName = "IsServerListMessageVisible";
-
-        private bool _isServerListMessageVisible = false;
-
-        /// <summary>
-        /// Sets and gets the IsServerListMessageVisible property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public bool IsServerListMessageVisible
-        {
-            get
-            {
-                return _isServerListMessageVisible;
-            }
-
-            set
-            {
-                if (_isServerListMessageVisible == value)
-                {
-                    return;
-                }
-
-                _isServerListMessageVisible = value;
-                RaisePropertyChanged(IsServerListMessageVisiblePropertyName);
-            }
-        }
-
-        /// <summary>
-        /// The <see cref="IsWindowReopen" /> property's name.
-        /// </summary>
-        public const string IsWindowReopenPropertyName = "IsWindowReopen";
-
-        private bool _isWindowReopen = false;
-
-        /// <summary>
-        /// Sets and gets the IsWindowReopen property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public bool IsWindowReopen
-        {
-            get
-            {
-                return _isWindowReopen;
-            }
-
-            set
-            {
-                if (_isWindowReopen == value)
-                {
-                    return;
-                }
-
-                _isWindowReopen = value;
-                RaisePropertyChanged(IsWindowReopenPropertyName);
-            }
-        }
-        private RelayCommand _exitApplication;
-
-        /// <summary>
-        /// Gets the ExitApplication.
-        /// </summary>
-        public RelayCommand ExitApplication
-        {
-            get
-            {
-                return _exitApplication
-                    ?? (_exitApplication = new RelayCommand(
-                    () =>
-                    {
-                        if (!IsWindowReopen)
-                        {
-                            Properties.Settings.Default.Save();
-                            Application.Current.Shutdown();
-                        }
-                        IsWindowReopen = false;
-                    }));
-            }
-        }
-
-        /// <summary>
-        /// The <see cref="Config" /> property's name.
-        /// </summary>
-        public const string ConfigPropertyName = "Config";
-
-        private Config _config = null;
-
-        /// <summary>
-        /// Sets and gets the Config property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public Config Config
-        {
-            get
-            {
-                return _config;
-            }
-
-            set
-            {
-                if (_config == value)
-                {
-                    return;
-                }
-
-                _config = value;
-                RaisePropertyChanged(ConfigPropertyName);
-            }
-        }
+		private void UpdateServerList()
+		{
+			UI.Dispatch(() => {
+				if (this.ServerList.Count == 0) {
+					this.IsServerListMessageVisible = true;
+					this.ServerListMessage = "Run some DServer to start log monitoring...";
+				} else {
+					this.IsServerListMessageVisible = false;
+				}
+			});
+		}
 
 
-        /// <summary>
-        /// The <see cref="LogMessages" /> property's name.
-        /// </summary>
-        public const string LogMessagesPropertyName = "LogMessages";
+		private Task messagesRefresherTask;
+		private int ignoredCalls = 0;
+		private int executedCalls = 0; 
 
-        private string _logMessages = null;
+		private void messages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			// -- THROTTLING of events -- fire "ScrollingTextBox" refresh only once per 500ms: 
 
-        /// <summary>
-        /// Sets and gets the LogMessages property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string LogMessages
-        {
-            get
-            {
-                return _logMessages;
-            }
+			if (this.messagesRefresherTask != null && !this.messagesRefresherTask.IsCompleted) {
+				this.ignoredCalls++;
+				return;		// <-- refresher task is stil "running", so the refresh is scheduled in a "near" future... don't do anything now. 
+			}
 
-            set
-            {
-                if (_logMessages == value)
-                {
-                    return;
-                }
+			this.messagesRefresherTask = Task.Factory.StartNew(async () => {
+				await Task.Delay(500);
+				UI.Dispatch(() => {
+					this.executedCalls++; 
+					var ocLogLines = sender as ObservableCollection<string>;
+					if (ocLogLines != null) {
+						this.LogMessages = string.Join(Environment.NewLine, ocLogLines);
+					}
+				});
+			});
+			
+		}
 
-                _logMessages = value;
-                RaisePropertyChanged(LogMessagesPropertyName);
-            }
-        }
 
-        private RelayCommand _enableChatLogMonitor;
 
-        /// <summary>
-        /// Gets the EnableChatLogMonitor.
-        /// </summary>
-        public RelayCommand EnableChatLogMonitor
-        {
-            get
-            {
-                return _enableChatLogMonitor
-                    ?? (_enableChatLogMonitor = new RelayCommand(
-                    () =>
-                    {
-                        
-                    }));
-            }
-        }
 
-        private RelayCommand _enableMissionLogMonitor;
+		private ScriptConfig _currentScriptSettings = null;
 
-        /// <summary>
-        /// Gets the EnableMissionLogMonitor.
-        /// </summary>
-        public RelayCommand EnableMissionLogMonitor
-        {
-            get
-            {
-                return _enableMissionLogMonitor
-                    ?? (_enableMissionLogMonitor = new RelayCommand(
-                    () =>
-                    {
-                        var missionLogService = (Application.Current as App).MissionLogDataService;
-                        if (missionLogService == null)
-                            return;
+		/// <summary>
+		/// Sets and gets the CurrentScriptSettings property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public ScriptConfig CurrentScriptSettings
+		{
+			get => this._currentScriptSettings;
 
-                        if( !Config.IsMissionLogMonitorEnabled )
-                            missionLogService.Stop();
-                        else
-                            missionLogService.Start();
-                    }));
-            }
-        }
+			set
+			{
+				if (this._currentScriptSettings == value) {
+					return;
+				}
 
-        private RelayCommand<string> _scriptCheck;
+				this._currentScriptSettings = value;
+				this.RaisePropertyChanged(nameof(this.CurrentScriptSettings));
+			}
+		}
 
-        /// <summary>
-        /// Gets the ScriptCheck.
-        /// </summary>
-        public RelayCommand<string> ScriptCheck
-        {
-            get
-            {
-                return _scriptCheck
-                    ?? (_scriptCheck = new RelayCommand<string>(
-                    (scriptFile) =>
-                    {
-                        if( scriptManager != null )
-                        {
-                            scriptManager.SwitchScript(scriptFile);
-                        }
-                    }));
-            }
-        }
+		private RelayCommand<ScriptConfig> _scriptSelectionChanged;
 
-        private RelayCommand<string> _scriptButtonClick;
+		/// <summary>
+		/// Gets the ScriptSelectionChanged.
+		/// </summary>
+		public RelayCommand<ScriptConfig> ScriptSelectionChanged
+		{
+			get
+			{
+				return this._scriptSelectionChanged
+						?? (this._scriptSelectionChanged = new RelayCommand<ScriptConfig>(
+							(config) => { this.CurrentScriptSettings.ConfigFields = config.ConfigFields; }));
+			}
+		}
 
-        /// <summary>
-        /// Gets the ScriptButtonClick.
-        /// </summary>
-        public RelayCommand<string> ScriptButtonClick
-        {
-            get
-            {
-                return _scriptButtonClick
-                    ?? (_scriptButtonClick = new RelayCommand<string>(
-                    (buttonName) =>
-                    {
-                        Task.Factory.StartNew(() => actionManager.ProcessButtonClick(buttonName));                        
-                    }));
-            }
-        }
-        /// <summary>
-        /// The <see cref="ServerList" /> property's name.
-        /// </summary>
-        public const string ServerListPropertyName = "ServerList";
 
-        private ObservableCollection<Server> _serverList = null;
 
-        /// <summary>
-        /// Sets and gets the ServerList property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public ObservableCollection<Server> ServerList
-        {
-            get
-            {
-                return _serverList;
-            }
+		private string _serverListMessage = null;
 
-            set
-            {
-                if (_serverList == value)
-                {
-                    return;
-                }
+		/// <summary>
+		/// Sets and gets the ServerListMessage property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public string ServerListMessage
+		{
+			get => this._serverListMessage;
 
-                _serverList = value;
-                RaisePropertyChanged(ServerListPropertyName);
-            }
-        }
+			set
+			{
+				if (this._serverListMessage == value) {
+					return;
+				}
 
-        ////public override void Cleanup()
-        ////{
-        ////    // Clean up if needed
+				this._serverListMessage = value;
+				this.RaisePropertyChanged(nameof(this.ServerListMessage));
+			}
+		}
 
-        ////    base.Cleanup();
-        ////}
-    }
+
+
+		private bool _isServerListMessageVisible = false;
+
+		/// <summary>
+		/// Sets and gets the IsServerListMessageVisible property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public bool IsServerListMessageVisible
+		{
+			get => this._isServerListMessageVisible;
+
+			set
+			{
+				if (this._isServerListMessageVisible == value) {
+					return;
+				}
+
+				this._isServerListMessageVisible = value;
+				this.RaisePropertyChanged(nameof(this.IsServerListMessageVisible));
+			}
+		}
+
+
+
+		private bool _isWindowReopen = false;
+
+		/// <summary>
+		/// Sets and gets the IsWindowReopen property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public bool IsWindowReopen
+		{
+			get => this._isWindowReopen;
+
+			set
+			{
+				if (this._isWindowReopen == value) {
+					return;
+				}
+
+				this._isWindowReopen = value;
+				this.RaisePropertyChanged(nameof(this.IsWindowReopen));
+			}
+		}
+
+		private RelayCommand _exitApplication;
+
+		/// <summary>
+		/// Gets the ExitApplication.
+		/// </summary>
+		public RelayCommand ExitApplication
+		{
+			get
+			{
+				return this._exitApplication
+						?? (this._exitApplication = new RelayCommand(
+							() => {
+								if (!this.IsWindowReopen) {
+									Settings.Default.Save();
+									Application.Current.Shutdown();
+								}
+
+								this.IsWindowReopen = false;
+							}));
+			}
+		}
+
+
+
+		private Config _config = null;
+
+		/// <summary>
+		/// Sets and gets the Config property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public Config Config
+		{
+			get => this._config;
+
+			set
+			{
+				if (this._config == value) {
+					return;
+				}
+
+				this._config = value;
+				this.RaisePropertyChanged(nameof(this.Config));
+			}
+		}
+
+
+
+		private string _logMessages = null;
+
+		/// <summary>
+		/// Sets and gets the LogMessages property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public string LogMessages
+		{
+			get => this._logMessages;
+
+			set
+			{
+				if (this._logMessages == value) {
+					return;
+				}
+
+				this._logMessages = value;
+				this.RaisePropertyChanged(nameof(this.LogMessages));
+			}
+		}
+
+		//private RelayCommand _enableChatLogMonitor;
+
+		///// <summary>
+		///// Gets the EnableChatLogMonitor.
+		///// </summary>
+		//public RelayCommand EnableChatLogMonitor
+		//{
+		//	get
+		//	{
+		//		return this._enableChatLogMonitor
+		//				?? (this._enableChatLogMonitor = new RelayCommand(
+		//					() => { }));
+		//	}
+		//}
+
+		private RelayCommand _refreshEnabledDisabledStateOfServerComponentsCommand;
+
+		/// <summary>
+		/// Gets the RefreshEnabledDisabledStateOfServerComponentsCommand.
+		/// </summary>
+		public RelayCommand RefreshEnabledDisabledStateOfServerComponentsCommand
+		{
+			get
+			{
+				if (this._refreshEnabledDisabledStateOfServerComponentsCommand == null) {
+					this._refreshEnabledDisabledStateOfServerComponentsCommand = new RelayCommand(
+						() => {
+							var allServers = this.dserverManager?.Servers?.Where(srv => srv != null).ToList();
+
+							if (allServers == null) {
+								return;
+							}
+
+							// -- i) MissionLogMonitor
+							if (this.Config.IsMissionLogMonitorEnabled) {
+								allServers.ForEach(server => server.MissionLogService?.Start());
+							} else {
+								allServers.ForEach(server => server.MissionLogService?.Stop());
+							}
+
+							// -- ii) ChatLogMonitor
+							if (this.Config.IsChatMonitorEnabled) {
+								// ??? where is ChatLogMonitor service? 
+							} else {
+								// ??? where is ChatLogMonitor service? 
+							}
+
+							// -- iii) RCon connection: 
+							if (this.Config.IsRConEnabled) {
+								allServers.ForEach(server => server.Rcon?.Start());
+							} else {
+								allServers.ForEach(server => server.Rcon?.Stop());
+							}
+						});
+				}
+
+				return this._refreshEnabledDisabledStateOfServerComponentsCommand;
+			}
+		}
+
+
+
+
+
+		private RelayCommand<string> _scriptCheck;
+
+		/// <summary>
+		/// Gets the ScriptCheck.
+		/// </summary>
+		public RelayCommand<string> ScriptCheck
+		{
+			get
+			{
+				return this._scriptCheck
+						?? (this._scriptCheck = new RelayCommand<string>(
+														(scriptFile) => {
+															this.scriptManager?.SwitchScript(scriptFile);
+														}
+												)
+						   );
+			}
+		}
+
+		private RelayCommand<string> _scriptButtonClick;
+
+		/// <summary>
+		/// Gets the ScriptButtonClick.
+		/// </summary>
+		public RelayCommand<string> ScriptButtonClick
+		{
+			get
+			{
+				return this._scriptButtonClick
+						?? (this._scriptButtonClick = new RelayCommand<string>(
+							(buttonName) => {
+								Task.Factory.StartNew(() => this.actionManager.ProcessButtonClick(buttonName));
+							}));
+			}
+		}
+
+
+		private ObservableCollection<Server> _serverList = null;
+
+		/// <summary>
+		/// Sets and gets the ServerList property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public ObservableCollection<Server> ServerList
+		{
+			get => this._serverList;
+
+			set
+			{
+				if (this._serverList == value) {
+					return;
+				}
+
+				this._serverList = value;
+				this.RaisePropertyChanged(nameof(this.ServerList));
+			}
+		}
+
+		////public override void Cleanup()
+		////{
+		////    // Clean up if needed
+
+		////    base.Cleanup();
+		////}
+	}
 }

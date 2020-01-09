@@ -7,7 +7,7 @@ using IL2CDR.Model;
 
 namespace IL2CDR.Design
 {
-    public class DesignMissionLogDataService : IMissionLogDataService
-    {
-    }
+	public class DesignMissionLogDataService : IMissionLogDataService
+	{
+	}
 }

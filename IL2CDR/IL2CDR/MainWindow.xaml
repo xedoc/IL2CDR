@@ -1,147 +1,161 @@
 ﻿<Controls:MetroWindow x:Class="IL2CDR.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls" 
-        xmlns:Control="clr-namespace:IL2CDR.Control"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:ie="http://schemas.microsoft.com/expression/2010/interactions"
-        xmlns:mvvmlight="http://www.galasoft.ch/mvvmlight"
-        xmlns:my="clr-namespace:IL2CDR"
-        xmlns:ignore="http://www.ignore.com"
-        mc:Ignorable="d ignore"
-        UseLayoutRounding="True"
-        Height="436"
-        Width="716"
-        Title="IL2 CDR"
-        Background="#252525"
-        DataContext="{Binding Main, Source={StaticResource Locator}}" Icon="Resources/cdr.ico">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <mvvmlight:EventToCommand Command="{Binding ExitApplication}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-    <Controls:MetroWindow.Resources>
-        <ResourceDictionary>
-            <VisualBrush Visual="{StaticResource appbar_connect}" x:Key="ConnectIcon"/>
-            <VisualBrush Visual="{StaticResource appbar_settings}" x:Key="SettingsIcon"/>
-            <Style TargetType="Rectangle" x:Key="ConnectIconStyle">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsRconConnected}" Value="False">
-                        <Setter Property="Fill" Value="Red"/>
-                        <Setter Property="OpacityMask">
-                            <Setter.Value>
-                                <VisualBrush Visual="{StaticResource appbar_connect}"/>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsRconConnected}" Value="True">
-                        <Setter Property="Fill" Value="Green"/>
-                        <Setter Property="OpacityMask">
-                            <Setter.Value>
-                                <VisualBrush Visual="{StaticResource appbar_connect}"/>
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>               
-            </Style>
-            <Style TargetType="Rectangle" x:Key="SettingsIconStyle">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsConfigSet}" Value="False">
-                        <Setter Property="Fill" Value="Red"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsConfigSet}" Value="True">
-                        <Setter Property="Fill" Value="Green"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
+					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+					xmlns:Control="clr-namespace:IL2CDR.Control"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+					xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+					xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+					xmlns:ie="http://schemas.microsoft.com/expression/2010/interactions"
+					xmlns:mvvmlight="http://www.galasoft.ch/mvvmlight"
+					xmlns:my="clr-namespace:IL2CDR"
+					xmlns:ignore="http://www.ignore.com"
+					mc:Ignorable="d ignore"
+					UseLayoutRounding="True"
+					Height="436"
+					Width="716"
+					Title="IL2 CDR"
+					Background="#252525"
+					DataContext="{Binding Main, Source={StaticResource Locator}}" Icon="Resources/cdr.ico">
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="Closing">
+			<mvvmlight:EventToCommand Command="{Binding ExitApplication}" />
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
+	<Controls:MetroWindow.Resources>
+		<ResourceDictionary>
+			<VisualBrush Visual="{StaticResource appbar_connect}" x:Key="ConnectIcon" />
+			<VisualBrush Visual="{StaticResource appbar_settings}" x:Key="SettingsIcon" />
+			<Style TargetType="Rectangle" x:Key="ConnectIconStyle">
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding IsRconConnected}" Value="False">
+						<Setter Property="Fill" Value="Red" />
+						<Setter Property="OpacityMask">
+							<Setter.Value>
+								<VisualBrush Visual="{StaticResource appbar_connect}" />
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+					<DataTrigger Binding="{Binding IsRconConnected}" Value="True">
+						<Setter Property="Fill" Value="Green" />
+						<Setter Property="OpacityMask">
+							<Setter.Value>
+								<VisualBrush Visual="{StaticResource appbar_connect}" />
+							</Setter.Value>
+						</Setter>
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+			<Style TargetType="Rectangle" x:Key="SettingsIconStyle">
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding IsConfigSet}" Value="False">
+						<Setter Property="Fill" Value="Red" />
+					</DataTrigger>
+					<DataTrigger Binding="{Binding IsConfigSet}" Value="True">
+						<Setter Property="Fill" Value="Green" />
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
 
-            <BooleanToVisibilityConverter x:Key="boolToVisibility"/>
-            <Style x:Key="TabItemBorder" TargetType="Border">
-                <Setter Property="BorderBrush" Value="#FF494949"/>
-                <Setter Property="BorderThickness" Value="0,1,0,0"/>
-                <Setter Property="Padding" Value="10"/>
-            </Style>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Skins/MainSkin.xaml" />
-                <ResourceDictionary Source="Resources/Icons.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+			<BooleanToVisibilityConverter x:Key="boolToVisibility" />
+			<Style x:Key="TabItemBorder" TargetType="Border">
+				<Setter Property="BorderBrush" Value="#FF494949" />
+				<Setter Property="BorderThickness" Value="0,1,0,0" />
+				<Setter Property="Padding" Value="10" />
+			</Style>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Skins/MainSkin.xaml" />
+				<ResourceDictionary Source="Resources/Icons.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 
-    </Controls:MetroWindow.Resources>
+	</Controls:MetroWindow.Resources>
 
-    <Grid x:Name="LayoutRoot">
-        <TabControl>
-            <TabItem Header="Servers">
-                <Border Style="{StaticResource TabItemBorder}">
-                    <StackPanel Orientation="Vertical" Margin="20,0,10,0">
-                        <TextBlock Visibility="{Binding IsServerListMessageVisible, Converter={StaticResource boolToVisibility}}" Text="{Binding ServerListMessage}"/>
-                        <ItemsControl ItemsSource="{Binding ServerList}" >
-                            <ItemsControl.ItemTemplate>                                                               
-                                <DataTemplate>
-                                    <StackPanel DataContext="{Binding}" Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Top">
-                                        <Rectangle OpacityMask="{StaticResource ConnectIcon}" Width="26" Height="26" Margin="0" Style="{StaticResource ConnectIconStyle}"/>
-                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-26,-16,0,0" Foreground="#FF7D7D7D" >rcon</TextBlock>
-                                        <Rectangle Style="{StaticResource SettingsIconStyle}" Width="26" Height="26" Margin="11,0,0,0" OpacityMask="{StaticResource SettingsIcon}"/>
-                                        <TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-30,-16,0,0" Foreground="#FF7D7D7D">config</TextBlock>
-                                        <TextBox Text="{Binding Name}" Padding="0" Margin="0" IsReadOnly="True" BorderThickness="0" VerticalAlignment="Top" MinHeight="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" MaxLines="1" FontSize="14"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Vertical">
-                                    </StackPanel>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
-            </TabItem>
-            <TabItem Header="Scripts">
-                <Border Style="{StaticResource TabItemBorder}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <ListBox SelectedItem="{Binding CurrentScriptSettings}" ItemsSource="{Binding Config.ScriptConfigs}" ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0,0,1,0" BorderBrush="#FF494949" x:Name="scriptListBox">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ScriptSelectionChanged}"  CommandParameter="{Binding ElementName=scriptListBox, Path=SelectedItem}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox Command="{Binding Path=Main.ScriptCheck, Source={StaticResource Locator}}" CommandParameter="{Binding FileName}" Focusable="False" IsChecked="{Binding IsEnabled}" Margin="5"/>
-                                        <Label Content="{Binding Title}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <StackPanel Grid.Column="1" Orientation="Vertical">
-                            <TextBlock Margin="10" Text="{Binding CurrentScriptSettings.Description}" VerticalAlignment="Top"/>
-                            <ItemsControl ItemsSource="{Binding CurrentScriptSettings.ConfigFields}" >
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <my:ScriptConfigField Margin="6" DataContext="{Binding}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Vertical">
-                                        </StackPanel>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </StackPanel>
-                        
-                    </Grid>
-                </Border>
-            </TabItem>
-            <!--<TabItem Header="RCON">
+	<Grid x:Name="LayoutRoot">
+		<TabControl>
+			<TabItem Header="Servers">
+				<Border Style="{StaticResource TabItemBorder}">
+					<StackPanel Orientation="Vertical" Margin="20,0,10,0">
+						<TextBlock Visibility="{Binding IsServerListMessageVisible, Converter={StaticResource boolToVisibility}}"
+									Text="{Binding ServerListMessage}" />
+						<ItemsControl ItemsSource="{Binding ServerList}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel DataContext="{Binding}" Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Top">
+										
+										<Rectangle OpacityMask="{StaticResource ConnectIcon}" Width="26" Height="26" Margin="0"
+													Style="{StaticResource ConnectIconStyle}" >
+											<Rectangle.InputBindings>
+												<MouseBinding Gesture="LeftClick" Command="{Binding SwitchRconOnOff}"/>
+											</Rectangle.InputBindings>
+										</Rectangle>	
+										
+
+										<TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-26,-16,0,0" Foreground="#FF7D7D7D">rcon</TextBlock>
+										<Rectangle Style="{StaticResource SettingsIconStyle}" Width="26" Height="26" Margin="11,0,0,0"
+													OpacityMask="{StaticResource SettingsIcon}" />
+										<TextBlock VerticalAlignment="Top" HorizontalAlignment="Center" Margin="-30,-16,0,0" Foreground="#FF7D7D7D">config</TextBlock>
+										<TextBox Text="{Binding Name}" Padding="0" Margin="0" IsReadOnly="True" BorderThickness="0"
+												VerticalAlignment="Top" MinHeight="0" HorizontalContentAlignment="Stretch"
+												VerticalContentAlignment="Stretch" MaxLines="1" FontSize="14" />
+									</StackPanel>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Vertical" />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+						</ItemsControl>
+					</StackPanel>
+				</Border>
+			</TabItem>
+			<TabItem Header="Scripts">
+				<Border Style="{StaticResource TabItemBorder}">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+						<ListBox SelectedItem="{Binding CurrentScriptSettings}" ItemsSource="{Binding Config.ScriptConfigs}"
+								ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0,0,1,0" BorderBrush="#FF494949"
+								x:Name="scriptListBox">
+							<i:Interaction.Triggers>
+								<i:EventTrigger EventName="SelectionChanged">
+									<i:InvokeCommandAction Command="{Binding ScriptSelectionChanged}"
+															CommandParameter="{Binding ElementName=scriptListBox, Path=SelectedItem}" />
+								</i:EventTrigger>
+							</i:Interaction.Triggers>
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<CheckBox Command="{Binding Path=Main.ScriptCheck, Source={StaticResource Locator}}"
+												CommandParameter="{Binding FileName}" Focusable="False" IsChecked="{Binding IsEnabled}" Margin="5" />
+										<Label Content="{Binding Title}" />
+									</StackPanel>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+						<StackPanel Grid.Column="1" Orientation="Vertical">
+							<TextBlock Margin="10" Text="{Binding CurrentScriptSettings.Description}" VerticalAlignment="Top" />
+							<ItemsControl ItemsSource="{Binding CurrentScriptSettings.ConfigFields}">
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<my:ScriptConfigField Margin="6" DataContext="{Binding}" />
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Vertical" />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+							</ItemsControl>
+						</StackPanel>
+
+					</Grid>
+				</Border>
+			</TabItem>
+			<!--<TabItem Header="RCON">
                 <Border Style="{StaticResource TabItemBorder}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -194,28 +208,60 @@
                     </Grid>
                 </Border>
             </TabItem>-->
-            <TabItem Header="Settings">
-                <Border Style="{StaticResource TabItemBorder}">
-                    <StackPanel Orientation="Vertical">
-                        <CheckBox Focusable="False" Command="{Binding EnableMissionLogMonitor}" IsChecked="{Binding Config.IsMissionLogMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,10">Enable mission log monitoring</CheckBox>
-                        <CheckBox Focusable="False" Command="{Binding EnableChatLogMonitor}" IsChecked="{Binding Config.IsChatMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,5">Enable chat log monitoring</CheckBox>
-                        <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
-                            <CheckBox Focusable="False">Delete mission logs older than</CheckBox>
-                            <TextBox Margin="5,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding Config.MissionLogCleanupInterval, Mode=TwoWay}"></TextBox>
-                            <Label>days</Label>
+			<TabItem Header="Settings">
+				<Border Style="{StaticResource TabItemBorder}">
+					<StackPanel Orientation="Vertical">
+						<CheckBox Focusable="False" Command="{Binding RefreshEnabledDisabledStateOfServerComponentsCommand}"
+								IsChecked="{Binding Config.IsMissionLogMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,10">
+							Enable mission log monitoring
+						</CheckBox>
+						<CheckBox Focusable="False" Command="{Binding RefreshEnabledDisabledStateOfServerComponentsCommand}"
+								IsChecked="{Binding Config.IsChatMonitorEnabled, Mode=TwoWay}" Margin="0,0,0,5">
+							Enable chat log monitoring
+						</CheckBox>
+						<CheckBox Focusable="False" Command="{Binding RefreshEnabledDisabledStateOfServerComponentsCommand}"
+								IsChecked="{Binding Config.IsRConEnabled, Mode=TwoWay}" Margin="0,0,0,10">
+							Enable RCon connection
+						</CheckBox>
+						<DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+							<CheckBox Focusable="False">Delete mission logs older than</CheckBox>
+							<TextBox Margin="5,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+									Text="{Binding Config.MissionLogCleanupInterval, Mode=TwoWay}" />
+							<Label>days</Label>
+						</DockPanel>	
+					    <DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+							<Label>Max number of lines in Log window: </Label>
+							<TextBox Margin="10,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="50"
+									Text="{Binding Config.ApplicationLogBufferSize, Mode=TwoWay}" HorizontalAlignment="Left" />
                         </DockPanel>
-                    </StackPanel>
+
+						<DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+							<Label>(default) Rcon Login: </Label>
+							<TextBox Margin="10,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Width="100"
+									Text="{Binding Config.RconStaticLogin, Mode=TwoWay}" HorizontalAlignment="Left" />
+							<Label FontSize="8" VerticalAlignment="Center">(please restart application after modification to take effect)</Label>
+						</DockPanel>
+
+						<DockPanel Margin="0,0,0,5" VerticalAlignment="Top">
+							<Label>(default) Rcon Password:</Label>
+							<TextBox Margin="10,1,1,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Width="100"
+									Text="{Binding Config.RconStaticPassword, Mode=TwoWay}" HorizontalAlignment="Left" />
+							<Label FontSize="8" VerticalAlignment="Center">(please restart application after modification to take effect)</Label>
+						</DockPanel>
+
+					</StackPanel>
 
 
-                </Border>
+				</Border>
 
-            </TabItem>
-            <TabItem Header="Log">
-                <Border Style="{StaticResource TabItemBorder}">
-                    <Control:ScrollingTextBox HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible" Text="{Binding LogMessages}" Foreground="White"/>
-                </Border>
-            </TabItem>
-        </TabControl>
+			</TabItem>
+			<TabItem Header="Log">
+				<Border Style="{StaticResource TabItemBorder}">
+					<Control:ScrollingTextBox HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible"
+											Text="{Binding LogMessages,Delay=500}" Foreground="White" />
+				</Border>
+			</TabItem>
+		</TabControl>
 
-    </Grid>
+	</Grid>
 </Controls:MetroWindow>

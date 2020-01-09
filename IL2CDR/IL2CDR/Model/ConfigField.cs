@@ -1,240 +1,219 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace IL2CDR.Model
 {
-    [Serializable]
-    public enum FieldType
-    {
-        Unknown = -1,
-        Text = 0,
-        FileOpen = 1,
-        FileSave = 2,
-        Folder = 3,
-        Number = 4,
-        Range = 5,
-        Flag = 6,
-        Password = 7,
-        Button = 8
-    }
-    [Serializable]
-    public class ConfigField : NotifyPropertyChangeBase 
-    {
-        public ConfigField()
-        {
+	[Serializable]
+	public enum FieldType
+	{
+		Unknown = -1,
+		Text = 0,
+		FileOpen = 1,
+		FileSave = 2,
+		Folder = 3,
+		Number = 4,
+		Range = 5,
+		Flag = 6,
+		Password = 7,
+		Button = 8
+	}
 
-        }
-        public ConfigField(string name, string label, string watermark, FieldType dataType, bool isVisible, object value)
-        {
-            Name = name;
-            Label = label;
-            Watermark = watermark;
-            Type = dataType;
-            IsVisible = isVisible;
-            Value = value;
-        }
+	[Serializable]
+	public class ConfigField : NotifyPropertyChangeBase
+	{
+		public ConfigField()
+		{
+		}
 
-        /// <summary>
-        /// The <see cref="Type" /> property's name.
-        /// </summary>
-        public const string TypePropertyName = "Type";
+		public ConfigField(string name, string label, string watermark, FieldType dataType, bool isVisible,
+			object value)
+		{
+			this.Name = name;
+			this.Label = label;
+			this.Watermark = watermark;
+			this.Type = dataType;
+			this.IsVisible = isVisible;
+			this.Value = value;
+		}
 
-        private FieldType _type = FieldType.Unknown;
+		/// <summary>
+		/// The <see cref="Type" /> property's name.
+		/// </summary>
+		public const string TypePropertyName = "Type";
 
-        /// <summary>
-        /// Sets and gets the Type property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public FieldType Type
-        {
-            get
-            {
-                return _type;
-            }
+		private FieldType _type = FieldType.Unknown;
 
-            set
-            {
-                if (_type == value)
-                {
-                    return;
-                }
+		/// <summary>
+		/// Sets and gets the Type property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public FieldType Type
+		{
+			get => this._type;
 
-                _type = value;
-                RaisePropertyChanged(TypePropertyName);
-            }
-        }
+			set
+			{
+				if (this._type == value) {
+					return;
+				}
 
-        /// <summary>
-        /// The <see cref="IsVisible" /> property's name.
-        /// </summary>
-        public const string IsVisiblePropertyName = "IsVisible";
+				this._type = value;
+				this.RaisePropertyChanged(TypePropertyName);
+			}
+		}
 
-        private bool _isVisible = true;
+		/// <summary>
+		/// The <see cref="IsVisible" /> property's name.
+		/// </summary>
+		public const string IsVisiblePropertyName = "IsVisible";
 
-        /// <summary>
-        /// Sets and gets the IsVisible property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public bool IsVisible
-        {
-            get
-            {
-                return _isVisible;
-            }
+		private bool _isVisible = true;
 
-            set
-            {
-                if (_isVisible == value)
-                {
-                    return;
-                }
+		/// <summary>
+		/// Sets and gets the IsVisible property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsVisible
+		{
+			get => this._isVisible;
 
-                _isVisible = value;
-                RaisePropertyChanged(IsVisiblePropertyName);
-            }
-        }
-        /// <summary>
-        /// The <see cref="Value" /> property's name.
-        /// </summary>
-        public const string ValuePropertyName = "Value";
+			set
+			{
+				if (this._isVisible == value) {
+					return;
+				}
 
-        private object _value = null;
+				this._isVisible = value;
+				this.RaisePropertyChanged(IsVisiblePropertyName);
+			}
+		}
 
-        /// <summary>
-        /// Sets and gets the Value property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlElement]
-        public object Value
-        {
-            get
-            {
-                return _value;
-            }
+		/// <summary>
+		/// The <see cref="Value" /> property's name.
+		/// </summary>
+		public const string ValuePropertyName = "Value";
 
-            set
-            {
-                if (_value == value)
-                {
-                    return;
-                }
+		private object _value = null;
 
-                _value = value;
-                RaisePropertyChanged(ValuePropertyName);
-            }
-        }
+		/// <summary>
+		/// Sets and gets the Value property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlElement]
+		public object Value
+		{
+			get => this._value;
 
-        /// <summary>
-        /// The <see cref="Label" /> property's name.
-        /// </summary>
-        public const string LabelPropertyName = "Label";
+			set
+			{
+				if (this._value == value) {
+					return;
+				}
 
-        private string _label = null;
+				this._value = value;
+				this.RaisePropertyChanged(ValuePropertyName);
+			}
+		}
 
-        /// <summary>
-        /// Sets and gets the Label property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public string Label
-        {
-            get
-            {
-                return _label;
-            }
+		/// <summary>
+		/// The <see cref="Label" /> property's name.
+		/// </summary>
+		public const string LabelPropertyName = "Label";
 
-            set
-            {
-                if (_label == value)
-                {
-                    return;
-                }
+		private string _label = null;
 
-                _label = value;
-                RaisePropertyChanged(LabelPropertyName);
-            }
-        }
-        /// <summary>
-        /// The <see cref="Name" /> property's name.
-        /// </summary>
-        public const string NamePropertyName = "Name";
+		/// <summary>
+		/// Sets and gets the Label property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public string Label
+		{
+			get => this._label;
 
-        private string _name = null;
+			set
+			{
+				if (this._label == value) {
+					return;
+				}
 
-        /// <summary>
-        /// Sets and gets the Name property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public string Name
-        {
-            get
-            {
-                return _name;
-            }
+				this._label = value;
+				this.RaisePropertyChanged(LabelPropertyName);
+			}
+		}
 
-            set
-            {
-                if (_name == value)
-                {
-                    return;
-                }
+		/// <summary>
+		/// The <see cref="Name" /> property's name.
+		/// </summary>
+		public const string NamePropertyName = "Name";
 
-                _name = value;
-                RaisePropertyChanged(NamePropertyName);
-            }
-        }
-        /// <summary>
-        /// The <see cref="Watermark" /> property's name.
-        /// </summary>
-        public const string WatermarkPropertyName = "Watermark";
+		private string _name = null;
 
-        private string _watermark = null;
+		/// <summary>
+		/// Sets and gets the Name property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public string Name
+		{
+			get => this._name;
 
-        /// <summary>
-        /// Sets and gets the Watermark property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string Watermark
-        {
-            get
-            {
-                return _watermark;
-            }
+			set
+			{
+				if (this._name == value) {
+					return;
+				}
 
-            set
-            {
-                if (_watermark == value)
-                {
-                    return;
-                }
+				this._name = value;
+				this.RaisePropertyChanged(NamePropertyName);
+			}
+		}
 
-                _watermark = value;
-                RaisePropertyChanged(WatermarkPropertyName);
-            }
-        }
-    }
+		/// <summary>
+		/// The <see cref="Watermark" /> property's name.
+		/// </summary>
+		public const string WatermarkPropertyName = "Watermark";
 
-    [Serializable]
-    public class ConfigFieldList : List<ConfigField>
-    {
-        public void Add( string name, string label, string watermark, FieldType dataType, object value, bool isVisible)
-        {
-            this.Add(new ConfigField(name, label, watermark, dataType, isVisible,  value));
-        }
+		private string _watermark = null;
 
-        public void Set( string name, object value )
-        {
-            var found = this.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-            if (found != null)
-                found.Value = value;
-        }
-    }
+		/// <summary>
+		/// Sets and gets the Watermark property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		public string Watermark
+		{
+			get => this._watermark;
 
+			set
+			{
+				if (this._watermark == value) {
+					return;
+				}
+
+				this._watermark = value;
+				this.RaisePropertyChanged(WatermarkPropertyName);
+			}
+		}
+	}
+
+	[Serializable]
+	public class ConfigFieldList : List<ConfigField>
+	{
+		public void Add(string name, string label, string watermark, FieldType dataType, object value, bool isVisible)
+		{
+			this.Add(new ConfigField(name, label, watermark, dataType, isVisible, value));
+		}
+
+		public void Set(string name, object value)
+		{
+			var found = this.FirstOrDefault(o => o.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+			if (found != null) {
+				found.Value = value;
+			}
+		}
+	}
 }

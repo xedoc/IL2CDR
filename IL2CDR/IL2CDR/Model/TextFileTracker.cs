@@ -8,131 +8,141 @@ using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
-    public class TextFileTracker : IStopStart
-    {
-        private FileSystemWatcher watcher;
-        private Dictionary<string, long> filePositions;
-        private ConcurrentQueue<string> logLinesQueue;
-        private string folder, mask;
+	public class TextFileTracker : IStopStart
+	{
+		private FileSystemWatcher watcher;
+		private readonly Dictionary<string, long> filePositions;
+		private ConcurrentQueue<string> logLinesQueue;
+		public string Folder { get; }
+		private readonly string mask;
 
-        public Func<string,bool> Preprocess { get; set; }
-        public Action<string> OnNewLine { get; set; }
-        public Action<string> OnFileCreation { get; set; }
-        public Action<string> OnChanged { get; set; }
-        public string CurrentFileName { get; set; }
-        public TextFileTracker(string folder, string mask)
-        {
-            this.folder = folder;
-            this.mask = mask;
-            filePositions = new Dictionary<string, long>();
-        }
-        public void SetupFolderWatcher()
-        {
-            if (String.IsNullOrWhiteSpace(folder))
-                return;
+		public Func<string, bool> Preprocess { get; set; }
+		public Action<string> OnNewLine { get; set; }
+		public Action<string> OnFileCreation { get; set; }
+		public Action<string> OnChanged { get; set; }
+		public string CurrentFileName { get; set; }
 
-            watcher = new FileSystemWatcher(folder,mask);
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
-            watcher.Changed += watcher_Changed;
-            watcher.Created += watcher_Changed;
-            watcher.EnableRaisingEvents = true;
-        }
-        void watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            var path = e.FullPath;
-            CurrentFileName = path;
-            if( e.ChangeType == WatcherChangeTypes.Created)
-            {
-                if (OnFileCreation != null)
-                    OnFileCreation(e.FullPath);
-            }
-            if( e.ChangeType != WatcherChangeTypes.Deleted )
-            {
-                if (Preprocess != null)
-                {
-                    bool handled = false;
-                    Util.Try(() => handled = Preprocess(File.ReadAllText(path)));
-                    if (handled)
-                        return;
-                }
-            }
 
-            if( e.ChangeType == WatcherChangeTypes.Changed )
-            {
-                if (OnChanged != null)
-                {
-                    OnChanged(e.FullPath);
-                }
-                if (OnNewLine != null)
-                {
-                    ReadNewLines(e.FullPath);
-                    string line = null;
-                    while( logLinesQueue.TryDequeue( out line ))
-                        OnNewLine(line);
-                }
-                    
-            }
-            
-        }
-        private void ReadNewLines( string path )
-        {
-            if (!filePositions.ContainsKey(path))
-                filePositions.Add(path, 0);
+		/// <summary>
+		/// This property answers the question, whether this component is running or not.
+		/// </summary>
+		public bool IsRunning { get; private set; }
 
-            var openException = Util.Try(() => {
-                using (Stream stream = File.Open(path, FileMode.Open))
-                {
-                    stream.Seek(filePositions[path], 0);
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        while (!reader.EndOfStream)
-                        {
-                            var e = Util.Try(() => logLinesQueue.Enqueue(reader.ReadLine()));
-                            if (e != null)
-                                Log.WriteError("Error reading line from {0} {1}", path, e.Message);
-                        }
-                        if( reader.BaseStream != null && reader.BaseStream.Position >= 0 )
-                            AddFileOffset( path, reader.BaseStream.Position );
-                    }
-                }            
-            });
 
-            if (openException != null)
-                Log.WriteError("Can't open a file {0} {1}", path, openException.Message);
+		public TextFileTracker(string folder, string mask)
+		{
+			this.Folder = folder;
+			this.mask = mask;
+			this.filePositions = new Dictionary<string, long>();
+		}
 
-        }
-        public void AddFileOffset( string path, long offset )
-        {
+		public void SetupFolderWatcher()
+		{
+			if (string.IsNullOrWhiteSpace(this.Folder)) {
+				return;
+			}
 
-            if( filePositions != null && 
-                !String.IsNullOrWhiteSpace(path) && 
-                offset >= 0 )
-            {
-                if (!filePositions.ContainsKey(path))
-                    filePositions.Add(path, offset);
-                else
-                    filePositions[path] = offset;
+			this.watcher = new FileSystemWatcher(this.Folder, this.mask) {
+				NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName
+			};
+			this.watcher.Changed += this.watcher_Changed;
+			this.watcher.Created += this.watcher_Changed;
+			this.watcher.EnableRaisingEvents = true;
+		}
 
-            }
-        }
-        public void Start()
-        {
-            logLinesQueue = new ConcurrentQueue<string>();
-            filePositions.Clear();
-            SetupFolderWatcher();
-        }
+		private void watcher_Changed(object sender, FileSystemEventArgs e)
+		{
+			var path = e.FullPath;
+			this.CurrentFileName = path;
+			if (e.ChangeType == WatcherChangeTypes.Created) {
+				this.OnFileCreation?.Invoke(e.FullPath);
+			}
 
-        public void Stop()
-        {
-            if( watcher != null )
-                watcher.EnableRaisingEvents = false;
-        }
+			if (e.ChangeType != WatcherChangeTypes.Deleted) {
+				if (this.Preprocess != null) {
+					var handled = false;
+					Util.Try(() => handled = this.Preprocess(File.ReadAllText(path)));
+					if (handled) {
+						return;
+					}
+				}
+			}
 
-        public void Restart()
-        {
-            Stop();
-            Start();
-        }
+			if (e.ChangeType == WatcherChangeTypes.Changed) {
+				this.OnChanged?.Invoke(e.FullPath);
 
-    }
+				if (this.OnNewLine != null) {
+					this.ReadNewLines(e.FullPath);
+					while (this.logLinesQueue.TryDequeue(out var line)) {
+						this.OnNewLine(line);
+					}
+				}
+			}
+		}
+
+		private void ReadNewLines(string path)
+		{
+			if (!this.filePositions.ContainsKey(path)) {
+				this.filePositions.Add(path, 0);
+			}
+
+			var openException = Util.Try(() => {
+				using (Stream stream = File.Open(path, FileMode.Open)) {
+					stream.Seek(this.filePositions[path], 0);
+					using (var reader = new StreamReader(stream)) {
+						while (!reader.EndOfStream) {
+							var e = Util.Try(() => this.logLinesQueue.Enqueue(reader.ReadLine()));
+							if (e != null) {
+								Log.WriteError("Error reading line from {0} {1}", path, e.Message);
+							}
+						}
+
+						if (reader.BaseStream != null && reader.BaseStream.Position >= 0) {
+							this.AddFileOffset(path, reader.BaseStream.Position);
+						}
+					}
+				}
+			});
+
+			if (openException != null) {
+				Log.WriteError("Can't open a file {0} {1}", path, openException.Message);
+			}
+		}
+
+		public void AddFileOffset(string path, long offset)
+		{
+			if (this.filePositions != null &&
+				!string.IsNullOrWhiteSpace(path) &&
+				offset >= 0) {
+				if (!this.filePositions.ContainsKey(path)) {
+					this.filePositions.Add(path, offset);
+				} else {
+					this.filePositions[path] = offset;
+				}
+			}
+		}
+
+		public void Start()
+		{
+			this.IsRunning = true; 
+			this.logLinesQueue = new ConcurrentQueue<string>();
+			this.filePositions.Clear();
+			this.SetupFolderWatcher();
+		}
+
+		public void Stop()
+		{
+			if (this.watcher != null) {
+				this.watcher.EnableRaisingEvents = false;
+			}
+
+			this.IsRunning = false; 
+		}
+
+		public void Restart()
+		{
+			this.Stop();
+			this.Start();
+		}
+	}
 }

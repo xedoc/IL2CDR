@@ -3,172 +3,192 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Xml.Serialization;
 using IL2CDR.Properties;
 
 namespace IL2CDR.Model
 {
-    [Serializable]
-    public class Config : NotifyPropertyChangeBase
-    {
-        public Config()
-        {
-            ScriptConfigs = new List<ScriptConfig>();
-        }
+	[Serializable]
+	public class Config : NotifyPropertyChangeBase
+	{
+		public Config()
+		{
+			this.ScriptConfigs = new List<ScriptConfig>();
+		}
 
-        /// <summary>
-        /// The <see cref="ScriptConfigs" /> property's name.
-        /// </summary>
-        public const string ScriptConfigsPropertyName = "ScriptConfigs";
 
-        private List<ScriptConfig> _scriptConfigs = null;
+		private List<ScriptConfig> _scriptConfigs = null;
 
-        /// <summary>
-        /// Sets and gets the ScriptConfigs property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlArray]
-        public List<ScriptConfig> ScriptConfigs
-        {
-            get
-            {
-                return _scriptConfigs;
-            }
+		/// <summary>
+		/// Sets and gets the ScriptConfigs property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlArray]
+		public List<ScriptConfig> ScriptConfigs
+		{
+			get => this._scriptConfigs;
 
-            set
-            {
-                if (_scriptConfigs == value)
-                {
-                    return;
-                }
+			set
+			{
+				if (this._scriptConfigs == value) {
+					return;
+				}
 
-                _scriptConfigs = value;
-                RaisePropertyChanged(ScriptConfigsPropertyName);
-            }
-        }
+				this._scriptConfigs = value;
+				this.RaisePropertyChanged(nameof(this.ScriptConfigs));
+			}
+		}
 
-        /// <summary>
-        /// The <see cref="IsChatMonitorEnabled" /> property's name.
-        /// </summary>
-        public const string IsChatMonitorEnabledPropertyName = "IsChatMonitorEnabled";
 
-        private bool _isChatMonitorEnabled = true;
+		private bool _isChatMonitorEnabled = true;
 
-        /// <summary>
-        /// Sets and gets the IsChatMonitorEnabled property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public bool IsChatMonitorEnabled
-        {
-            get
-            {
-                return _isChatMonitorEnabled;
-            }
+		/// <summary>
+		/// Sets and gets the IsChatMonitorEnabled property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsChatMonitorEnabled
+		{
+			get => this._isChatMonitorEnabled;
 
-            set
-            {
-                if (_isChatMonitorEnabled == value)
-                {
-                    return;
-                }
+			set
+			{
+				if (this._isChatMonitorEnabled == value) {
+					return;
+				}
 
-                _isChatMonitorEnabled = value;
-                RaisePropertyChanged(IsChatMonitorEnabledPropertyName);
-            }
-        }
+				this._isChatMonitorEnabled = value;
+				this.RaisePropertyChanged(nameof(this.IsChatMonitorEnabled));
+			}
+		}
 
-        /// <summary>
-        /// The <see cref="MissionLogCleanupInterval" /> property's name.
-        /// </summary>
-        public const string MissionLogCleanupIntervalPropertyName = "MissionLogCleanupInterval";
 
-        private int _missionLogCleanupInterval = 5;
+		private int _missionLogCleanupInterval = 5;
 
-        /// <summary>
-        /// Sets and gets the MissionLogCleanupInterval property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public int MissionLogCleanupInterval
-        {
-            get
-            {
-                return _missionLogCleanupInterval;
-            }
+		/// <summary>
+		/// Sets and gets the MissionLogCleanupInterval property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public int MissionLogCleanupInterval
+		{
+			get => this._missionLogCleanupInterval;
 
-            set
-            {
-                if (_missionLogCleanupInterval == value)
-                {
-                    return;
-                }
+			set
+			{
+				if (this._missionLogCleanupInterval == value) {
+					return;
+				}
 
-                _missionLogCleanupInterval = value;
-                RaisePropertyChanged(MissionLogCleanupIntervalPropertyName);
-            }
-        }
+				this._missionLogCleanupInterval = value;
+				this.RaisePropertyChanged(nameof(this.MissionLogCleanupInterval));
+			}
+		}
 
-        /// <summary>
-        /// The <see cref="IsMissionLogCleanupEnabled" /> property's name.
-        /// </summary>
-        public const string IsMissionLogCleanupEnabledPropertyName = "IsMissionLogCleanupEnabled";
 
-        private bool _isMissionLogCleanupEnabled = false;
+		private bool _isMissionLogCleanupEnabled = false;
 
-        /// <summary>
-        /// Sets and gets the IsMissionLogCleanupEnabled property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public bool IsMissionLogCleanupEnabled
-        {
-            get
-            {
-                return _isMissionLogCleanupEnabled;
-            }
+		/// <summary>
+		/// Sets and gets the IsMissionLogCleanupEnabled property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsMissionLogCleanupEnabled
+		{
+			get => this._isMissionLogCleanupEnabled;
 
-            set
-            {
-                if (_isMissionLogCleanupEnabled == value)
-                {
-                    return;
-                }
+			set
+			{
+				if (this._isMissionLogCleanupEnabled == value) {
+					return;
+				}
 
-                _isMissionLogCleanupEnabled = value;
-                RaisePropertyChanged(IsMissionLogCleanupEnabledPropertyName);
-            }
-        }
+				this._isMissionLogCleanupEnabled = value;
+				this.RaisePropertyChanged(nameof(this.IsMissionLogCleanupEnabled));
+			}
+		}
 
-        /// <summary>
-        /// The <see cref="IsMissionLogMonitorEnabled" /> property's name.
-        /// </summary>
-        public const string IsMissionLogMonitorEnabledPropertyName = "IsMissionLogMonitorEnabled";
 
-        private bool _isMissionLogMonitorEnabled = true;
+		private bool _isMissionLogMonitorEnabled = true;
 
-        /// <summary>
-        /// Sets and gets the IsMissionLogMonitorEnabled property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        [XmlAttribute]
-        public bool IsMissionLogMonitorEnabled
-        {
-            get
-            {
-                return _isMissionLogMonitorEnabled;
-            }
+		/// <summary>
+		/// Sets and gets the IsMissionLogMonitorEnabled property.
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsMissionLogMonitorEnabled
+		{
+			get => this._isMissionLogMonitorEnabled;
 
-            set
-            {
-                if (_isMissionLogMonitorEnabled == value)
-                {
-                    return;
-                }
+			set
+			{
+				if (this._isMissionLogMonitorEnabled == value) {
+					return;
+				}
 
-                _isMissionLogMonitorEnabled = value;
-                RaisePropertyChanged(IsMissionLogMonitorEnabledPropertyName);
-            }
-        }
-    }
+				this._isMissionLogMonitorEnabled = value;
+				this.RaisePropertyChanged(nameof(this.IsMissionLogMonitorEnabled));
+			}
+		}
+
+
+		private bool _isRConEnabled = true;
+
+		/// <summary>
+		/// Sets and gets the IsRConEnabled property -- whether this application should connect to the DServer via RCon. 
+		/// Changes to that property's value raise the PropertyChanged event. 
+		/// </summary>
+		[XmlAttribute]
+		public bool IsRConEnabled
+		{
+			get => this._isRConEnabled;
+
+			set
+			{
+				if (this._isRConEnabled == value) {
+					return;
+				}
+
+				this._isRConEnabled = value;
+				this.RaisePropertyChanged(nameof(this.IsRConEnabled));
+			}
+		}
+
+
+
+
+		private int _applicationLogBufferSize;
+
+		[XmlAttribute]
+		public int ApplicationLogBufferSize {
+			get => this._applicationLogBufferSize;
+
+			set {
+				if (this._applicationLogBufferSize == value) {
+					return;
+				}
+
+				this._applicationLogBufferSize = value;
+				this.RaisePropertyChanged(nameof(this.ApplicationLogBufferSize));
+			}
+		}
+
+
+		/// <summary>
+		/// The configuration setting of the RconLogin -- this is a static value, which is used as a fallback when no login is found in the DServer's startup.cfg. 
+		/// </summary>
+		[XmlAttribute]
+		public string RconStaticLogin { get; set; }
+
+
+		/// <summary>
+		/// The configuration setting of the RconPassword -- this is a static value, which is used as a fallback when no login is found in the DServer's startup.cfg. 
+		/// </summary>
+		[XmlAttribute]
+		public string RconStaticPassword { get; set; }
+
+
+
+	}
 }

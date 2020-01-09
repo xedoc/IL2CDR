@@ -7,22 +7,20 @@ using System.Windows.Controls;
 
 namespace IL2CDR.Control
 {
-    public class ScrollingTextBox : TextBox
-    {
+	public class ScrollingTextBox : TextBox
+	{
+		protected override void OnInitialized(EventArgs e)
+		{
+			base.OnInitialized(e);
+			this.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+			this.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+		}
 
-        protected override void OnInitialized(EventArgs e)
-        {
-            base.OnInitialized(e);
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-        }
-
-        protected override void OnTextChanged(TextChangedEventArgs e)
-        {
-            base.OnTextChanged(e);
-            CaretIndex = Text.Length;
-            ScrollToEnd();
-        }
-
-    }
+		protected override void OnTextChanged(TextChangedEventArgs e)
+		{
+			base.OnTextChanged(e);
+			this.CaretIndex = this.Text.Length;
+			this.ScrollToEnd();
+		}
+	}
 }

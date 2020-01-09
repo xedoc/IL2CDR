@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace IL2CDR.Model
 {
-    public interface IScriptManager
-    {
-        List<IActionScript> ActionScripts { get;}
-    }
+	public interface IScriptManager
+	{
+		List<IActionScript> ActionScripts { get; }
+	}
 }

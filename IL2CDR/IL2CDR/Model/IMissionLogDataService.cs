@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
-    public interface IMissionLogDataService
-    {
-        
-    }
+	public interface IMissionLogDataService
+	{
+	}
 }

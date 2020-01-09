@@ -15,14 +15,14 @@ using System.Windows.Shapes;
 
 namespace IL2CDR
 {
-    /// <summary>
-    /// Interaction logic for ScriptConfigField.xaml
-    /// </summary>
-    public partial class ScriptConfigField : UserControl
-    {
-        public ScriptConfigField()
-        {
-            InitializeComponent();
-        }
-    }
+	/// <summary>
+	/// Interaction logic for ScriptConfigField.xaml
+	/// </summary>
+	public partial class ScriptConfigField : UserControl
+	{
+		public ScriptConfigField()
+		{
+			this.InitializeComponent();
+		}
+	}
 }

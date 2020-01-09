@@ -6,31 +6,31 @@ using System.Threading.Tasks;
 
 namespace IL2CDR.Model
 {
-    public class Country
-    {
-        public Country(int id)
-        {
-            Id = id;
-            Name = GetCountryName(id);
-        }
-        public int Id { get; set; }
-        public string Name { get; set; }
+	public class Country
+	{
+		public Country(int id)
+		{
+			this.Id = id;
+			this.Name = this.GetCountryName(id);
+		}
 
-        private string GetCountryName(int id )
-        {
-            switch( id )
-            {
-                case 0:
-                    return "Neutral";
-               case 101:
-                    return "Russia";
-                case 201:
-                    return "Germany";
-                case 202:
-                    return "Italy";
+		public int Id { get; set; }
+		public string Name { get; set; }
 
-            }
-            return "Unknown";
-        }
-    }
+		private string GetCountryName(int id)
+		{
+			switch (id) {
+				case 0:
+					return "Neutral";
+				case 101:
+					return "Russia";
+				case 201:
+					return "Germany";
+				case 202:
+					return "Italy";
+			}
+
+			return "Unknown";
+		}
+	}
 }
